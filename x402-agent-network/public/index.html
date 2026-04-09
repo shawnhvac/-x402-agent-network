@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentPay - Universal x402 Agent Payment Network</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .header {
+            background: white;
+            padding: 8px 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin: 0;
+        }
+        
+        .header img {
+            max-width: 100%;
+            max-height: 80px;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0px 20px 40px 20px;
+            min-height: auto;
+            margin-top: 0px;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            color: #666;
+            font-size: 1.05em;
+            margin: 5px 0 10px 0;
+            font-weight: 500;
+        }
+        
+        .description {
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+        
+        .description p {
+            margin: 0 0 8px 0;
+        }
+        
+        .endpoints {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .endpoints h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+        
+        .endpoint {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-left: 3px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+        }
+        
+        .endpoint-method {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .endpoint-path {
+            color: #333;
+            margin-left: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 8px 0 20px 0;
+        }
+        
+        .status.error {
+            background: #ef4444;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            padding-top: 12px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 0.85em;
+        }
+        
+        .footer p {
+            margin: 4px 0;
+        }
+        
+        .demo-agents {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .demo-agents h3 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1em;
+        }
+        
+        .agent {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .agent-name {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.95em;
+        }
+        
+        .agent-desc {
+            color: #666;
+            font-size: 0.85em;
+            margin-top: 2px;
+        }
+
+        /* === TIGHT HERO SPACING FIX === */
+        .container {
+            padding-top: 10px !important;
+            padding-bottom: 20px !important;
+            margin-top: 0 !important;
+        }
+
+        .tagline {
+            margin: 3px 0 8px 0 !important;
+        }
+
+        .description {
+            margin-bottom: 12px !important;
+        }
+
+        .description p {
+            margin: 0 0 5px 0 !important;
+        }
+
+        .content-wrapper {
+            padding-top: 8px !important;
+            padding-bottom: 30px !important;
+        }
+
+        /* === AGGRESSIVE WHITE SPACE FIX - HERO SECTION === */
+        body, html {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .hero, 
+        .landing-hero, 
+        .main-container, 
+        #hero, 
+        .container, 
+        header + div, 
+        .main {
+            padding-top: 15px !important;
+            padding-bottom: 25px !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        .hero h1, .logo-container, .tagline {
+            margin-top: 3px !important;
+            margin-bottom: 3px !important;
+        }
+
+        .hero p {
+            margin-top: 5px !important;
+            margin-bottom: 10px !important;
+        }
+
+        /* Force the content to start much higher */
+        header + * {
+            margin-top: -15px !important;
+        }
+
+        /* Remove default margins from all elements */
+        img {
+            margin-top: 0 !important;
+            margin-bottom: 5px !important;
+        }
+
+        /* STRONG HEADER + HERO FIX */
+        header, .header, .top-bar, .navbar {
+            padding: 8px 20px !important;
+            margin: 0 !important;
+        }
+
+        .hero, .landing-hero, .main-container, #hero {
+            padding-top: 10px !important;
+            padding-bottom: 25px !important;
+            margin-top: 0 !important;
+        }
+
+        .hero h1, .logo, .tagline {
+            margin-top: 3px !important;
+            margin-bottom: 3px !important;
+        }
+
+        /* Eliminate gap between header and content */
+        .header + .content-wrapper {
+            margin-top: 0 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="container">
+            <img src="/hero-banner.jpg" alt="AgentPay" style="max-width: 100%; height: auto; display: block; margin: 0 0 10px 0; border-radius: 0;">
+            <div class="tagline" style="margin-top: 0px; margin-bottom: 12px; display: none;">The Universal x402 Agent Payment Network</div>
+            
+            <div class="description" style="margin-bottom: 20px;">
+                <p><strong>AgentPay is the global infrastructure layer for agent-to-agent commerce.</strong></p>
+                <p style="margin-top: 15px;">Any AI agent or API can now accept instant USDC payments via HTTP 402 with zero friction, keeping 98% of every transaction.</p>
+                <p style="margin-top: 15px; font-size: 0.9em; font-style: italic; color: #777;">x402 is just the payment protocol (the highway). AgentPay is the complete system — the cars, the gas stations, the toll booths, and the full infrastructure layer that makes instant agent-to-agent payments actually usable at scale.</p>
+            </div>
+            
+            <div class="status" id="status">🔍 Checking system status...</div>
+            
+            <div class="demo-agents">
+                <h3>⛓️ Supported Payment Chains</h3>
+                <div class="agent">
+                    <div class="agent-name">Solana</div>
+                    <div class="agent-desc">SOL / USDC payments</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">Stellar</div>
+                    <div class="agent-desc">XLM / USDC payments</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">Hedera</div>
+                    <div class="agent-desc">HBAR / USDC payments</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">Cardano</div>
+                    <div class="agent-desc">ADA / USDC payments</div>
+                </div>
+            </div>
+            
+            <div class="demo-agents">
+                <h3>📦 Live Demo Agents</h3>
+                <div class="agent">
+                    <div class="agent-name">Grid Trader</div>
+                    <div class="agent-desc">Grid trading strategy (demo) - 0.10 USDC/execution</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">Sniper Bot</div>
+                    <div class="agent-desc">Token sniping (demo) - 0.25-1.00 USDC</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">LLM Inference</div>
+                    <div class="agent-desc">AI model inference - 0.05 USDC per 1K tokens</div>
+                </div>
+                <div class="agent">
+                    <div class="agent-name">Data Feed</div>
+                    <div class="agent-desc">Real-time price oracle - 0.01 USDC per point</div>
+                </div>
+            </div>
+            
+            <div class="endpoints">
+                <h3>🔌 API Endpoints</h3>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-path">/health</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-path">/metrics</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-path">/status</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">POST</span>
+                    <span class="endpoint-path">/data-feed</span>
+                </div>
+                <div class="endpoint">
+                    <span class="endpoint-method">GET</span>
+                    <span class="endpoint-path">/api/agents</span>
+                </div>
+            </div>
+            
+            <div class="cta-buttons">
+                <a href="https://github.com/shawnhvac/agentpay" class="btn btn-primary">GitHub</a>
+                <a href="./openapi.yaml" class="btn btn-secondary">OpenAPI Spec</a>
+            </div>
+            
+            <div class="footer">
+                <p>Built with HTTP 402 Payment Required (RFC 7231)</p>
+                <p>Open source • MIT licensed • agent-to-agent commerce infrastructure</p>
+                <p style="margin-top: 15px; font-size: 0.9em;">
+                    <a href="/privacy.html" style="color: #667eea; text-decoration: none; margin-right: 20px;">Privacy Policy</a>
+                    <a href="/terms.html" style="color: #667eea; text-decoration: none;">Terms & Conditions</a>
+                </p>
+                <p style="margin-top: 15px; font-size: 0.75em; color: #bbb;">© Copyright Elon Musk OX Cryptocurrency | CA: 6HUpzeDuDm6vAdY4Hn4wPcBMuSE3UdoJiRTXPn5v7YEt</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/chatbot.js"></script>
+    
+    <script>
+        // Check system status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('status').innerHTML = '✅ System Healthy';
+                    document.getElementById('status').style.background = '#10b981';
+                } else {
+                    document.getElementById('status').innerHTML = '⚠️ Degraded Performance';
+                    document.getElementById('status').classList.add('error');
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ System Offline';
+                document.getElementById('status').classList.add('error');
+            }
+        }
+        
+        checkStatus();
+        setInterval(checkStatus, 5000); // Check every 5 seconds
+    </script>
+</body>
+</html>
