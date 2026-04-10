@@ -144,8 +144,11 @@ app.use("/agents", agentRoutes);
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
  */
 app.use("/", demoAgentRoutes);
+// Import at top
+import { appendFileSync } from 'fs';
+import { join as pathJoin } from 'path';
 /**
- * Contact form endpoint
+ * Contact form endpoint - Save to file
  */
 app.post("/api/contact", async (req, res) => {
     try {
@@ -154,35 +157,22 @@ app.post("/api/contact", async (req, res) => {
         if (!name || !email || !subject || !message) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-        // Send email using nodemailer (configure with Gmail SMTP)
-        const nodemailer = await import('nodemailer');
-        const transporter = nodemailer.default.createTransport({
-            service: 'gmail',
-            auth: {
-                user: process.env.SUPPORT_EMAIL_USER || 'lippertshawn@gmail.com',
-                pass: process.env.SUPPORT_EMAIL_PASS || '' // Set via .env
-            }
-        });
-        const mailOptions = {
-            from: email,
-            to: 'lippertshawn@gmail.com',
-            subject: `AgentPay Contact: ${subject}`,
-            html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>From:</strong> ${name} (${email})</p>
-        <p><strong>Subject:</strong> ${subject}</p>
-        <p><strong>Message:</strong></p>
-        <pre>${message}</pre>
-        <hr>
-        <p><small>Submitted from x402-agent-pay.com contact form</small></p>
-      `
+        // Save to contacts file
+        const contactsFile = pathJoin(process.cwd(), 'contacts.jsonl');
+        const contactEntry = {
+            timestamp: new Date().toISOString(),
+            name,
+            email,
+            subject,
+            message
         };
-        await transporter.sendMail(mailOptions);
-        res.json({ success: true, message: "Email sent successfully" });
+        appendFileSync(contactsFile, JSON.stringify(contactEntry) + '\n');
+        console.log(`📧 New contact: ${name} (${email}) - ${subject}`);
+        res.json({ success: true, message: "Message received! We'll get back to you soon." });
     }
     catch (error) {
         console.error("Contact form error:", error);
-        res.status(500).json({ error: "Failed to send email" });
+        res.status(500).json({ error: "Failed to process submission" });
     }
 });
 /**
