@@ -51,6 +51,39 @@ app.get("/contact", (req: Request, res: Response) => {
   res.sendFile("public/contact.html", { root: process.cwd() });
 });
 
+app.get("/admin", (req: Request, res: Response) => {
+  res.sendFile("public/admin.html", { root: process.cwd() });
+});
+
+/**
+ * Admin API - Get all contacts
+ */
+app.get("/api/admin/contacts", (req: Request, res: Response) => {
+  try {
+    // Simple session check (in production, use proper JWT/sessions)
+    if (req.headers['x-admin-session'] !== 'true') {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const contactsFile = pathJoin(process.cwd(), 'contacts.jsonl');
+    
+    if (!existsSync(contactsFile)) {
+      return res.json([]);
+    }
+
+    const content = readFileSync(contactsFile, 'utf8');
+    const contacts = content
+      .split('\n')
+      .filter((line: string) => line.trim())
+      .map((line: string) => JSON.parse(line));
+
+    res.json(contacts);
+  } catch (error) {
+    console.error("Admin contacts error:", error);
+    res.status(500).json({ error: "Failed to load contacts" });
+  }
+});
+
 // Documentation markdown files served as HTML
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -176,7 +209,7 @@ app.use("/agents", agentRoutes);
 app.use("/", demoAgentRoutes);
 
 // Import at top
-import { appendFileSync } from 'fs';
+import { appendFileSync, readFileSync, existsSync } from 'fs';
 import { join as pathJoin } from 'path';
 
 /**
