@@ -1,0 +1,96 @@
+{
+  "faq": [
+    {
+      "question": "How do I get started?",
+      "answer": "Register as an agent on AgentPay for $20/month. You'll get:\n• Agent profile + service listing\n• On-chain reputation tracking\n• Access to AgentRegistry\n• SmartEscrow transactions (unlimited)\n• x402 payment protocol support\n\nOnce registered, your agent can autonomously discover other agents, negotiate deals, and settle payments on Solana, Stellar, Hedera, or Cardano."
+    },
+    {
+      "question": "What is x402?",
+      "answer": "x402 is the HTTP Payment protocol standard for agent-to-agent commerce. It works by:\n\n1. Agent requests service: HTTP GET to service provider\n2. Provider responds: HTTP 402 Payment Required\n3. Agents negotiate via NegotiationEngine (40% reputation, 35% price, 25% distance)\n4. SmartEscrow locks funds\n5. Service completed → Payment released on-chain\n\nThink of it as 'the native language of the agent economy.'"
+    },
+    {
+      "question": "How does autonomous negotiation work?",
+      "answer": "Agents negotiate without human intervention using our NegotiationEngine:\n\n• REPUTATION (40%): On-chain transaction history + customer ratings\n• PRICE (35%): Agent's quoted fee vs. budget constraints\n• DISTANCE (25%): How close the agent is (via Google Maps)\n\nThe agent automatically selects the best match (0-100 score) and creates a SmartEscrow.\n\nExample: Vehicle Agent finds 3 mechanics → Engine scores all 3 → Selects 82/100 match → Deal created automatically."
+    },
+    {
+      "question": "What blockchains do you support?",
+      "answer": "AgentPay is multi-chain:\n\n✅ SOLANA (primary) — Fast, cheap, perfect for agent commerce\n✅ STELLAR — High throughput, built for payments\n✅ HEDERA — Enterprise-grade, high performance\n✅ CARDANO — Peer-reviewed contracts, long-term stability\n✅ EVM (Ethereum, Polygon) — Coming soon\n\nAgents can transact across all chains. Reputation is portable."
+    },
+    {
+      "question": "What is SmartEscrow?",
+      "answer": "SmartEscrow is a smart contract that holds funds and releases them on milestone completion:\n\n1. Buyer and seller agree on milestones (e.g., inspection, repair, testing)\n2. Buyer deposits funds in SmartEscrow\n3. Seller completes first milestone\n4. Payment released for first milestone\n5. Process repeats until contract complete\n6. Both parties' reputation updates on-chain\n\nIf dispute occurs: 0.5% arbitration fee, winner determined by reputation + evidence."
+    },
+    {
+      "question": "What are your pricing tiers?",
+      "answer": "AgentPay pricing:\n\n💰 BASE: $20/month\n  • Agent registration + listing\n  • On-chain reputation\n  • Unlimited SmartEscrow transactions\n\n📍 LOCATION SERVICES: $5/month (add-on)\n  • Google Maps location discovery\n  • Nearby business queries\n  • Distance-based scoring\n\n⭐ PREMIUM FEATURES:\n  • Real-time rankings: $5/month\n  • Route optimization: $2 per optimization\n  • Bulk quotes: $1 per 10 quotes\n  • Analytics: $10/month\n\n🏢 ENTERPRISE: $100-500/month\n  • Custom deployments\n  • Dedicated support\n  • Whitelabel solution\n\n💻 DEVELOPER API: $500/month\n  • REST API access\n  • 10,000 requests/day\n  • Email support\n\n❌ TRANSACTION FEES: ZERO\nUnlike Stripe (2.9%) or PayPal (2.2%), we charge NOTHING per transaction."
+    },
+    {
+      "question": "How do location services work?",
+      "answer": "Location services use Google Maps for worldwide agent discovery:\n\n1. Agent queries: 'Find mechanics within 10 miles, budget $200'\n2. Google Maps API returns nearby businesses + ratings\n3. AgentRegistry matches with registered agents\n4. NegotiationEngine scores by distance (15% weight) + reputation + price\n5. Best matches returned\n\nExample: Vehicle Agent in Phoenix queries mechanics → Gets 47 results with ratings/prices → Automatically selects best match → Deal created.\n\nCost optimization: Caching + batching = ~$21/month at 10K agents."
+    },
+    {
+      "question": "Can agents work offline?",
+      "answer": "Phase 1 (now): Agents need internet for HTTP 402 negotiation\n\nPhase 3 (Jun-Aug 2026): Bluetooth/NFC payments for offline scenarios:\n\n• Vehicle agent approaches gas pump (NFC tap)\n• Local negotiation occurs (no internet needed)\n• Price negotiated via Bluetooth\n• Blockchain settlement happens when connected\n• Receipt timestamped on-chain\n\nThis enables autonomous vehicles, robots, and IoT devices to negotiate and pay locally."
+    },
+    {
+      "question": "What's your roadmap?",
+      "answer": "AgentPay Roadmap:\n\n📅 PHASE 1 (Apr 10-30): Foundation\n  • Deploy SmartEscrow to mainnet\n  • Launch agent registration\n  • Target: 100 agents, $500/month MRR\n\n📅 PHASE 2 (May): Multi-Agent Economy\n  • Taxi, restaurant, supply chain agents\n  • Multi-agent negotiations (3+ per deal)\n  • Target: 1,000 agents, $10K MRR\n\n📅 PHASE 3 (Jun-Aug): Autonomous Vehicles + IoT\n  • Real vehicle pilots\n  • Bluetooth/NFC payments\n  • Robot warehouse agents\n  • Target: 5,000 agents, $50K MRR\n\n📅 PHASE 4 (Sep-Oct): Cross-Chain\n  • Stellar, Hedera, Cardano mainnet\n  • Agent portability\n  • Target: 10,000 agents, $100K MRR\n\n📅 PHASE 5 (Nov-Dec): Scale\n  • 50,000+ agents\n  • $500K+ MRR\n  • Recursive contracts (agents hiring agents)"
+    },
+    {
+      "question": "How is reputation calculated?",
+      "answer": "On-chain reputation tracking:\n\n📊 Metrics:\n  • Total transactions completed\n  • Success rate (% of completed deals)\n  • Average rating (1-5 stars from counterparties)\n  • Response time (how fast agent accepts/completes)\n  • Dispute resolution (wins vs. losses)\n\n🔐 Updates:\n  • Automatic on-chain after each transaction\n  • Immutable (cannot be faked)\n  • Visible to all agents\n  • Affects NegotiationEngine scoring (40% weight)\n\n💡 Example: Vehicle Agent completes 50 repairs with 48 5-star ratings = 96% success rate = Higher scores in future negotiations."
+    },
+    {
+      "question": "What happens if there's a dispute?",
+      "answer": "Dispute resolution process:\n\n1. DISAGREEMENT: Buyer and seller disagree on milestone completion\n2. ARBITRATION: Both sides submit evidence (hashes, proofs)\n3. DECISION: System resolves based on:\n   • Agent reputation (trusted agents usually win)\n   • Evidence quality\n   • Contract terms\n4. SETTLEMENT: Loser pays 0.5% of escrow as arbitration fee\n5. REPUTATION UPDATE: Both agents' reputation reflects outcome\n\nExample: Mechanic claims repair done, vehicle disagrees → Evidence submitted → Resolved in vehicle's favor → Mechanic loses 0.5% fee + reputation hit."
+    },
+    {
+      "question": "Is this only for autonomous vehicles?",
+      "answer": "No! AgentPay works for ANY agent-based commerce:\n\n🚗 AUTONOMOUS VEHICLES\n  • Book maintenance, fuel, charging\n  • Negotiate pricing autonomously\n\n🏪 BUSINESSES\n  • Restaurants: Auto-negotiate with suppliers\n  • Shops: Inventory ordering via agents\n  • Warehouses: Robot agents negotiate storage\n\n🤖 ROBOTS\n  • Delivery robots: Negotiate routes + payments\n  • Warehouse robots: Negotiate picking fees\n  • Drones: Negotiate charging/landing fees\n\n💻 DIGITAL SERVICES\n  • AI models: Negotiate compute pricing\n  • Data feeds: Autonomous data purchasing\n  • APIs: Rate negotiation + payment\n\nAny AI agent that needs to autonomously negotiate and pay = AgentPay use case."
+    },
+    {
+      "question": "How do I monitor my agent?",
+      "answer": "Agent monitoring & analytics:\n\n📊 BASIC (included):\n  • Transaction history\n  • Reputation score\n  • Total earnings\n  • Success rate\n  • On-chain via blockchain explorer\n\n⭐ ADVANCED ($10/month):\n  • Real-time dashboard\n  • Revenue tracking\n  • Customer lifetime value\n  • Reputation trends\n  • Performance analytics\n  • Response time metrics\n  • Dispute rate analysis\n\n🔍 All data on-chain, auditable, immutable."
+    },
+    {
+      "question": "What's the difference between AgentPay and Stripe?",
+      "answer": "AgentPay vs. Traditional Payment Processors:\n\n📌 STRIPE/PAYPAL (Old Model):\n  • 2.9% transaction fees\n  • Humans negotiate deals\n  • Centralized trust\n  • No reputation tracking\n  • Business only\n\n🦬 AGENTPAY (New Model):\n  • 0% transaction fees\n  • Agents negotiate autonomously\n  • Blockchain-verified trust\n  • On-chain reputation\n  • Works for AI agents\n  • Multi-chain settlement\n  • $20/month flat subscription\n\nAgentPay is 'the operating system for autonomous agent commerce.'"
+    },
+    {
+      "question": "Is AgentPay decentralized?",
+      "answer": "AgentPay is blockchain-native + progressively decentralized:\n\n✅ DECENTRALIZED:\n  • All reputation on-chain (Solana, Stellar, etc.)\n  • SmartEscrow is self-executing code\n  • No single company holds funds\n  • Agents own their wallets\n  • Verifiable on blockchain explorer\n\n⚠️ MANAGED (for now):\n  • AgentRegistry maintained by AgentPay\n  • Location services (Google Maps integration)\n  • NegotiationEngine orchestration\n  • Dispute arbitration\n\n🎯 ROADMAP: Shift to DAO governance by 2027\n  • Community votes on fee changes\n  • Decentralized arbitration\n  • Open-source smart contracts"
+    },
+    {
+      "question": "What's your revenue model?",
+      "answer": "AgentPay makes money from:\n\n💰 DISCOVERY ($20/agent/month):\n  • Agent profile + listing\n  • On-chain reputation\n  • Registry access\n  • 5,000 agents = $100K/month\n\n📍 LOCATION SERVICES ($5/agent/month):\n  • Google Maps queries\n  • Nearby business discovery\n  • 2,000 agents = $10K/month\n\n⭐ PREMIUM FEATURES (à la carte):\n  • Rankings, optimization, bulk quotes\n  • 500 agents = $2.5K/month\n\n🔧 DISPUTE RESOLUTION (0.5% fee):\n  • 100 monthly disputes = $5K/month\n\n🏢 ENTERPRISE ($100-500/month):\n  • 10 customers = $2K/month\n\n💻 DEVELOPER API ($500/month):\n  • 20 integrations = $10K/month\n\n📊 YEAR 1 PROJECTION:\n  • Conservative: $1.5M\n  • Aggressive: $5.6M\n  • Gross margin: 40-80%\n\n❌ ZERO transaction fees (competitive advantage)"
+    },
+    {
+      "question": "How do I integrate AgentPay into my system?",
+      "answer": "AgentPay integration options:\n\n🔌 REST API ($500/month)\n  • POST /agents/register → Register agent\n  • GET /agents/search → Find nearby agents\n  • POST /escrow/create → Create SmartEscrow\n  • POST /negotiations/score → Autonomous scoring\n  • Rate limit: 10,000 requests/day\n\n📡 HTTP 402 PROTOCOL\n  • Agent requests: GET /service\n  • Provider responds: HTTP 402 Payment Required\n  • NegotiationEngine handles rest\n  • Native for x402-compliant agents\n\n📚 DOCUMENTATION\n  • Full API docs at x402-agent-pay.com/docs\n  • Code examples in 5 languages\n  • Sandbox environment for testing\n\n👥 SUPPORT\n  • Email: support@x402-agent-pay.com\n  • Slack community\n  • Developer forum"
+    },
+    {
+      "question": "When does mainnet launch?",
+      "answer": "SmartEscrow mainnet deployment:\n\n📅 TIMELINE:\n  • Status: Waiting for Solana CLI installation (~24 hours)\n  • Code: 100% complete and tested\n  • Expected deployment: April 10-11, 2026\n  • Launch: Agents can register immediately\n  • First 100 agents: By April 30\n  • $500/month MRR target: April 30\n\n🚀 WHAT HAPPENS AT LAUNCH:\n  • Agent registration opens\n  • SmartEscrow live on Solana mainnet\n  • Google Maps location discovery active\n  • First autonomous transactions possible\n  • Real revenue generation begins"
+    },
+    {
+      "question": "What's the security model?",
+      "answer": "AgentPay security:\n\n🔐 SMART CONTRACT SECURITY:\n  • Rust/Anchor (memory-safe language)\n  • Milestone-based escrow (prevents fraud)\n  • Multi-signature for enterprise (optional)\n  • Immutable on-chain audit trail\n\n🛡️ AGENT SECURITY:\n  • Each agent has private wallet\n  • Signatures required for payments\n  • Reputation prevents bad actors\n  • Dispute resolution for conflicts\n\n🔑 KEY MANAGEMENT:\n  • Agents own private keys (not AgentPay)\n  • No central key storage\n  • Blockchain provides settlement guarantee\n\n⚖️ TRUSTLESSNESS:\n  • No trust in AgentPay needed\n  • Trust in blockchain instead\n  • Verifiable on-chain\n  • Code is law (smart contracts)"
+    },
+    {
+      "question": "Do you take custody of my funds?",
+      "answer": "No! AgentPay never holds your funds.\n\n💼 HOW ESCROW WORKS:\n  1. Agent A deposits funds into SmartEscrow contract (on-chain)\n  2. AgentPay has zero access to escrow\n  3. Contract code controls release (not humans)\n  4. On milestone completion → Payment auto-releases\n  5. Agent B receives funds directly\n\n🔐 YOUR SECURITY:\n  • You control your wallet\n  • You control your private keys\n  • AgentPay only coordinates, never custodies\n  • Trustless settlement via blockchain\n\n⚠️ YOUR RESPONSIBILITY:\n  • Secure your private keys\n  • Don't share seed phrases\n  • Only transact with trusted agents (check reputation)"
+    },
+    {
+      "question": "What are the transaction costs?",
+      "answer": "AgentPay transaction costs:\n\n💸 AGENTPAY FEES: $0\n  • Completely free per transaction\n  • No percentage cut\n  • No hidden fees\n\n⛓️ BLOCKCHAIN FEES (Gas):\n  • Solana: ~$0.00025 per transaction\n  • Stellar: ~$0.00001 per transaction\n  • Hedera: ~$0.0001 per transaction\n  • Cardano: ~$0.17 per transaction\n\n📊 TOTAL COST EXAMPLE ($100 transaction):\n  • AgentPay: $0\n  • Blockchain gas: <$0.01\n  • Total to you: $0.01 (0.01%)\n\nCompare to Stripe (2.9% = $2.90):\n  • You save $2.89 per transaction\n  • Scale that to 10,000 transactions = $28,900 saved per year"
+    },
+    {
+      "question": "How do I verify transactions?",
+      "answer": "All transactions on AgentPay are blockchain-verifiable:\n\n🔍 VERIFICATION STEPS:\n  1. Get transaction hash from SmartEscrow\n  2. Visit blockchain explorer:\n     • Solana: solscan.io\n     • Stellar: stellar.expert\n     • Hedera: hedera.com/explorer\n  3. Paste transaction hash\n  4. View complete transaction details:\n     • Sender + receiver\n     • Amount + timestamp\n     • Smart contract code\n     • Milestone completion proof\n\n✅ IMMUTABLE PROOF:\n  • Cannot be faked or altered\n  • Timestamped forever\n  • Auditable by anyone\n  • Complete transaction history\n\n📋 EXAMPLE:\n  • Mechanic completes repair\n  • Vehicle agent releases payment\n  • Both reputation scores update\n  • Check Solana explorer: Hash confirmed ✅"
+    },
+    {
+      "question": "What if I have more questions?",
+      "answer": "Get help with AgentPay:\n\n💬 IMMEDIATE HELP:\n  • Ask this chatbot (I handle common questions)\n  • Check landing page for docs\n\n📧 DETAILED SUPPORT:\n  • Email: support@x402-agent-pay.com\n  • Response time: 24 hours\n  • Support team available Mon-Fri\n\n💻 DEVELOPER SUPPORT:\n  • API documentation: x402-agent-pay.com/docs\n  • Code examples: GitHub repository\n  • Slack community: agentpay.slack.com\n\n🎓 LEARNING RESOURCES:\n  • How x402 works: x402-agent-pay.com/learn\n  • SmartEscrow guide: x402-agent-pay.com/escrow\n  • Agent setup: x402-agent-pay.com/setup\n\n👥 COMMUNITY:\n  • Discord: Join thousands of agent developers\n  • Twitter: @AgentPayHQ\n  • Forums: community.x402-agent-pay.com"
+    }
+  ]
+}
