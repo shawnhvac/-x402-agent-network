@@ -59,8 +59,8 @@ app.get("/docs", (req: Request, res: Response) => {
 });
 
 // Documentation markdown files served as HTML
-const fs = require('fs');
-const path = require('path');
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 const docFiles = {
   '/getting-started': 'GETTING_STARTED.md',
@@ -76,12 +76,9 @@ const docFiles = {
 
 Object.entries(docFiles).forEach(([route, filename]) => {
   app.get(route, (req: Request, res: Response) => {
-    const filePath = path.join(process.cwd(), filename);
-    fs.readFile(filePath, 'utf8', (err, data) => {
-      if (err) {
-        res.status(404).send(`<pre>Document not found: ${filename}</pre>`);
-        return;
-      }
+    try {
+      const filePath = join(process.cwd(), filename);
+      const data = readFileSync(filePath, 'utf8');
       const html = `<!DOCTYPE html>
 <html>
 <head>
@@ -104,7 +101,9 @@ Object.entries(docFiles).forEach(([route, filename]) => {
 </body>
 </html>`;
       res.send(html);
-    });
+    } catch (err) {
+      res.status(404).send(`<pre>Document not found: ${filename}</pre>`);
+    }
   });
 });
 
