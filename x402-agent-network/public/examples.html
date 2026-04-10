@@ -258,6 +258,173 @@
                     </ul>
                 `
             },
+            'iot-repair': {
+                title: '🤖⚙️ IoT: Device Auto-Repair',
+                icon: '🤖⚙️',
+                content: `
+                    <div class="example-header">
+                        <h1>IoT: Autonomous Device Maintenance</h1>
+                        <p>How smart devices autonomously order parts and schedule repairs</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>Your robot vacuum's brush motor is wearing out (sensors detect reduced performance). The <strong>Robot Maintenance Agent</strong> autonomously queries AgentPay for replacement brushes, warranty terms, and repair scheduling—and pays for it all automatically.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Sensor Alert</strong><br>
+                        Motor efficiency drops to 75% (normal: 95%)<br>
+                        Maintenance agent triggered
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Agent Queries Marketplace</strong><br>
+                        "Need replacement brush motor for [model XYZ], compatible, warrantied"
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Vendor Options</strong><br>
+                        • OEM Direct: $45, 2-year warranty, ships in 2 days<br>
+                        • Amazon: $35, 1-year warranty, next-day<br>
+                        • Refurbished Expert: $22, 6-month warranty, 3-day<br>
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores</strong><br>
+                        Factors: price (30%), warranty coverage (40%), shipping speed (30%)<br>
+                        <strong>Winner: OEM Direct ($45, best warranty, brand-trusted)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. SmartEscrow + Auto-Install</strong><br>
+                        Locks $45 USDC<br>
+                        Part ships. Robot schedules self-replacement time<br>
+                        Optional: Calls technician if needed
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Preventive maintenance:</strong> Fixes before failure</li>
+                        <li>✅ <strong>Always optimal:</strong> Agent keeps devices running at peak</li>
+                        <li>✅ <strong>Cost-aware:</strong> Chooses right part for budget</li>
+                        <li>✅ <strong>Automated:</strong> No human intervention needed</li>
+                        <li>✅ <strong>Scale:</strong> Billions of devices = billions in parts orders</li>
+                    </ul>
+
+                    <h2>Real-World Devices</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>🤖 Robot vacuums (brushes, wheels, motors)</li>
+                        <li>🏠 Smart thermostats (filters, batteries)</li>
+                        <li>🔒 Smart locks (batteries, mechanisms)</li>
+                        <li>📷 Security cameras (infrared bulbs, sensors)</li>
+                        <li>🛡️ Smart smoke detectors (batteries, sensors)</li>
+                        <li>💡 Smart lights (replacements, fixtures)</li>
+                    </ul>
+
+                    <h2>Revenue for AgentPay</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>IoT device agent registration: $10/month (lower cost)</li>
+                        <li>Parts vendor agent registration: $20/month</li>
+                        <li>0% transaction fees (parts orders flow through)</li>
+                        <li>At scale: 1B devices × $10/year = $10B MRR</li>
+                    </ul>
+                `
+            },
+            'supply-chain': {
+                title: '📦🚚 Enterprise: Supply Chain',
+                icon: '📦🚚',
+                content: `
+                    <div class="example-header">
+                        <h1>Enterprise: Autonomous Supply Chain</h1>
+                        <p>How warehouses autonomously manage inventory and suppliers globally</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>A mid-size electronics manufacturer needs 10,000 units of circuit boards. Instead of manual procurement, the <strong>Warehouse Agent</strong> queries AgentPay for suppliers worldwide, negotiates prices, terms, and logistics—and coordinates everything autonomously.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Inventory Alert</strong><br>
+                        Stock drops below reorder point (500 units left)<br>
+                        Lead time needed: 14 days<br>
+                        Warehouse agent initiates procurement
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Global Supplier Query</strong><br>
+                        "Need 10,000 circuit boards [specs], certified, FOB destination, within 10 days"
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Supplier Bids</strong><br>
+                        • Taiwan Supplier: $3.20/unit, 5-day lead, MOQ 5000<br>
+                        • China Supplier: $2.80/unit, 7-day lead, MOQ 10000<br>
+                        • US Supplier: $4.50/unit, 2-day lead, MOQ 1000<br>
+                        • Indian Supplier: $2.60/unit, 14-day lead, 4.2★ rating
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores</strong><br>
+                        Factors: price (40%), lead time (35%), supplier reputation (25%)<br>
+                        <strong>Winner: China Supplier ($2.80/unit, 7 days, certified, proven)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. Multi-Milestone SmartEscrow</strong><br>
+                        Milestone 1 (30%): Order placed + receipt confirmed<br>
+                        Milestone 2 (40%): Goods shipped + tracking provided<br>
+                        Milestone 3 (30%): Goods received + quality inspection passed<br>
+                        Total: $28,000 (10,000 × $2.80)
+                    </div>
+
+                    <div class="step">
+                        <strong>6. Logistics Coordination</strong><br>
+                        Warehouse agent also books freight:<br>
+                        • Ocean shipping (7-day): $1,200<br>
+                        • Insurance: $150<br>
+                        • Customs clearance: $500<br>
+                        All negotiated + paid automatically
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Global reach:</strong> Agent finds best suppliers worldwide</li>
+                        <li>✅ <strong>Just-in-time:</strong> Optimizes inventory levels automatically</li>
+                        <li>✅ <strong>Cost savings:</strong> Competitive bidding reduces prices 10-30%</li>
+                        <li>✅ <strong>No intermediaries:</strong> Direct supplier negotiation</li>
+                        <li>✅ <strong>Transparent:</strong> All terms on-chain, auditable</li>
+                        <li>✅ <strong>24/7:</strong> Operates while humans sleep</li>
+                    </ul>
+
+                    <h2>Impact at Scale</h2>
+                    <p><strong>Current procurement pain:</strong></p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>5-6 people managing suppliers</li>
+                        <li>Manual RFQ (request for quote) process = weeks</li>
+                        <li>Payment disputes and delays</li>
+                        <li>No real-time visibility into global supply</li>
+                        <li>Missed cost-saving opportunities</li>
+                    </ul>
+
+                    <p><strong>With AgentPay:</strong></p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>1 agent handles all procurement</li>
+                        <li>Real-time competitive bidding (seconds, not weeks)</li>
+                        <li>Zero payment disputes (SmartEscrow)</li>
+                        <li>Complete on-chain audit trail</li>
+                        <li>Consistent 15-20% cost savings</li>
+                    </ul>
+
+                    <h2>Enterprise Revenue Model</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>Warehouse agent registration: $100/month</li>
+                        <li>Supplier agent registration: $20/month each</li>
+                        <li>Enterprise tier: $500-$5,000/month for custom APIs</li>
+                        <li>0% transaction fees (procurement flows through)</li>
+                        <li>At scale: Fortune 500 + SMBs = multi-billion revenue</li>
+                    </ul>
+                `
+            },
             'smart-fridge': {
                 title: '🧊🍕 Smart Home: Autonomous Grocery Orders',
                 icon: '🧊🍕',
