@@ -1,0 +1,91 @@
+{
+  "session_start": "2026-03-29T21:19:37.557792",
+  "scans": 134000,
+  "opportunities": [
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110038.42373485611,
+      "fee_adjusted_pct": 110037.52373485612,
+      "final_value": 1101.384237348561,
+      "wouldbe_pnl_25": 27509.60593371403
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110038.42373485611,
+      "fee_adjusted_pct": 110037.52373485612,
+      "final_value": 1101.384237348561,
+      "wouldbe_pnl_25": 27509.60593371403
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110044.2510974325,
+      "fee_adjusted_pct": 110043.3510974325,
+      "final_value": 1101.442510974325,
+      "wouldbe_pnl_25": 27511.062774358124
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110055.64122262622,
+      "fee_adjusted_pct": 110054.74122262622,
+      "final_value": 1101.5564122262622,
+      "wouldbe_pnl_25": 27513.910305656555
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.53983417574,
+      "fee_adjusted_pct": 110053.63983417574,
+      "final_value": 1101.5453983417574,
+      "wouldbe_pnl_25": 27513.634958543935
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.53983417574,
+      "fee_adjusted_pct": 110053.63983417574,
+      "final_value": 1101.5453983417574,
+      "wouldbe_pnl_25": 27513.634958543935
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110055.60808750197,
+      "fee_adjusted_pct": 110054.70808750197,
+      "final_value": 1101.5560808750197,
+      "wouldbe_pnl_25": 27513.902021875492
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.5066993828,
+      "fee_adjusted_pct": 110053.6066993828,
+      "final_value": 1101.545066993828,
+      "wouldbe_pnl_25": 27513.6266748457
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.5066993828,
+      "fee_adjusted_pct": 110053.6066993828,
+      "final_value": 1101.545066993828,
+      "wouldbe_pnl_25": 27513.6266748457
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.5066993828,
+      "fee_adjusted_pct": 110053.6066993828,
+      "final_value": 1101.545066993828,
+      "wouldbe_pnl_25": 27513.6266748457
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.5066993828,
+      "fee_adjusted_pct": 110053.6066993828,
+      "final_value": 1101.545066993828,
+      "wouldbe_pnl_25": 27513.6266748457
+    },
+    {
+      "loop": "USD \u2192 ETH \u2192 BTC \u2192 USD (implied)",
+      "gross_pct": 110054.5066993828,
+      "fee_adjusted_pct": 110053.6066993828,
+      "final_value": 1101.545066993828,
+      "wouldbe_pnl_25": 27513.6266748457
+    }
+  ],
+  "mode": "PAPER ONLY"
+}

@@ -1,0 +1,238 @@
+[2026-03-26T01:40:17+00:00] 🦬 Polymarket Auto-Trader Started
+[2026-03-26T01:40:17+00:00] Mode: Silent (no alerts)
+[2026-03-26T01:40:17+00:00] Strategy: Sum-to-one hedging on BTC/ETH 5/15-min markets
+[2026-03-26T01:40:17+00:00] Scanning for opportunities...
+[2026-03-26T01:40:18+00:00] No short-duration BTC markets found
+[2026-03-26T01:41:18+00:00] Scanning for opportunities...
+[2026-03-26T01:41:19+00:00] No short-duration BTC markets found
+[2026-03-26T01:42:19+00:00] Scanning for opportunities...
+[2026-03-26T01:42:19+00:00] No short-duration BTC markets found
+[2026-03-26T01:43:17+00:00] 🦬 Polymarket Auto-Trader Started (Dynamic Short-Duration Mode)
+[2026-03-26T01:43:17+00:00] Strategy: Sum-to-one hedging on ALL short-duration BTC/ETH markets
+[2026-03-26T01:43:17+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:43:19+00:00] Found 1 potential markets
+[2026-03-26T01:43:19+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:44:19+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:44:20+00:00] Found 1 potential markets
+[2026-03-26T01:44:20+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:45:20+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:45:22+00:00] Found 1 potential markets
+[2026-03-26T01:45:22+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:46:22+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:46:23+00:00] Found 1 potential markets
+[2026-03-26T01:46:23+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:47:23+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:47:25+00:00] Found 2 potential markets
+[2026-03-26T01:47:25+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:48:25+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:48:26+00:00] Found 2 potential markets
+[2026-03-26T01:48:26+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:49:26+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:49:28+00:00] Found 2 potential markets
+[2026-03-26T01:49:28+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:50:28+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:50:29+00:00] Found 1 potential markets
+[2026-03-26T01:50:29+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:51:29+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:51:31+00:00] Found 1 potential markets
+[2026-03-26T01:51:31+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:52:31+00:00] Scanning for short-duration crypto markets...
+[2026-03-26T01:52:32+00:00] Found 1 potential markets
+[2026-03-26T01:52:32+00:00] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:53:20.074947] 🦬 Polymarket Aggressive Trader Started
+[2026-03-26T01:53:20.075087] Strategy: Live short-duration crypto Up/Down markets only
+[2026-03-26T01:53:20.075191] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:53:21.089988] Found 0 live short-duration crypto markets
+[2026-03-26T01:53:21.090166] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:54:21.090355] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:54:21.298917] Found 0 live short-duration crypto markets
+[2026-03-26T01:54:21.299104] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:55:21.299287] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:55:21.514545] Found 0 live short-duration crypto markets
+[2026-03-26T01:55:21.514730] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:56:21.514920] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:56:21.870667] Found 0 live short-duration crypto markets
+[2026-03-26T01:56:21.870857] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:57:21.871041] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:57:22.067336] Found 0 live short-duration crypto markets
+[2026-03-26T01:57:22.067522] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:58:22.067718] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:58:22.257246] Found 0 live short-duration crypto markets
+[2026-03-26T01:58:22.257491] No opportunities found (all sums >= 0.99)
+[2026-03-26T01:59:22.257673] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T01:59:22.640848] Found 0 live short-duration crypto markets
+[2026-03-26T01:59:22.641073] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:00:22.641268] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:00:22.891408] Found 0 live short-duration crypto markets
+[2026-03-26T02:00:22.891719] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:01:22.891916] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:01:23.100018] Found 0 live short-duration crypto markets
+[2026-03-26T02:01:23.100198] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:02:23.100371] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:02:23.719086] Found 0 live short-duration crypto markets
+[2026-03-26T02:02:23.719305] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:03:23.719724] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:03:23.958664] Found 0 live short-duration crypto markets
+[2026-03-26T02:03:23.958875] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:04:23.959041] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:04:24.198683] Found 0 live short-duration crypto markets
+[2026-03-26T02:04:24.198873] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:05:24.199048] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:05:24.576716] Found 0 live short-duration crypto markets
+[2026-03-26T02:05:24.576943] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:06:24.577143] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:06:24.791532] Found 0 live short-duration crypto markets
+[2026-03-26T02:06:24.791745] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:07:24.791908] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:07:25.018470] Found 0 live short-duration crypto markets
+[2026-03-26T02:07:25.018664] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:08:25.018832] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:08:25.385458] Found 0 live short-duration crypto markets
+[2026-03-26T02:08:25.385644] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:09:25.385833] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:09:25.581471] Found 0 live short-duration crypto markets
+[2026-03-26T02:09:25.581683] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:10:25.581866] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:10:25.777209] Found 0 live short-duration crypto markets
+[2026-03-26T02:10:25.777390] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:11:25.777540] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:11:26.108086] Found 0 live short-duration crypto markets
+[2026-03-26T02:11:26.108370] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:12:26.108537] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:12:26.324660] Found 0 live short-duration crypto markets
+[2026-03-26T02:12:26.324846] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:13:26.325027] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:13:26.549088] Found 0 live short-duration crypto markets
+[2026-03-26T02:13:26.549271] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:14:26.549432] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:14:26.906295] Found 0 live short-duration crypto markets
+[2026-03-26T02:14:26.906479] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:15:26.906661] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:15:27.104833] Found 0 live short-duration crypto markets
+[2026-03-26T02:15:27.105039] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:16:27.105302] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:16:27.315950] Found 0 live short-duration crypto markets
+[2026-03-26T02:16:27.316218] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:17:27.316408] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:17:27.694064] Found 0 live short-duration crypto markets
+[2026-03-26T02:17:27.694261] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:18:27.694888] Scanning for live Up/Down markets with valid prices...
+[2026-03-26T02:18:27.911631] Found 0 live short-duration crypto markets
+[2026-03-26T02:18:27.911804] No opportunities found (all sums >= 0.99)
+[2026-03-26T02:19:41.392406] 🦬 Polymarket Up/Down Trader Started
+[2026-03-26T02:19:41.392526] Target: 5m/15m BTC/ETH/SOL rolling markets
+[2026-03-26T02:19:42.368215] Scan: 0 live 5m/15m markets
+[2026-03-26T02:20:13.247448] Scan: 0 live 5m/15m markets
+[2026-03-26T02:20:44.272569] Scan: 0 live 5m/15m markets
+[2026-03-26T02:21:15.133617] Scan: 0 live 5m/15m markets
+[2026-03-26T02:21:46.059935] Scan: 0 live 5m/15m markets
+[2026-03-26T02:22:16.927231] Scan: 0 live 5m/15m markets
+[2026-03-26T02:22:47.819592] Scan: 0 live 5m/15m markets
+[2026-03-26T02:23:18.842934] Scan: 0 live 5m/15m markets
+[2026-03-26T02:23:49.870600] Scan: 0 live 5m/15m markets
+[2026-03-26T02:24:20.749990] Scan: 0 live 5m/15m markets
+[2026-03-26T02:24:51.621240] Scan: 0 live 5m/15m markets
+[2026-03-26T02:25:22.479483] Scan: 0 live 5m/15m markets
+[2026-03-26T02:25:53.353734] Scan: 0 live 5m/15m markets
+[2026-03-26T02:26:24.210078] Scan: 0 live 5m/15m markets
+[2026-03-26T02:26:55.065901] Scan: 0 live 5m/15m markets
+[2026-03-26T02:27:25.940891] Scan: 0 live 5m/15m markets
+[2026-03-26T02:27:56.778902] Scan: 0 live 5m/15m markets
+[2026-03-26T02:28:27.660629] Scan: 0 live 5m/15m markets
+[2026-03-26T02:28:58.527229] Scan: 0 live 5m/15m markets
+[2026-03-26T02:29:29.412565] Scan: 0 live 5m/15m markets
+[2026-03-26T02:30:00.288326] Scan: 0 live 5m/15m markets
+[2026-03-26T02:30:31.200018] Scan: 0 live 5m/15m markets
+[2026-03-26T02:31:02.346163] Scan: 0 live 5m/15m markets
+[2026-03-26T02:31:33.227206] Scan: 0 live 5m/15m markets
+[2026-03-26T02:32:04.086391] Scan: 0 live 5m/15m markets
+[2026-03-26T02:32:34.980172] Scan: 0 live 5m/15m markets
+[2026-03-26T02:33:05.897793] Scan: 0 live 5m/15m markets
+[2026-03-26T02:33:39.613177] Scan: 0 live 5m/15m markets
+[2026-03-26T02:34:10.494667] Scan: 0 live 5m/15m markets
+[2026-03-26T02:34:41.355444] Scan: 0 live 5m/15m markets
+[2026-03-26T02:35:12.262573] Scan: 0 live 5m/15m markets
+[2026-03-26T02:35:43.129395] Scan: 0 live 5m/15m markets
+[2026-03-26T02:36:14.052183] Scan: 0 live 5m/15m markets
+[2026-03-26T02:36:44.938834] Scan: 0 live 5m/15m markets
+[2026-03-26T02:37:15.824726] Scan: 0 live 5m/15m markets
+[2026-03-26T02:37:46.713660] Scan: 0 live 5m/15m markets
+[2026-03-26T02:38:18.301607] Scan: 0 live 5m/15m markets
+[2026-03-26T02:38:49.158101] Scan: 0 live 5m/15m markets
+[2026-03-26T02:39:20.029475] Scan: 0 live 5m/15m markets
+[2026-03-26T02:39:50.884757] Scan: 0 live 5m/15m markets
+[2026-03-26T02:40:21.795014] Scan: 0 live 5m/15m markets
+[2026-03-26T02:40:52.676201] Scan: 0 live 5m/15m markets
+[2026-03-26T02:41:23.519613] Scan: 0 live 5m/15m markets
+[2026-03-26T02:41:54.501477] Scan: 0 live 5m/15m markets
+[2026-03-26T02:42:25.414458] Scan: 0 live 5m/15m markets
+[2026-03-26T02:42:56.312905] Scan: 0 live 5m/15m markets
+[2026-03-26T02:43:27.226324] Scan: 0 live 5m/15m markets
+[2026-03-26T02:43:58.148224] Scan: 0 live 5m/15m markets
+[2026-03-26T02:44:29.040695] Scan: 0 live 5m/15m markets
+[2026-03-26T02:44:59.929099] Scan: 0 live 5m/15m markets
+[2026-03-26T02:45:30.801151] Scan: 0 live 5m/15m markets
+[2026-03-26T02:46:01.691021] Scan: 0 live 5m/15m markets
+[2026-03-26T02:46:32.560092] Scan: 0 live 5m/15m markets
+[2026-03-26T02:47:03.479496] Scan: 0 live 5m/15m markets
+[2026-03-26T02:47:34.396190] Scan: 0 live 5m/15m markets
+[2026-03-26T02:48:05.293049] Scan: 0 live 5m/15m markets
+[2026-03-26T02:48:36.195676] Scan: 0 live 5m/15m markets
+[2026-03-26T02:49:07.109535] Scan: 0 live 5m/15m markets
+[2026-03-26T02:49:37.999088] Scan: 0 live 5m/15m markets
+[2026-03-26T02:50:08.864879] Scan: 0 live 5m/15m markets
+[2026-03-26T02:50:39.769327] Scan: 0 live 5m/15m markets
+[2026-03-26T02:51:10.664712] Scan: 0 live 5m/15m markets
+[2026-03-26T02:51:41.560629] Scan: 0 live 5m/15m markets
+[2026-03-26T02:52:12.420800] Scan: 0 live 5m/15m markets
+[2026-03-26T02:52:43.481439] Scan: 0 live 5m/15m markets
+[2026-03-26T02:53:14.414659] Scan: 0 live 5m/15m markets
+[2026-03-26T02:53:45.306020] Scan: 0 live 5m/15m markets
+[2026-03-26T02:54:16.188448] Scan: 0 live 5m/15m markets
+[2026-03-26T02:54:47.047324] Scan: 0 live 5m/15m markets
+[2026-03-26T02:55:17.932913] Scan: 0 live 5m/15m markets
+[2026-03-26T02:55:48.782071] Scan: 0 live 5m/15m markets
+[2026-03-26T02:56:19.674780] Scan: 0 live 5m/15m markets
+[2026-03-26T02:56:50.526834] Scan: 0 live 5m/15m markets
+[2026-03-26T02:57:21.420834] Scan: 0 live 5m/15m markets
+[2026-03-26T02:57:52.360089] Scan: 0 live 5m/15m markets
+[2026-03-26T02:58:23.253046] Scan: 0 live 5m/15m markets
+[2026-03-26T02:58:54.108360] Scan: 0 live 5m/15m markets
+[2026-03-26T02:59:26.273198] Scan: 0 live 5m/15m markets
+[2026-03-26T02:59:57.163482] Scan: 0 live 5m/15m markets
+[2026-03-26T03:00:28.070728] Scan: 0 live 5m/15m markets
+[2026-03-26T03:00:58.973071] Scan: 0 live 5m/15m markets
+[2026-03-26T03:01:29.876871] Scan: 0 live 5m/15m markets
+[2026-03-26T03:02:00.803246] Scan: 0 live 5m/15m markets
+[2026-03-26T03:02:31.722776] Scan: 0 live 5m/15m markets
+[2026-03-26T03:03:02.622650] Scan: 0 live 5m/15m markets
+[2026-03-26T03:03:33.910990] Scan: 0 live 5m/15m markets
+[2026-03-26T03:04:04.823762] Scan: 0 live 5m/15m markets
+[2026-03-26T03:04:35.744681] Scan: 0 live 5m/15m markets
+[2026-03-26T03:05:06.646789] Scan: 0 live 5m/15m markets
+[2026-03-26T03:05:37.597619] Scan: 0 live 5m/15m markets
+[2026-03-26T03:06:08.514514] Scan: 0 live 5m/15m markets
+[2026-03-26T03:06:39.451046] Scan: 0 live 5m/15m markets
+[2026-03-26T03:07:10.309452] Scan: 0 live 5m/15m markets
+[2026-03-26T03:07:41.221819] Scan: 0 live 5m/15m markets
+[2026-03-26T03:08:12.113552] Scan: 0 live 5m/15m markets
+[2026-03-26T03:08:43.212528] Scan: 0 live 5m/15m markets
+[2026-03-26T03:09:14.222525] Scan: 0 live 5m/15m markets
+[2026-03-26T03:09:45.103763] Scan: 0 live 5m/15m markets
+[2026-03-26T03:10:16.056220] Scan: 0 live 5m/15m markets
+[2026-03-26T03:10:46.943839] Scan: 0 live 5m/15m markets
+[2026-03-26T03:11:17.814889] Scan: 0 live 5m/15m markets
+[2026-03-26T03:11:48.837671] Scan: 0 live 5m/15m markets
+[2026-03-26T03:12:19.791443] Scan: 0 live 5m/15m markets
+[2026-03-26T03:12:50.702709] Scan: 0 live 5m/15m markets
+[2026-03-26T03:13:21.602708] Scan: 0 live 5m/15m markets
+[2026-03-26T03:13:52.456693] Scan: 0 live 5m/15m markets
+[2026-03-26T03:14:23.360018] Scan: 0 live 5m/15m markets
+[2026-03-26T03:14:54.237181] Scan: 0 live 5m/15m markets
+[2026-03-26T03:15:25.112644] Scan: 0 live 5m/15m markets
+[2026-03-26T03:15:55.988362] Scan: 0 live 5m/15m markets
+[2026-03-26T03:16:26.882944] Scan: 0 live 5m/15m markets
+[2026-03-26T03:16:57.804600] Scan: 0 live 5m/15m markets
+[2026-03-26T03:17:28.713600] Scan: 0 live 5m/15m markets
+[2026-03-26T03:17:59.622642] Scan: 0 live 5m/15m markets
+[2026-03-26T03:18:30.503924] Scan: 0 live 5m/15m markets

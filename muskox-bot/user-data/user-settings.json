@@ -1,0 +1,27 @@
+{
+  "6842854356": {
+    "userId": 6842854356,
+    "walletAddress": "BQ9sDS6WuNnbgni2NutHNnrgqh385QjpYTo2QLiq9eYv",
+    "defaultBuyAmount": 0.5,
+    "slippage": 15,
+    "priorityFee": 500000,
+    "monitoringEnabled": false,
+    "alertsEnabled": false,
+    "watchlist": [],
+    "takeProfitPercent": 100,
+    "stopLossPercent": 50,
+    "autoSellEnabled": false,
+    "minLiquidity": 10,
+    "lpLockedCheck": true,
+    "devWalletFilter": true,
+    "ageFilterSeconds": 60,
+    "language": "en",
+    "isPremium": true,
+    "snipeCount": 0,
+    "feePaid": 0,
+    "activePositions": [],
+    "tradeHistory": [],
+    "lastUpdated": 1775357477799,
+    "premiumExpiresAt": 1777957436482
+  }
+}

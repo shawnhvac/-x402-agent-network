@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Starship to Mars - $MUSKOX Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            touch-action: none;
+        }
+
+        #gameContainer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        canvas {
+            display: block;
+            flex: 1;
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 100%);
+            touch-action: none;
+        }
+
+        #ui {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: #00ff00;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 100;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        #score {
+            margin-bottom: 8px;
+        }
+
+        #leaderboardBtn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 12px;
+        }
+
+        #leaderboardBtn:active {
+            background: #00cc00;
+            transform: scale(0.98);
+        }
+
+        #gameOver {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px 30px;
+            border: 3px solid #00ff00;
+            border-radius: 15px;
+            text-align: center;
+            color: #00ff00;
+            z-index: 200;
+            display: none;
+            min-width: 280px;
+            max-width: 90%;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3), inset 0 0 20px rgba(0, 255, 0, 0.1);
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        #gameOver h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            animation: pulse 1s infinite;
+        }
+
+        #gameOver p {
+            font-size: 14px;
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+
+        #gameOver button {
+            margin-top: 10px;
+            padding: 12px 20px;
+            font-size: 14px;
+            background: #00ff00;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 180px;
+        }
+
+        #gameOver button:active {
+            background: #00cc00;
+            transform: scale(0.98);
+        }
+
+        #leaderboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            z-index: 300;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+            color: #00ff00;
+        }
+
+        #leaderboard.show {
+            display: block;
+        }
+
+        #leaderboard h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        .leaderboard-entry {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .leaderboard-rank {
+            font-weight: bold;
+            min-width: 30px;
+        }
+
+        .leaderboard-player {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .leaderboard-score {
+            font-weight: bold;
+            color: #ffff00;
+            margin-right: 10px;
+        }
+
+        #leaderboardClose {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            max-width: 150px;
+            margin: 20px auto;
+            display: block;
+        }
+
+        #instructions {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ff00;
+            font-size: 11px;
+            text-align: center;
+            z-index: 100;
+            opacity: 0.7;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 255, 0, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @media (max-width: 600px) {
+            #gameOver {
+                padding: 30px 20px;
+                min-width: 250px;
+            }
+
+            #gameOver h2 {
+                font-size: 24px;
+            }
+
+            #gameOver p {
+                font-size: 12px;
+            }
+
+            #instructions {
+                font-size: 10px;
+            }
+
+            #ui {
+                font-size: 14px;
+                padding: 8px;
+                top: 5px;
+                left: 5px;
+            }
+
+            #leaderboardBtn {
+                font-size: 11px;
+                padding: 6px 10px;
+                top: 5px;
+                right: 5px;
+            }
+        }
+
+        @supports (padding: max(0px)) {
+            #ui {
+                padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 10px max(10px, env(safe-area-inset-left));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div id="score">Score: 0</div>
+            <div id="health">❤️ 3</div>
+            <div id="level">Level 1</div>
+        </div>
+        <button id="leaderboardBtn">🏆 Scores</button>
+        <div id="gameOver">
+            <h2>🎮 GAME OVER!</h2>
+            <p id="finalScore">Final Score: 0</p>
+            <p id="shareMessage" style="font-size: 12px; color: #888;"></p>
+            <div id="leaderboardContent"></div>
+            <button onclick="location.reload()">Play Again 🚀</button>
+        </div>
+        <div id="leaderboard">
+            <h2>🏆 HIGH SCORES</h2>
+            <p style="text-align: center; font-size: 12px; color: #888; margin-bottom: 20px;">Shared across all players (Web + Telegram)</p>
+            <div id="leaderboardList"></div>
+            <button id="leaderboardClose">Close</button>
+        </div>
+        <div id="instructions">
+            📱 Arrow keys to move • SPACE to shoot • 🦬 = Shield
+        </div>
+    </div>
+
+    <script>
+        // Telegram WebApp Integration
+        if (window.Telegram?.WebApp) {
+            const tg = window.Telegram.WebApp;
+            tg.ready();
+            tg.expand();
+            document.body.style.backgroundColor = tg.backgroundColor || '#0a0e27';
+        }
+
+        const API_BASE = window.location.origin;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const game = {
+            score: 0,
+            health: 3,
+            shield: false,
+            shieldTimer: 0,
+            gameOver: false,
+            level: 1,
+            playerName: `Player_${Math.floor(Math.random() * 10000)}`
+        };
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 50,
+            width: 40,
+            height: 40,
+            speed: 5,
+            vel: { x: 0, y: 0 },
+            draw() {
+                ctx.save();
+                ctx.fillStyle = game.shield ? '#00ff00' : '#ffaa00';
+                ctx.shadowColor = game.shield ? 'rgba(0, 255, 0, 0.5)' : 'rgba(255, 170, 0, 0.5)';
+                ctx.shadowBlur = 15;
+                
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y - this.height / 2);
+                ctx.lineTo(this.x + this.width / 2, this.y + this.height / 2);
+                ctx.lineTo(this.x, this.y + this.height / 3);
+                ctx.lineTo(this.x - this.width / 2, this.y + this.height / 2);
+                ctx.closePath();
+                ctx.fill();
+
+                if (game.shield) {
+                    ctx.strokeStyle = '#00ff00';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.width, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            },
+            update() {
+                this.x += this.vel.x;
+                this.y += this.vel.y;
+                if (this.x < this.width / 2) this.x = this.width / 2;
+                if (this.x > canvas.width - this.width / 2) this.x = canvas.width - this.width / 2;
+                if (this.y < this.height / 2) this.y = this.height / 2;
+                if (this.y > canvas.height - this.height / 2) this.y = canvas.height - this.height / 2;
+            }
+        };
+
+        const bullets = [];
+        function shoot() {
+            bullets.push({
+                x: player.x,
+                y: player.y - player.height / 2,
+                width: 5,
+                height: 15,
+                speed: 8,
+                draw() {
+                    ctx.fillStyle = '#ffff00';
+                    ctx.shadowColor = 'rgba(255, 255, 0, 0.5)';
+                    ctx.shadowBlur = 10;
+                    ctx.fillRect(this.x - this.width / 2, this.y, this.width, this.height);
+                },
+                update() {
+                    this.y -= this.speed;
+                }
+            });
+        }
+
+        const enemies = [];
+        function spawnEnemy() {
+            const type = Math.random() > 0.5 ? 'asteroid' : 'satellite';
+            enemies.push({
+                x: Math.random() * canvas.width,
+                y: -30,
+                width: type === 'asteroid' ? 30 : 40,
+                height: type === 'asteroid' ? 30 : 40,
+                speed: Math.random() * 2 + 1 + (game.level * 0.5),
+                type: type,
+                health: type === 'asteroid' ? 1 : 2,
+                draw() {
+                    ctx.save();
+                    ctx.fillStyle = this.type === 'asteroid' ? '#888' : '#00aaff';
+                    ctx.shadowColor = this.type === 'asteroid' ? 'rgba(136, 136, 136, 0.5)' : 'rgba(0, 170, 255, 0.5)';
+                    ctx.shadowBlur = 10;
+
+                    if (this.type === 'asteroid') {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.width / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+                        ctx.strokeStyle = '#00aaff';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(this.x - this.width / 2, this.y - this.height / 2);
+                        ctx.lineTo(this.x - this.width / 2 - 10, this.y - this.height / 2 - 15);
+                        ctx.stroke();
+                    }
+
+                    ctx.restore();
+                },
+                update() {
+                    this.y += this.speed;
+                }
+            });
+        }
+
+        const powerups = [];
+        function spawnPowerup(x, y) {
+            if (Math.random() < 0.3) {
+                powerups.push({
+                    x: x,
+                    y: y,
+                    width: 25,
+                    height: 25,
+                    speed: 2,
+                    draw() {
+                        ctx.save();
+                        ctx.fillStyle = '#00ff00';
+                        ctx.shadowColor = 'rgba(0, 255, 0, 0.7)';
+                        ctx.shadowBlur = 15;
+                        ctx.font = '20px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('🦬', this.x, this.y);
+                        ctx.restore();
+                    },
+                    update() {
+                        this.y += this.speed;
+                    }
+                });
+            }
+        }
+
+        const keys = {};
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            if (e.key === ' ') {
+                e.preventDefault();
+                shoot();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                shoot();
+            }
+        });
+
+        function updateUI() {
+            document.getElementById('score').textContent = `Score: ${game.score}`;
+            document.getElementById('health').textContent = `❤️ ${game.health}`;
+            document.getElementById('level').textContent = `Level ${game.level}`;
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/leaderboard`);
+                const data = await response.json();
+                return data.scores || [];
+            } catch (e) {
+                console.error('Failed to load leaderboard:', e);
+                return [];
+            }
+        }
+
+        async function submitScore(score) {
+            try {
+                const response = await fetch(`${API_BASE}/api/leaderboard`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ player: game.playerName, score: score, timestamp: new Date().toISOString() })
+                });
+                return await response.json();
+            } catch (e) {
+                console.error('Failed to submit score:', e);
+                return { success: false };
+            }
+        }
+
+        async function displayLeaderboard(gameOverMode = false) {
+            const scores = await loadLeaderboard();
+            const container = gameOverMode ? document.getElementById('leaderboardContent') : document.getElementById('leaderboardList');
+            
+            container.innerHTML = '';
+            
+            if (scores.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">No scores yet. Be the first!</p>';
+                return;
+            }
+
+            scores.slice(0, 10).forEach((entry, index) => {
+                const div = document.createElement('div');
+                div.className = 'leaderboard-entry';
+                div.innerHTML = `
+                    <span class="leaderboard-rank">#${index + 1}</span>
+                    <span class="leaderboard-player">${entry.player}</span>
+                    <span class="leaderboard-score">${entry.score}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        document.getElementById('leaderboardBtn').addEventListener('click', async () => {
+            document.getElementById('leaderboard').classList.add('show');
+            await displayLeaderboard(false);
+        });
+
+        document.getElementById('leaderboardClose').addEventListener('click', () => {
+            document.getElementById('leaderboard').classList.remove('show');
+        });
+
+        let spawnTimer = 0;
+        function gameLoop() {
+            ctx.fillStyle = 'rgba(10, 10, 26, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            for (let i = 0; i < 50; i++) {
+                const x = (i * 73 + Date.now() / 100) % canvas.width;
+                const y = (i * 113) % canvas.height;
+                ctx.fillRect(x, y, 1, 1);
+            }
+
+            player.vel.x = 0;
+            player.vel.y = 0;
+            if (keys['ArrowUp'] || keys['w']) player.vel.y = -player.speed;
+            if (keys['ArrowDown'] || keys['s']) player.vel.y = player.speed;
+            if (keys['ArrowLeft'] || keys['a']) player.vel.x = -player.speed;
+            if (keys['ArrowRight'] || keys['d']) player.vel.x = player.speed;
+
+            player.update();
+            player.draw();
+
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].update();
+                bullets[i].draw();
+                if (bullets[i].y < 0) bullets.splice(i, 1);
+            }
+
+            spawnTimer++;
+            if (spawnTimer > Math.max(20, 80 - game.level * 5)) {
+                spawnEnemy();
+                spawnTimer = 0;
+            }
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].update();
+                enemies[i].draw();
+
+                for (let j = bullets.length - 1; j >= 0; j--) {
+                    if (
+                        bullets[j].x > enemies[i].x - enemies[i].width / 2 &&
+                        bullets[j].x < enemies[i].x + enemies[i].width / 2 &&
+                        bullets[j].y > enemies[i].y - enemies[i].height / 2 &&
+                        bullets[j].y < enemies[i].y + enemies[i].height / 2
+                    ) {
+                        enemies[i].health--;
+                        bullets.splice(j, 1);
+                        if (enemies[i].health <= 0) {
+                            game.score += enemies[i].type === 'asteroid' ? 10 : 20;
+                            spawnPowerup(enemies[i].x, enemies[i].y);
+                            enemies.splice(i, 1);
+                        }
+                        break;
+                    }
+                }
+
+                if (i >= 0) {
+                    if (
+                        player.x > enemies[i].x - enemies[i].width / 2 &&
+                        player.x < enemies[i].x + enemies[i].width / 2 &&
+                        player.y > enemies[i].y - enemies[i].height / 2 &&
+                        player.y < enemies[i].y + enemies[i].height / 2
+                    ) {
+                        if (game.shield) {
+                            game.shield = false;
+                            enemies.splice(i, 1);
+                        } else {
+                            game.health--;
+                            enemies.splice(i, 1);
+                            if (game.health <= 0) {
+                                endGame();
+                            }
+                        }
+                    }
+                }
+
+                if (enemies[i] && enemies[i].y > canvas.height) {
+                    enemies.splice(i, 1);
+                }
+            }
+
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                powerups[i].update();
+                powerups[i].draw();
+
+                if (
+                    player.x > powerups[i].x - powerups[i].width &&
+                    player.x < powerups[i].x + powerups[i].width &&
+                    player.y > powerups[i].y - powerups[i].height &&
+                    player.y < powerups[i].y + powerups[i].height
+                ) {
+                    game.shield = true;
+                    game.shieldTimer = 300;
+                    powerups.splice(i, 1);
+                }
+
+                if (powerups[i] && powerups[i].y > canvas.height) {
+                    powerups.splice(i, 1);
+                }
+            }
+
+            if (game.shield && game.shieldTimer > 0) {
+                game.shieldTimer--;
+            } else if (game.shieldTimer <= 0) {
+                game.shield = false;
+            }
+
+            if (game.score % 100 === 0 && game.score > 0) {
+                game.level = Math.floor(game.score / 100) + 1;
+            }
+
+            updateUI();
+
+            if (!game.gameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        async function endGame() {
+            game.gameOver = true;
+            
+            // Submit score to leaderboard
+            const result = await submitScore(game.score);
+            
+            document.getElementById('finalScore').textContent = `Final Score: ${game.score}`;
+            document.getElementById('shareMessage').textContent = result.rank ? `🏆 Rank #${result.rank} on leaderboard!` : 'Score saved to leaderboard!';
+            
+            // Show leaderboard in game over screen
+            await displayLeaderboard(true);
+            
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>

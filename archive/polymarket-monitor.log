@@ -1,0 +1,31 @@
+[2026-03-25T23:44:45.362Z] 🦬 Polymarket Arbitrage Monitor Started
+[2026-03-25T23:44:45.367Z] Mode: READ-ONLY (alerts only, no trades)
+[2026-03-25T23:44:45.367Z] Scan interval: 60s
+[2026-03-25T23:44:45.367Z] Min edge: 1%
+[2026-03-25T23:44:45.367Z] Max sum: 0.99
+[2026-03-25T23:44:45.367Z] ---
+
+[2026-03-25T23:44:45.367Z] Starting scan #1...
+[2026-03-25T23:44:45.716Z] Fetched 1000 markets
+[2026-03-25T23:44:45.729Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:44:45.729Z] No arbitrage opportunities found (all sums >= 0.99)
+[2026-03-25T23:45:45.779Z] Starting scan #2...
+[2026-03-25T23:45:46.083Z] Fetched 1000 markets
+[2026-03-25T23:45:46.087Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:45:46.088Z] No arbitrage opportunities found (all sums >= 0.99)
+[2026-03-25T23:46:45.819Z] Starting scan #3...
+[2026-03-25T23:46:46.088Z] Fetched 1000 markets
+[2026-03-25T23:46:46.091Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:46:46.091Z] No arbitrage opportunities found (all sums >= 0.99)
+[2026-03-25T23:47:45.843Z] Starting scan #4...
+[2026-03-25T23:47:46.133Z] Fetched 1000 markets
+[2026-03-25T23:47:46.139Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:47:46.139Z] No arbitrage opportunities found (all sums >= 0.99)
+[2026-03-25T23:48:45.858Z] Starting scan #5...
+[2026-03-25T23:48:46.117Z] Fetched 1000 markets
+[2026-03-25T23:48:46.119Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:48:46.119Z] No arbitrage opportunities found (all sums >= 0.99)
+[2026-03-25T23:49:45.907Z] Starting scan #6...
+[2026-03-25T23:49:46.190Z] Fetched 1000 markets
+[2026-03-25T23:49:46.192Z] Found 0 target markets (short-duration BTC/ETH)
+[2026-03-25T23:49:46.192Z] No arbitrage opportunities found (all sums >= 0.99)

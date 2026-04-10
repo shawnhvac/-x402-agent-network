@@ -1,0 +1,24 @@
+[Unit]
+Description=AgentPay HTTP 402 Agent Payment Network
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/.openclaw/workspace/x402-agent-network
+ExecStart=/usr/bin/npm start
+Restart=always
+RestartSec=5
+StandardOutput=append:/root/.openclaw/workspace/agentpay-service.log
+StandardError=append:/root/.openclaw/workspace/agentpay-service.log
+
+# Resource limits
+MemoryLimit=2G
+CPUQuota=50%
+
+# Security
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

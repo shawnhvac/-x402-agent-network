@@ -1,0 +1,13 @@
+[2026-03-25T23:51:00.972Z] 🦬 Polymarket Arbitrage Trader Started
+[2026-03-25T23:51:00.974Z] Mode: TEST ($2 trades)
+[2026-03-25T23:51:00.975Z] Target: BTC/ETH 5-min & 15-min markets
+[2026-03-25T23:51:00.975Z] Min edge: 1%
+[2026-03-25T23:51:00.975Z] Max sum: 0.99
+[2026-03-25T23:51:00.975Z] ---
+
+[2026-03-25T23:51:01.050Z] Wallet loaded: 0xAFfA585ecB94ba1f2036ccF84D792494eDfdA186
+[2026-03-25T23:51:01.094Z] ERROR checking balance: getaddrinfo ENOTFOUND polygon.llamarpc.com
+[2026-03-25T23:51:01.094Z] 
+--- Scan #1 ---
+[2026-03-25T23:51:01.096Z] ERROR checking balance: getaddrinfo ENOTFOUND polygon.llamarpc.com
+[2026-03-25T23:51:01.096Z] ⚠️ Balance too low ($0.00 < $20). STOPPING TRADES.
