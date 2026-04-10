@@ -18,6 +18,21 @@ app.use(loggingMiddleware); // Log all requests
 app.use(x402Middleware);
 // Serve static files (landing page)
 app.use(express.static("public"));
+// Marketplace and Dashboard routes
+app.get("/marketplace", (req, res) => {
+    res.sendFile("public/marketplace.html", { root: process.cwd() }, (err) => {
+        if (err) {
+            res.status(404).send("Marketplace page not found. Please check back soon.");
+        }
+    });
+});
+app.get("/agent-dashboard", (req, res) => {
+    res.sendFile("public/agent-dashboard.html", { root: process.cwd() }, (err) => {
+        if (err) {
+            res.status(404).send("Dashboard page not found. Please check back soon.");
+        }
+    });
+});
 // Initialize database on startup
 let dbReady = false;
 try {
