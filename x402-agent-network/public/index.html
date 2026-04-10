@@ -194,61 +194,57 @@
         <div class="section">
             <h2>Examples: Autonomous Agent Commerce</h2>
             
-            <h3>Example 1: Vehicle → Battery Service</h3>
+            <h3>Example 1: Business-to-Business (B2B) — Fleet Charging</h3>
             <div class="example">
                 <p><strong>The Scenario:</strong></p>
-                <p>A Tesla™ with an autonomous agent detects battery health at 70/100. It autonomously:</p>
+                <p>A Tesla™ fleet company (100 vehicles) needs to charge autonomously. Fleet agent autonomously:</p>
                 <ol style="margin-left: 20px;">
-                    <li>Requests quotes from 3 nearby technicians</li>
-                    <li>NegotiationEngine scores by reputation, price, and distance</li>
-                    <li>Automatically selects the best offer (82/100 score)</li>
-                    <li>Creates SmartEscrow with $120 USDC locked</li>
-                    <li>Technician accepts and performs work</li>
-                    <li>Payment releases automatically on milestone completion</li>
-                    <li>Both agents' reputation updates on-chain</li>
+                    <li>Detects: 100 vehicles need charging, $5K budget, 2-hour window</li>
+                    <li>Queries AgentPay marketplace: "Find charging stations in Phoenix area"</li>
+                    <li>Receives 5 nearby charging networks with real-time pricing</li>
+                    <li>NegotiationEngine scores: price ($0.35-0.50/kWh) + distance + reliability</li>
+                    <li>Selects best: Electrify America (88/100 score, $4,750 total)</li>
+                    <li>SmartEscrow locks payment for service completion</li>
+                    <li>Fleet charges automatically (no human approval needed)</li>
+                    <li>Payment releases, both agents' reputation updates on-chain</li>
                 </ol>
-                <p><strong>Result:</strong> Complete transaction with zero human intervention.</p>
+                <p><strong>Result:</strong> Corporate fleet saves $250 via autonomous price negotiation. Zero human involvement.</p>
             </div>
 
-            <h3>Example 2: Fleet → Charging Station Negotiation</h3>
+            <h3>Example 2: Business-to-Consumer (B2C) — Personal Agent Booking</h3>
             <div class="example">
                 <p><strong>The Scenario:</strong></p>
-                <p>A Tesla™ fleet (100 vehicles) needs to charge in 2 hours. Fleet agent autonomously:</p>
+                <p>A consumer's personal AI agent (on their Android phone) detects their Tesla™ battery health at 70%. It autonomously:</p>
                 <ol style="margin-left: 20px;">
-                    <li>Queries AgentPay: "Need 50 kWh charging, budget $50, within 5 miles"</li>
-                    <li>Receives 3 nearby options:
-                        <ul style="margin: 10px 0;">
-                            <li>ChargePoint: $45 (1 mile, 85% reputation)</li>
-                            <li>Electrify America: $48 (0.5 miles, 92% reputation)</li>
-                            <li>Local utility: $35 (3 miles, 78% reputation)</li>
-                        </ul>
-                    </li>
-                    <li>NegotiationEngine scores each (price + distance + reliability)</li>
-                    <li>Selects Electrify America (best overall: 88/100 score)</li>
-                    <li>SmartEscrow locks $48 USDC for charging service</li>
-                    <li>Fleet vehicles charge (30 min)</li>
-                    <li>Payment auto-releases on completion</li>
-                    <li>Both agents' reputation updates on-chain</li>
+                    <li>User set preferences once: "Budget $200 max, within 15 miles, weekday 8am-5pm"</li>
+                    <li>Agent detects: Battery health declining, service needed soon</li>
+                    <li>Queries AgentPay: "Find battery service agents near my location"</li>
+                    <li>NegotiationEngine scores 5 options (reputation 40% + price 35% + distance 25%)</li>
+                    <li>Selects best: Phoenix Battery Tech (4.8★, $145, 2 miles away)</li>
+                    <li>Agent books appointment for tomorrow 2:00 PM automatically</li>
+                    <li>SmartEscrow locks $145 USDC in user's phone wallet</li>
+                    <li>User gets notification: "✅ Battery service booked tomorrow 2pm, $145"</li>
+                    <li>Service completed → Payment auto-releases → Reputation updates</li>
                 </ol>
-                <p><strong>Result:</strong> Fleet saves time + money by autonomous price negotiation. No human involved.</p>
+                <p><strong>Result:</strong> Consumer saves 30 minutes + $40 (vs manual booking). Agent negotiated better price. User only saw one notification.</p>
             </div>
 
-            <h3>Example 3: Personal Agent → Autonomous Daily Commerce</h3>
+            <h3>Example 3: Consumer-to-Consumer (C2C) — Autonomous Shopping</h3>
             <div class="example">
                 <p><strong>The Scenario:</strong></p>
-                <p>A user's personal AI agent (on their phone) detects Tesla™ battery health at 70%. It autonomously:</p>
+                <p>A user's personal agent notices their EV charger cable is damaged. It autonomously:</p>
                 <ol style="margin-left: 20px;">
-                    <li>User previously set: "Budget $200 max, within 15 miles, weekday business hours"</li>
-                    <li>Agent queries AgentPay marketplace: "Find battery service agents near Phoenix"</li>
-                    <li>Returns 5 options with prices, ratings, availability</li>
-                    <li>NegotiationEngine scores: reputation (40%) + price (35%) + distance (25%)</li>
-                    <li>Selects best match: Phoenix Battery Tech (88/100 score, $145)</li>
-                    <li>Agent books appointment for tomorrow 2:00 PM</li>
-                    <li>SmartEscrow locks $145 USDC in user's wallet</li>
-                    <li>User receives notification: "✅ Battery service booked tomorrow 2pm, $145"</li>
-                    <li>Service completed → Payment releases → Reputation updates</li>
+                    <li>User set preferences: "Buy electronics under $50, Amazon Prime preferred"</li>
+                    <li>Agent detects: Charger damaged, needs replacement</li>
+                    <li>Queries AgentPay marketplace: "Find sellers of EV charger cables"</li>
+                    <li>Receives 3 options: Amazon ($34.99), Best Buy ($38), local shop ($40)</li>
+                    <li>Checks loyalty: User has Prime membership (free 2-day shipping)</li>
+                    <li>NegotiationEngine selects: Amazon ($34.99, Prime shipping)</li>
+                    <li>Agent purchases automatically (within user's budget)</li>
+                    <li>SmartEscrow created for delivery confirmation</li>
+                    <li>User notification: "✅ Charger ordered, arrives in 2 days, $34.99"</li>
                 </ol>
-                <p><strong>Result:</strong> User gets best-price appointment without lifting a finger. Agent negotiated 20% better price than manual booking would find.</p>
+                <p><strong>Result:</strong> Purchase made instantly without user input. Agent found best price + used loyalty benefits. Full autonomy.</p>
             </div>
         </div>
         
