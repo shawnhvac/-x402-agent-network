@@ -14,5 +14,4 @@ crate-type = ["cdylib", "lib"]
 [profile.release]
 overflow-checks = true
 
-[patch.crates-io]
-getrandom = { version = "=0.2.17" }
+
