@@ -320,15 +320,61 @@
             </div>
         </div>
 
-        <!-- Featured Video Section -->
-        <div style="background: #1e293b; border: 2px solid #a78bfa; border-radius: 8px; padding: 40px 20px; margin: 50px 0; text-align: center;">
-            <h2 style="color: #a78bfa; margin-bottom: 20px;">Watch: Fleet Charging in Action</h2>
-            <p style="color: #cbd5e1; margin-bottom: 30px; font-size: 1.05em;">See how autonomous agents negotiate EV charging in real-time across multiple networks.</p>
-            <video width="100%" style="max-width: 900px; border-radius: 8px; border: 1px solid #334155;" controls autoplay muted>
-                <source src="/video-fleet-charging.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <p style="color: #94a3b8; font-size: 0.9em; margin-top: 15px;">B2B Fleet Charging Example | Generated with Grok Imagine</p>
+        <!-- Featured Videos Carousel -->
+        <div style="background: #1e293b; border: 2px solid #a78bfa; border-radius: 8px; padding: 40px 20px; margin: 50px 0;">
+            <h2 style="color: #a78bfa; margin-bottom: 10px; text-align: center;">Watch: Autonomous Commerce in Action</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px; font-size: 1.05em; text-align: center;">Real-world examples of AgentPay™ solving problems.</p>
+            
+            <div style="position: relative; max-width: 900px; margin: 0 auto;">
+                <!-- Video Container -->
+                <div id="videoContainer" style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #334155;">
+                    <video id="mainVideo" width="100%" style="display: block;" controls autoplay muted>
+                        <source src="/video-fleet-charging.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Video Title -->
+                <h3 id="videoTitle" style="color: #a78bfa; margin-top: 15px; margin-bottom: 5px; text-align: center;">🚗⚡ B2B Fleet Charging</h3>
+                <p id="videoDesc" style="color: #94a3b8; font-size: 0.9em; text-align: center; margin-bottom: 20px;">Autonomous agents negotiate EV charging in real-time across networks.</p>
+
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                    <button onclick="switchVideo(0)" id="btn-0" style="padding: 10px 20px; background: #a78bfa; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🚗⚡ Fleet</button>
+                    <button onclick="switchVideo(1)" id="btn-1" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🔧💼 Service</button>
+                    <button onclick="switchVideo(2)" id="btn-2" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🛒🤝 Shopping</button>
+                    <button onclick="switchVideo(3)" id="btn-3" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🧊🍕 Fridge</button>
+                    <button onclick="switchVideo(4)" id="btn-4" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🤖⚙️ IoT</button>
+                    <button onclick="switchVideo(5)" id="btn-5" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">📦🚚 Supply</button>
+                </div>
+            </div>
+
+            <script>
+                const videos = [
+                    { src: '/video-fleet-charging.mp4', title: '🚗⚡ B2B Fleet Charging', desc: 'Autonomous agents negotiate EV charging in real-time across networks.' },
+                    { src: '/video-service-booking.mp4', title: '🔧💼 B2C Service Booking', desc: 'Personal agent finds and books the best mechanic, HVAC, or service provider.' },
+                    { src: '/video-shopping.mp4', title: '🛒🤝 C2C Smart Shopping', desc: 'Buyer agent finds best prices across 100+ vendors automatically.' },
+                    { src: '/video-smart-fridge.mp4', title: '🧊🍕 Smart Home Grocery Orders', desc: 'Smart fridge detects low stock and autonomously orders groceries.' },
+                    { src: '/video-iot-repair.mp4', title: '🤖⚙️ IoT Device Auto-Repair', desc: 'Devices autonomously order replacement parts and schedule repairs.' },
+                    { src: '/video-supply-chain.mp4', title: '📦🚚 Enterprise Supply Chain', desc: 'Warehouse autonomously negotiates with global suppliers in real-time.' }
+                ];
+
+                function switchVideo(index) {
+                    const video = videos[index];
+                    document.getElementById('mainVideo').src = video.src;
+                    document.getElementById('videoTitle').textContent = video.title;
+                    document.getElementById('videoDesc').textContent = video.desc;
+                    
+                    // Update button styles
+                    document.querySelectorAll('[id^="btn-"]').forEach((btn, i) => {
+                        btn.style.background = i === index ? '#a78bfa' : '#64748b';
+                    });
+                    
+                    // Restart video
+                    document.getElementById('mainVideo').load();
+                    document.getElementById('mainVideo').play();
+                }
+            </script>
         </div>
 
         <!-- CTA Section -->
