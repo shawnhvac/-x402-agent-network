@@ -19,26 +19,18 @@ app.use(x402Middleware);
 // Serve static files (landing page)
 app.use(express.static("public"));
 // Marketplace and Dashboard routes
+// Serve specific HTML pages without .html extension
 app.get("/marketplace", (req, res) => {
-    res.sendFile("public/marketplace.html", { root: process.cwd() }, (err) => {
-        if (err) {
-            res.status(404).send("Marketplace page not found. Please check back soon.");
-        }
-    });
+    res.sendFile("public/marketplace.html", { root: process.cwd() });
 });
 app.get("/agent-dashboard", (req, res) => {
-    res.sendFile("public/agent-dashboard.html", { root: process.cwd() }, (err) => {
-        if (err) {
-            res.status(404).send("Dashboard page not found. Please check back soon.");
-        }
-    });
+    res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
 });
 app.get("/docs", (req, res) => {
-    res.sendFile("public/docs.html", { root: process.cwd() }, (err) => {
-        if (err) {
-            res.status(404).send("Documentation page not found. Please check back soon.");
-        }
-    });
+    res.sendFile("public/docs.html", { root: process.cwd() });
+});
+app.get("/contact", (req, res) => {
+    res.sendFile("public/contact.html", { root: process.cwd() });
 });
 // Documentation markdown files served as HTML
 import { readFileSync } from 'fs';
@@ -152,6 +144,47 @@ app.use("/agents", agentRoutes);
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
  */
 app.use("/", demoAgentRoutes);
+/**
+ * Contact form endpoint
+ */
+app.post("/api/contact", async (req, res) => {
+    try {
+        const { name, email, subject, message } = req.body;
+        // Validate
+        if (!name || !email || !subject || !message) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        // Send email using nodemailer (configure with Gmail SMTP)
+        const nodemailer = await import('nodemailer');
+        const transporter = nodemailer.default.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.SUPPORT_EMAIL_USER || 'lippertshawn@gmail.com',
+                pass: process.env.SUPPORT_EMAIL_PASS || '' // Set via .env
+            }
+        });
+        const mailOptions = {
+            from: email,
+            to: 'lippertshawn@gmail.com',
+            subject: `AgentPay Contact: ${subject}`,
+            html: `
+        <h2>New Contact Form Submission</h2>
+        <p><strong>From:</strong> ${name} (${email})</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong></p>
+        <pre>${message}</pre>
+        <hr>
+        <p><small>Submitted from x402-agent-pay.com contact form</small></p>
+      `
+        };
+        await transporter.sendMail(mailOptions);
+        res.json({ success: true, message: "Email sent successfully" });
+    }
+    catch (error) {
+        console.error("Contact form error:", error);
+        res.status(500).json({ error: "Failed to send email" });
+    }
+});
 /**
  * Health check endpoint
  */

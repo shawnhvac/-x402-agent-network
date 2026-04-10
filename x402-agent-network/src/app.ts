@@ -34,36 +34,21 @@ app.use(x402Middleware);
 app.use(express.static("public"));
 
 // Marketplace and Dashboard routes
+// Serve specific HTML pages without .html extension
 app.get("/marketplace", (req: Request, res: Response) => {
-  res.sendFile("public/marketplace.html", { root: process.cwd() }, (err) => {
-    if (err) {
-      res.status(404).send("Marketplace page not found. Please check back soon.");
-    }
-  });
+  res.sendFile("public/marketplace.html", { root: process.cwd() });
 });
 
 app.get("/agent-dashboard", (req: Request, res: Response) => {
-  res.sendFile("public/agent-dashboard.html", { root: process.cwd() }, (err) => {
-    if (err) {
-      res.status(404).send("Dashboard page not found. Please check back soon.");
-    }
-  });
+  res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
 });
 
 app.get("/docs", (req: Request, res: Response) => {
-  res.sendFile("public/docs.html", { root: process.cwd() }, (err) => {
-    if (err) {
-      res.status(404).send("Documentation page not found. Please check back soon.");
-    }
-  });
+  res.sendFile("public/docs.html", { root: process.cwd() });
 });
 
 app.get("/contact", (req: Request, res: Response) => {
-  res.sendFile("public/contact.html", { root: process.cwd() }, (err) => {
-    if (err) {
-      res.status(404).send("Contact page not found. Please check back soon.");
-    }
-  });
+  res.sendFile("public/contact.html", { root: process.cwd() });
 });
 
 // Documentation markdown files served as HTML
