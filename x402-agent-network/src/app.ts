@@ -55,6 +55,10 @@ app.get("/examples", (req: Request, res: Response) => {
   res.sendFile("public/examples.html", { root: process.cwd() });
 });
 
+app.get("/trademark", (req: Request, res: Response) => {
+  res.sendFile("public/trademark.html", { root: process.cwd() });
+});
+
 app.get("/admin", (req: Request, res: Response) => {
   res.sendFile("public/admin.html", { root: process.cwd() });
 });

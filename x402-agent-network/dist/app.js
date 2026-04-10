@@ -35,6 +35,9 @@ app.get("/contact", (req, res) => {
 app.get("/examples", (req, res) => {
     res.sendFile("public/examples.html", { root: process.cwd() });
 });
+app.get("/trademark", (req, res) => {
+    res.sendFile("public/trademark.html", { root: process.cwd() });
+});
 app.get("/admin", (req, res) => {
     res.sendFile("public/admin.html", { root: process.cwd() });
 });
