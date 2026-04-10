@@ -1,7 +1,7 @@
 {
   "session_start": "2026-04-02T03:24:00.000000",
-  "scan_count": 9000,
-  "timestamp": "2026-04-10T23:50:36.236820",
+  "scan_count": 9100,
+  "timestamp": "2026-04-10T23:55:50.816357",
   "btc_equity": 401.108,
   "eth_equity": 601.6619999999999,
   "total_equity": 1002.77,
@@ -9,8 +9,8 @@
   "btc_trades": 0,
   "eth_trades": 0,
   "drawdown": 0.0,
-  "btc_price": 72986.01,
-  "eth_price": 2246.59,
+  "btc_price": 72972.61,
+  "eth_price": 2245.2,
   "live_mode": true,
   "trades": []
 }
