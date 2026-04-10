@@ -403,8 +403,11 @@ export class GoogleMapsService {
   private _mapBusinessTypeToPlacesType(businessType: string): string {
     const mapping: { [key: string]: string } = {
       'mechanic': 'car_repair',
+      'battery_service': 'car_repair',
       'plumber': 'plumber',
       'electrician': 'electrician',
+      'hvac': 'plumber',
+      'carpenter': 'home_goods_store',
       'restaurant': 'restaurant',
       'cafe': 'cafe',
       'hotel': 'lodging',
@@ -416,7 +419,10 @@ export class GoogleMapsService {
       'bank': 'bank',
       'salon': 'hair_care',
       'gym': 'gym',
-      'dentist': 'dentist'
+      'dentist': 'dentist',
+      'delivery': 'delivery',
+      'taxi': 'transit_station',
+      'charging_station': 'gas_station'
     };
 
     return mapping[businessType.toLowerCase()] || businessType;

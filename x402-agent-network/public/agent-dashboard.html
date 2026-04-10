@@ -142,11 +142,19 @@
                             <option value="battery_service">Battery Service</option>
                             <option value="plumber">Plumber</option>
                             <option value="electrician">Electrician</option>
+                            <option value="hvac">HVAC/R (Heating, Ventilation, AC, Refrigeration)</option>
+                            <option value="carpenter">Carpenter</option>
                             <option value="delivery">Delivery</option>
                             <option value="taxi">Taxi</option>
                             <option value="charging_station">Charging Station</option>
+                            <option value="custom">Other (specify below)</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-group" id="customServiceGroup" style="display: none;">
+                    <label for="customService">Custom Service Type</label>
+                    <input type="text" id="customService" placeholder="Enter your service type (e.g., Roofing, Landscaping, etc.)">
                 </div>
 
                 <div class="form-group">
@@ -218,12 +226,34 @@
     </div>
 
     <script>
+        // Show/hide custom service field
+        document.getElementById('serviceType').addEventListener('change', (e) => {
+            const customGroup = document.getElementById('customServiceGroup');
+            if (e.target.value === 'custom') {
+                customGroup.style.display = 'block';
+            } else {
+                customGroup.style.display = 'none';
+            }
+        });
+        
         document.getElementById('registrationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            let serviceType = document.getElementById('serviceType').value;
+            
+            // If custom service, use the custom value
+            if (serviceType === 'custom') {
+                const customService = document.getElementById('customService').value;
+                if (!customService) {
+                    showMessage('❌ Please enter a custom service type', 'error');
+                    return;
+                }
+                serviceType = customService;
+            }
+            
             const agentData = {
                 name: document.getElementById('agentName').value,
-                serviceType: document.getElementById('serviceType').value,
+                serviceType: serviceType,
                 description: document.getElementById('description').value,
                 city: document.getElementById('city').value,
                 state: document.getElementById('state').value,
