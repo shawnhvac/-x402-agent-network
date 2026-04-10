@@ -33,6 +33,13 @@ app.get("/agent-dashboard", (req, res) => {
         }
     });
 });
+app.get("/docs", (req, res) => {
+    res.sendFile("public/docs.html", { root: process.cwd() }, (err) => {
+        if (err) {
+            res.status(404).send("Documentation page not found. Please check back soon.");
+        }
+    });
+});
 // Initialize database on startup
 let dbReady = false;
 try {

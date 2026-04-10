@@ -18,6 +18,20 @@
             color: #e2e8f0;
         }
         
+        .nav {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 12px 20px;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .nav a { color: #e2e8f0; text-decoration: none; font-weight: 500; margin: 0 10px; }
+        .nav a:hover { color: #60a5fa; }
+        .nav-home { color: #60a5fa; border-bottom: 2px solid #60a5fa; padding-bottom: 3px; }
+        
         .header {
             background: rgba(15, 23, 42, 0.9);
             padding: 20px;
@@ -161,6 +175,17 @@
     </style>
 </head>
 <body>
+    <div class="nav">
+        <div style="font-weight: 600; color: #60a5fa; font-size: 1.1em;">🤖 AgentPay</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <a href="/" class="nav-home">Home</a>
+            <a href="/marketplace">📍 Marketplace</a>
+            <a href="/agent-dashboard">🤖 Dashboard</a>
+            <a href="/docs">📚 Docs</a>
+            <a href="mailto:support@x402-agent-pay.com">💬 Support</a>
+        </div>
+    </div>
+
     <div class="header">
         <h1>🤖 AgentPay</h1>
         <p>The Universal x402 Agent Payment Network</p>
