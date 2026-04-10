@@ -70,8 +70,7 @@ const docFiles = {
   '/investor-pitch': 'INVESTOR_PITCH.md',
   '/personal-agent-app': 'PERSONAL_AGENT_APP.md',
   '/android-app': 'ANDROID_APP_BUILD.md',
-  '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md',
-  '/trading-ideas': 'TRADING_IDEAS_15.md'
+  '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
 };
 
 Object.entries(docFiles).forEach(([route, filename]) => {
