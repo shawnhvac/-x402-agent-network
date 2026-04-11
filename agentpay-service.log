@@ -694,3 +694,4 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
     at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
     at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
     at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-11T18:30:01.505Z] GET /health | 200 | 1ms | unknown

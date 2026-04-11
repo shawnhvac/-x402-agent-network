@@ -78,6 +78,20 @@ const translations = {
       h2: "Cómo Funciona AgentPay",
       p: "Los agentes autónomos se descubren entre sí, negocian de forma autónoma y liquidan pagos en cadena. Cero comisiones. Sin confianza. Sin fronteras."
     },
+    examples: {
+      fleet: "B2B: Carga de Flotas",
+      fleetDesc: "El Agente de Flota de Vehículos negocia de forma autónoma con Estaciones de Carga de VE para obtener las mejores tarifas y ubicaciones.",
+      service: "B2C: Reserva de Servicios",
+      serviceDesc: "El Agente Personal reserva automáticamente mecánicos, HVAC y carpinteros según tu presupuesto y preferencias de ubicación.",
+      shopping: "C2C: Compra Inteligente",
+      shoppingDesc: "El Agente Comprador negocia precios entre múltiples vendedores para encontrar las mejores ofertas para tu lista de compras.",
+      fridge: "Hogar Inteligente: Pedidos de Comestibles",
+      fridgeDesc: "El Agente Frigorífico Inteligente detecta bajo inventario, pide comestibles a través de Uber Eats y paga automáticamente al entregar.",
+      iot: "IoT: Reparación Automática de Dispositivos",
+      iotDesc: "El Agente de Mantenimiento de Robots ordena automáticamente piezas de repuesto cuando los sensores detectan desgaste, negocia garantías y programa reparaciones.",
+      supply: "Empresa: Cadena de Suministro",
+      supplyDesc: "El Agente de Almacén negocia automáticamente con proveedores, administra inventario y coordina logística entre múltiples vendedores globales."
+    },
     cta: {
       title: "¿Listo para comenzar?",
       subtitle: "Únete a miles de agentes autónomos construyendo el futuro del comercio.",
@@ -103,6 +117,20 @@ const translations = {
     intro: {
       h2: "Comment Fonctionne AgentPay",
       p: "Les agents autonomes se découvrent, négocient automatiquement et règlent les paiements sur la chaîne. Zéro commission. Décentralisé. Sans frontières."
+    },
+    examples: {
+      fleet: "B2B : Charge de flotte",
+      fleetDesc: "L'Agent de Flotte de Véhicules négocie automatiquement avec les Stations de Recharge de VE pour les meilleurs tarifs et emplacements.",
+      service: "B2C : Réservation de Service",
+      serviceDesc: "L'Agent Personnel réserve automatiquement les mécaniciens, le CVAC, les charpentiers en fonction de votre budget et de vos préférences de localisation.",
+      shopping: "C2C : Achat Intelligent",
+      shoppingDesc: "L'Agent Acheteur négocie les prix auprès de plusieurs vendeurs pour trouver les meilleures offres pour votre liste d'achat.",
+      fridge: "Maison Intelligente : Commandes d'Épicerie",
+      fridgeDesc: "L'Agent Réfrigérateur Intelligent détecte les stocks faibles, commande les courses via Uber Eats et paie automatiquement à la livraison.",
+      iot: "IoT : Réparation Automatique d'Appareils",
+      iotDesc: "L'Agent de Maintenance Robot commande automatiquement les pièces de remplacement lorsque les capteurs détectent l'usure, négocie les garanties et programme les réparations.",
+      supply: "Entreprise : Chaîne d'Approvisionnement",
+      supplyDesc: "L'Agent Entrepôt négocie automatiquement avec les fournisseurs, gère les stocks et coordonne la logistique auprès de plusieurs vendeurs mondiaux."
     },
     cta: {
       title: "Prêt à commencer?",

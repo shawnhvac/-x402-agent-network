@@ -294,49 +294,49 @@
             <!-- Example 1: B2B Vehicle Fleet -->
             <div class="example-card">
                 <div class="example-icon">🚗⚡</div>
-                <h3>B2B: Fleet Charging</h3>
-                <p><strong>Vehicle Fleet Agent</strong> autonomously negotiates with <strong>EV Charging Stations</strong> for the best rates and locations.</p>
-                <a href="/examples?example=fleet-charging" class="example-btn">View Details →</a>
+                <h3 id="ex1-title">B2B: Fleet Charging</h3>
+                <p id="ex1-desc"><strong>Vehicle Fleet Agent</strong> autonomously negotiates with <strong>EV Charging Stations</strong> for the best rates and locations.</p>
+                <a href="/examples?example=fleet-charging" class="example-btn" id="ex1-btn">View Details →</a>
             </div>
 
             <!-- Example 2: B2C Service Booking -->
             <div class="example-card">
                 <div class="example-icon">🔧💼</div>
-                <h3>B2C: Service Booking</h3>
-                <p><strong>Personal Agent</strong> books mechanics, HVAC, carpenters automatically based on your budget and location preferences.</p>
-                <a href="/examples?example=service-booking" class="example-btn">View Details →</a>
+                <h3 id="ex2-title">B2C: Service Booking</h3>
+                <p id="ex2-desc"><strong>Personal Agent</strong> books mechanics, HVAC, carpenters automatically based on your budget and location preferences.</p>
+                <a href="/examples?example=service-booking" class="example-btn" id="ex2-btn">View Details →</a>
             </div>
 
             <!-- Example 3: C2C Shopping -->
             <div class="example-card">
                 <div class="example-icon">🛒🤝</div>
-                <h3>C2C: Smart Shopping</h3>
-                <p><strong>Buyer Agent</strong> negotiates prices across multiple vendors to find the best deals for your shopping list.</p>
-                <a href="/examples?example=shopping" class="example-btn">View Details →</a>
+                <h3 id="ex3-title">C2C: Smart Shopping</h3>
+                <p id="ex3-desc"><strong>Buyer Agent</strong> negotiates prices across multiple vendors to find the best deals for your shopping list.</p>
+                <a href="/examples?example=shopping" class="example-btn" id="ex3-btn">View Details →</a>
             </div>
 
             <!-- Example 4: Smart Home (NEW) -->
             <div class="example-card">
                 <div class="example-icon">🧊🍕</div>
-                <h3>Smart Home: Grocery Orders</h3>
-                <p><strong>Smart Fridge Agent</strong> detects low stock, orders groceries via Uber Eats, and pays autonomously when delivered.</p>
-                <a href="/examples?example=smart-fridge" class="example-btn">View Details →</a>
+                <h3 id="ex4-title">Smart Home: Grocery Orders</h3>
+                <p id="ex4-desc"><strong>Smart Fridge Agent</strong> detects low stock, orders groceries via Uber Eats, and pays autonomously when delivered.</p>
+                <a href="/examples?example=smart-fridge" class="example-btn" id="ex4-btn">View Details →</a>
             </div>
 
             <!-- Example 5: IoT Device Auto-Repair -->
             <div class="example-card">
                 <div class="example-icon">🤖⚙️</div>
-                <h3>IoT: Device Auto-Repair</h3>
-                <p><strong>Robot Maintenance Agent</strong> autonomously orders replacement parts when sensors detect wear, negotiates warranties, and schedules repairs.</p>
-                <a href="/examples?example=iot-repair" class="example-btn">View Details →</a>
+                <h3 id="ex5-title">IoT: Device Auto-Repair</h3>
+                <p id="ex5-desc"><strong>Robot Maintenance Agent</strong> autonomously orders replacement parts when sensors detect wear, negotiates warranties, and schedules repairs.</p>
+                <a href="/examples?example=iot-repair" class="example-btn" id="ex5-btn">View Details →</a>
             </div>
 
             <!-- Example 6: Enterprise Supply Chain -->
             <div class="example-card">
                 <div class="example-icon">📦🚚</div>
-                <h3>Enterprise: Supply Chain</h3>
-                <p><strong>Warehouse Agent</strong> automatically negotiates with suppliers, manages inventory, and coordinates logistics across multiple vendors globally.</p>
-                <a href="/examples?example=supply-chain" class="example-btn">View Details →</a>
+                <h3 id="ex6-title">Enterprise: Supply Chain</h3>
+                <p id="ex6-desc"><strong>Warehouse Agent</strong> automatically negotiates with suppliers, manages inventory, and coordinates logistics across multiple vendors globally.</p>
+                <a href="/examples?example=supply-chain" class="example-btn" id="ex6-btn">View Details →</a>
             </div>
         </div>
 
@@ -501,6 +501,26 @@
       // Intro
       document.getElementById('introTitle').textContent = t('intro.h2');
       document.getElementById('introPara').textContent = t('intro.p');
+      
+      // Examples
+      document.getElementById('ex1-title').textContent = t('examples.fleet');
+      document.getElementById('ex1-desc').innerHTML = t('examples.fleetDesc');
+      document.getElementById('ex1-btn').textContent = t('examples.viewDetails') || 'View Details →';
+      
+      document.getElementById('ex2-title').textContent = t('examples.service');
+      document.getElementById('ex2-desc').innerHTML = t('examples.serviceDesc');
+      
+      document.getElementById('ex3-title').textContent = t('examples.shopping');
+      document.getElementById('ex3-desc').innerHTML = t('examples.shoppingDesc');
+      
+      document.getElementById('ex4-title').textContent = t('examples.fridge');
+      document.getElementById('ex4-desc').innerHTML = t('examples.fridgeDesc');
+      
+      document.getElementById('ex5-title').textContent = t('examples.iot');
+      document.getElementById('ex5-desc').innerHTML = t('examples.iotDesc');
+      
+      document.getElementById('ex6-title').textContent = t('examples.supply');
+      document.getElementById('ex6-desc').innerHTML = t('examples.supplyDesc');
       
       // CTA
       document.getElementById('ctaTitle').textContent = t('cta.title');
