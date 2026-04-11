@@ -1,9 +1,0 @@
-[2026-03-26T05:09:41.600108] 🦬 Kalshi Automated Trader Started
-[2026-03-26T05:09:41.600313] Strategy: Sum-to-one hedging on short-term prediction markets
-[2026-03-26T05:09:41.600356] Starting balance: $300
-[2026-03-26T13:41:31.355173] 🦬 Kalshi REST API Trader Started
-[2026-03-26T13:41:31.355525] Strategy: Value betting on high-volume markets
-[2026-03-26T13:41:31.355574] Testing authentication...
-[2026-03-26T13:41:31.593928] API Error: 401 Client Error: Unauthorized for url: https://trading-api.kalshi.com/trade-api/v2/portfolio
-[2026-03-26T13:41:31.595811] ❌ Auth failed: None
-[2026-03-26T13:41:31.596328] ❌ Authentication failed. Exiting.
