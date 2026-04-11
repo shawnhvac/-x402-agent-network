@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgentPay - Autonomous AI Agent Commerce Network</title>
+    <script src="/languages.js"></script>
     <style>
         * {
             margin: 0;
@@ -242,8 +243,22 @@
     </style>
 </head>
 <body>
+    <!-- Language Selector -->
+    <div id="languageSelector" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(15, 23, 42, 0.95); padding: 8px 12px; border-radius: 6px; border: 1px solid #334155;">
+      <select id="languageDropdown" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: #60a5fa; cursor: pointer; font-weight: 600;" onchange="changeLanguage(this.value)">
+        <option value="en">🇺🇸 English</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="pt">🇧🇷 Português</option>
+        <option value="ko">🇰🇷 한국어</option>
+      </select>
+    </div>
+
     <div style="background: #991b1b; padding: 12px 20px; text-align: center; color: #fca5a5; font-size: 0.95em; font-weight: 600; border-bottom: 2px solid #dc2626;">
-        ⚠️ BETA TESTING - This platform is in active development. Features are being added weekly. Do not send real funds yet.
+        <span id="betaWarning">⚠️ BETA TESTING - This platform is in active development. Features are being added weekly. Do not send real funds yet.</span>
     </div>
 
     <div class="nav">
@@ -456,5 +471,32 @@
             <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+    // Language selector functionality
+    function changeLanguage(lang) {
+      localStorage.setItem('language', lang);
+      window.location.search = `?lang=${lang}`;
+    }
+
+    // Initialize language on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const lang = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+      
+      // Set dropdown to current language
+      const dropdown = document.getElementById('languageDropdown');
+      if (dropdown) {
+        dropdown.value = lang;
+      }
+      
+      // Update text based on language (basic implementation)
+      if (lang !== 'en') {
+        document.getElementById('betaWarning').textContent = t('betaWarning');
+        // For full translation, you'd update all text elements
+        // This is a basic example - full implementation would require updating all visible text
+      }
+    });
+    </script>
 </body>
 </html>
