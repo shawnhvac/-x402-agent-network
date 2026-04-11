@@ -59,7 +59,7 @@ fun AgentPayApp(context: Context) {
                 .padding(16.dp)
         ) {
             Text(
-                "🦬 AgentPay™ - Solana",
+                "🦬 AgentPay™",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFA78BFA)
