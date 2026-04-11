@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "/root/.openclaw/workspace/grid-trading-live.py", line 12, in <module>
-    import ccxt
-ModuleNotFoundError: No module named 'ccxt'
