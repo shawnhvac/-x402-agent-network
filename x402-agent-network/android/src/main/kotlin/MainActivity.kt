@@ -341,7 +341,7 @@ fun HistoryScreen(context: Context, walletAddress: String) {
 
 @Composable
 fun WalletScreen(context: Context, walletAddress: String) {
-    var balance by remember { mutableStateOf(10.5) }
+    var balance by remember { mutableStateOf(0.0) }
     var showTopUpDialog by remember { mutableStateOf(false) }
     
     Column(modifier = Modifier
@@ -352,22 +352,17 @@ fun WalletScreen(context: Context, walletAddress: String) {
         Text("💰 Solana Wallet", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
         Text("Connected to Mainnet-Beta", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
         
-        // Wallet Address Card
+        // Wallet Status Card
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp)
-                .clickable {
-                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Wallet", walletAddress))
-                    Toast.makeText(context, "Wallet address copied!", Toast.LENGTH_SHORT).show()
-                },
+                .padding(top = 16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
-                Text("Your Wallet Address (tap to copy):", color = Color(0xFF94A3B8), fontSize = 10.sp)
-                Text(walletAddress, color = Color(0xFF06B6D4), fontSize = 11.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 4.dp))
-                Text("📋 Copy and fund from Phantom/Magic Eden", color = Color(0xFF64748B), fontSize = 9.sp, modifier = Modifier.padding(top = 4.dp))
+                Text("⏳ Wallet Connection Status", color = Color(0xFF94A3B8), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Connecting to Phantom/Magic Eden...", color = Color(0xFF06B6D4), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text("Real wallet connection coming soon. Don't send funds yet.", color = Color(0xFFEF4444), fontSize = 10.sp, modifier = Modifier.padding(top = 8.dp))
             }
         }
         
