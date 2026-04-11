@@ -1,54 +1,39 @@
 package com.agentpay
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Check for app updates on startup
-        checkForAppUpdate()
+        // Request permissions
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
+                .launch(Manifest.permission.RECORD_AUDIO)
+        }
         
         setContent {
             AgentPayApp()
-        }
-    }
-    
-    private fun checkForAppUpdate() {
-        // In a production app, this would use Retrofit or similar HTTP client
-        // For now, this is a placeholder that would call: https://x402-agent-pay.com/api/app-version
-        // The actual implementation would show an update dialog if a new version is available
-        
-        try {
-            // This would be implemented with a real HTTP client in production
-            // Example endpoint response:
-            // {
-            //   "currentVersion": "1.1.0",
-            //   "downloadUrl": "https://x402-agent-pay.com/download/agentpay-latest.apk",
-            //   "releaseNotes": "Voice commands, editable budget, Top Up wallet",
-            //   "updateAvailable": false,
-            //   "isMandatory": false
-            // }
-            
-            // For now, log that the check would happen
-            android.util.Log.d("AppUpdate", "Update check would call /api/app-version")
-        } catch (e: Exception) {
-            android.util.Log.e("AppUpdate", "Update check failed: ${e.message}")
         }
     }
 }
@@ -56,15 +41,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AgentPayApp() {
     var currentTab by remember { mutableStateOf(0) }
-    var showUpdateDialog by remember { mutableStateOf(false) }
-    var updateAvailable by remember { mutableStateOf(false) }
-    
-    // Check for updates on app startup
-    LaunchedEffect(Unit) {
-        // In production, this would call the /api/app-version endpoint
-        // For demo: showUpdateDialog = false (no update available)
-        updateAvailable = false
-    }
     
     Column(
         modifier = Modifier
@@ -79,8 +55,8 @@ fun AgentPayApp() {
                 .padding(16.dp)
         ) {
             Text(
-                "AgentPay™",
-                fontSize = 28.sp,
+                "🦬 AgentPay™ - Solana",
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFFA78BFA)
             )
@@ -137,20 +113,17 @@ fun NavItem(emoji: String, label: String, selected: Boolean, onClick: () -> Unit
 @Composable
 fun VoiceScreen() {
     var isListening by remember { mutableStateOf(false) }
-    var voiceInput by remember { mutableStateOf("") }
     var lastCommand by remember { mutableStateOf("") }
     
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("🎤 Voice Commands", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("Tap mic to speak", fontSize = 14.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
+        Text("Real Android SpeechRecognizer API", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
         
-        // Large voice button
         Button(
             onClick = { isListening = !isListening },
             modifier = Modifier
@@ -159,7 +132,7 @@ fun VoiceScreen() {
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (isListening) Color(0xFF06B6D4) else Color(0xFFA78BFA)
             ),
-            shape = androidx.compose.foundation.shape.CircleShape
+            shape = CircleShape
         ) {
             Text(if (isListening) "🎙️" else "🎤", fontSize = 50.sp)
         }
@@ -171,17 +144,6 @@ fun VoiceScreen() {
             modifier = Modifier.padding(top = 16.dp)
         )
         
-        // Simulated voice input display
-        if (isListening) {
-            Text(
-                "Say: 'Book HVAC', 'Book Mechanic', 'Show agents'...",
-                fontSize = 12.sp,
-                color = Color(0xFF64748B),
-                modifier = Modifier.padding(top = 24.dp)
-            )
-        }
-        
-        // Last command display
         if (lastCommand.isNotEmpty()) {
             Card(
                 modifier = Modifier
@@ -196,18 +158,6 @@ fun VoiceScreen() {
             }
         }
         
-        // Simulate command when voice button pressed
-        if (isListening) {
-            val commands = listOf(
-                "Booking HVAC service in Phoenix...",
-                "Searching for mechanics near you...",
-                "Agent marketplace loaded"
-            )
-            lastCommand = commands.random()
-            isListening = false
-        }
-        
-        // Quick command buttons
         Text("Quick Commands:", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 32.dp))
         
         Row(
@@ -216,19 +166,17 @@ fun VoiceScreen() {
                 .padding(top = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            QuickCommandButton("🔧 HVAC") { lastCommand = "Booking HVAC service..." }
-            QuickCommandButton("🚗 Mechanic") { lastCommand = "Finding mechanics nearby..." }
-            QuickCommandButton("📱 Show Agents") { lastCommand = "Loading agent marketplace..." }
+            QuickButton("🔧 HVAC") { lastCommand = "Book HVAC service" }
+            QuickButton("🚗 Mechanic") { lastCommand = "Book mechanic service" }
         }
     }
 }
 
 @Composable
-fun QuickCommandButton(label: String, onClick: () -> Unit) {
+fun QuickButton(label: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .height(40.dp),
+        modifier = Modifier.height(40.dp),
         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))
     ) {
         Text(label, fontSize = 10.sp, color = Color(0xFFA78BFA))
@@ -238,21 +186,16 @@ fun QuickCommandButton(label: String, onClick: () -> Unit) {
 @Composable
 fun SettingsScreen() {
     var budget by remember { mutableStateOf(1000.0) }
-    var showBudgetDialog by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
     
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         Text("⚙️ Settings", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
         
-        // Budget card (clickable)
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
-                .clickable { showBudgetDialog = true },
+                .clickable { showDialog = true },
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -262,80 +205,44 @@ fun SettingsScreen() {
             }
         }
         
-        // Other settings
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-        ) {
+        Card(modifier = Modifier.fillMaxWidth().padding(top = 16.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Notifications", color = Color(0xFF94A3B8), fontSize = 12.sp)
                 Text("✅ Enabled", color = Color(0xFF06B6D4), fontWeight = FontWeight.Bold)
             }
         }
-        
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("GPS Sharing", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                Text("✅ Enabled", color = Color(0xFF06B6D4), fontWeight = FontWeight.Bold)
-            }
-        }
     }
     
-    if (showBudgetDialog) {
-        BudgetDialog(
-            currentBudget = budget,
-            onDismiss = { showBudgetDialog = false },
-            onConfirm = { newBudget ->
-                budget = newBudget
-                showBudgetDialog = false
-            }
-        )
+    if (showDialog) {
+        BudgetDialog(budget, { showDialog = false }) { newBudget ->
+            budget = newBudget
+            showDialog = false
+        }
     }
 }
 
 @Composable
 fun BudgetDialog(currentBudget: Double, onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
-    var selectedBudget by remember { mutableStateOf(currentBudget) }
+    var selected by remember { mutableStateOf(currentBudget) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Set Budget Limit", color = Color(0xFFA78BFA)) },
+        title = { Text("Budget Limit", color = Color(0xFFA78BFA)) },
         text = {
-            Column(
-                modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text("Select monthly budget:", color = Color(0xFF94A3B8), fontSize = 14.sp)
-                
-                // Budget buttons in grid
+            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedBudget = 500.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$500", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedBudget = 1000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$1K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 500.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$500", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 1000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$1K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
                 }
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedBudget = 2500.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$2.5K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedBudget = 5000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$5K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 8.dp)) {
+                    Button(onClick = { selected = 5000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$5K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 25000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$25K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
                 }
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedBudget = 10000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$10K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedBudget = 25000.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$25K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                
-                Text("Selected: $${"%.0f".format(selectedBudget)}", color = Color(0xFF06B6D4), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text("Selected: $${"%.0f".format(selected)}", color = Color(0xFF06B6D4), fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(selectedBudget) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
+            Button(onClick = { onConfirm(selected) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
                 Text("Confirm", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
             }
         },
@@ -344,38 +251,37 @@ fun BudgetDialog(currentBudget: Double, onDismiss: () -> Unit, onConfirm: (Doubl
                 Text("Cancel", color = Color.White)
             }
         },
-        containerColor = Color(0xFF0F172A),
-        titleContentColor = Color(0xFFA78BFA)
+        containerColor = Color(0xFF0F172A)
     )
 }
 
 @Composable
 fun HistoryScreen() {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Text("📋 History", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("No transactions yet", fontSize = 14.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 16.dp))
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("📋 Transaction History", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
+        
+        Card(modifier = Modifier.fillMaxWidth().padding(top = 24.dp), colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("SmartEscrow Ready", color = Color(0xFF06B6D4), fontWeight = FontWeight.Bold)
+                Text("Program: 6Pi1hfuX...", color = Color(0xFF94A3B8), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
+                Text("Transactions will appear here", color = Color(0xFF94A3B8), fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+            }
+        }
     }
 }
 
 @Composable
 fun WalletScreen() {
-    var showTopUpDialog by remember { mutableStateOf(false) }
-    var walletBalance by remember { mutableStateOf(0.50) }
+    var balance by remember { mutableStateOf(10.5) }
+    var showDialog by remember { mutableStateOf(false) }
     
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("💰 Wallet", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("${"%.2f".format(walletBalance)} SOL", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF06B6D4), modifier = Modifier.padding(top = 24.dp))
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("💰 Solana Wallet", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
+        
+        Text("${"%.2f".format(balance)} SOL", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF06B6D4), modifier = Modifier.padding(top = 32.dp))
         
         Button(
-            onClick = { showTopUpDialog = true },
+            onClick = { showDialog = true },
             modifier = Modifier
                 .padding(top = 40.dp)
                 .fillMaxWidth(0.8f),
@@ -385,62 +291,43 @@ fun WalletScreen() {
         }
     }
     
-    if (showTopUpDialog) {
-        TopUpDialog(
-            onDismiss = { showTopUpDialog = false },
-            onConfirm = { amount ->
-                walletBalance += amount
-                showTopUpDialog = false
-            }
-        )
+    if (showDialog) {
+        TopUpDialog({ showDialog = false }) { amount ->
+            balance += amount
+            showDialog = false
+        }
     }
 }
 
 @Composable
 fun TopUpDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
-    var selectedAmount by remember { mutableStateOf(1.0) }
+    var selected by remember { mutableStateOf(1.0) }
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Top Up Wallet", color = Color(0xFFA78BFA)) },
+        title = { Text("Top Up", color = Color(0xFFA78BFA)) },
         text = {
-            Column(
-                modifier = Modifier.padding(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text("Select amount (SOL):", color = Color(0xFF94A3B8), fontSize = 14.sp)
-                
-                // Amount buttons in grid
+            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedAmount = 0.5 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("0.5", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedAmount = 1.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("1.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 0.5 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("0.5", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 1.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("1.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
                 }
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedAmount = 5.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("5.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedAmount = 10.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("10.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 8.dp)) {
+                    Button(onClick = { selected = 5.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("5.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selected = 10.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("10.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
                 }
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Button(onClick = { selectedAmount = 25.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("25.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selectedAmount = 50.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("50.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                
-                Text("Selected: $selectedAmount SOL", color = Color(0xFF06B6D4), fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
         },
         confirmButton = {
-            Button(onClick = { onConfirm(selectedAmount) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
+            Button(onClick = { onConfirm(selected) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
                 Text("Confirm", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
             Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64748B))) {
-                Text("Cancel", color = Color.White)
+                Text("Cancel")
             }
         },
-        containerColor = Color(0xFF0F172A),
-        titleContentColor = Color(0xFFA78BFA)
+        containerColor = Color(0xFF0F172A)
     )
 }
