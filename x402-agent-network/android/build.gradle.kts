@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "com.agentpay"
-    compileSdk = 33
+    compileSdk = 32
 
     defaultConfig {
         applicationId = "com.agentpay"
-        minSdk = 28
-        targetSdk = 34
+        minSdk = 26
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
 
