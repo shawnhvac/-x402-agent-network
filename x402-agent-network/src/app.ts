@@ -77,32 +77,23 @@ function validateSessionToken(token: string): boolean {
   return true;
 }
 
-// Serve static files (landing page)
-app.use(express.static("public"));
-
-// APK Download endpoint (stub - file will be generated on release)
-app.get("/download/:file", (req: Request, res: Response) => {
-  const { file } = req.params;
-  
-  // Only allow APK downloads
-  if (file !== "agentpay-latest.apk") {
-    return res.status(404).json({ error: "File not found" });
-  }
-  
-  // Serve APK when available
+// APK Download endpoint
+app.get("/download/agentpay-latest.apk", (req: Request, res: Response) => {
   const apkPath = pathJoin(process.cwd(), "public", "apk", "agentpay-latest.apk");
   
-  // For now, return download instructions
   if (!existsSync(apkPath)) {
-    return res.json({
+    return res.status(404).json({ 
       status: "coming-soon",
-      message: "Android APK coming soon! Build instructions at: /android-app",
-      buildGuide: "/ANDROID_APK_BUILD_GUIDE.md"
+      message: "Android APK coming soon!",
+      buildGuide: "/GITHUB_ACTIONS_APK_BUILD.md"
     });
   }
   
   res.download(apkPath, "agentpay.apk");
 });
+
+// Serve static files (landing page) - AFTER custom routes!
+app.use(express.static("public"));
 
 // Marketplace and Dashboard routes
 // Serve specific HTML pages without .html extension

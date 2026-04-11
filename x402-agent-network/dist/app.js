@@ -55,7 +55,19 @@ function validateSessionToken(token) {
     }
     return true;
 }
-// Serve static files (landing page)
+// APK Download endpoint
+app.get("/download/agentpay-latest.apk", (req, res) => {
+    const apkPath = pathJoin(process.cwd(), "public", "apk", "agentpay-latest.apk");
+    if (!existsSync(apkPath)) {
+        return res.status(404).json({
+            status: "coming-soon",
+            message: "Android APK coming soon!",
+            buildGuide: "/GITHUB_ACTIONS_APK_BUILD.md"
+        });
+    }
+    res.download(apkPath, "agentpay.apk");
+});
+// Serve static files (landing page) - AFTER custom routes!
 app.use(express.static("public"));
 // Marketplace and Dashboard routes
 // Serve specific HTML pages without .html extension

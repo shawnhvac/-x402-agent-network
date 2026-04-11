@@ -1,0 +1,105 @@
+
+> x402-agent-network@1.0.0 start
+> node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ suppress logs { quiet: true }
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+[2026-04-11T08:28:19.455Z] GET /health | 200 | 4ms | unknown
+
+> x402-agent-network@1.0.0 start
+> node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ override existing { override: true }
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+[ERROR] 2026-04-11T08:28:46.144Z | Request: req-1775896126140-z31vsdr5i | Wallet: unknown
+[ERROR] Not Found
+[ERROR] Stack: NotFoundError: Not Found
+    at createHttpError (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:861:12)
+    at SendStream.error (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:168:31)
+    at SendStream.pipe (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:468:14)
+    at sendfile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:1014:8)
+    at ServerResponse.sendFile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:411:3)
+    at ServerResponse.download (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:488:15)
+    at file:///root/.openclaw/workspace/x402-agent-network/dist/app.js:75:9
+    at Layer.handleRequest (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:152:17)
+    at next (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:117:3)
+[2026-04-11T08:28:46.140Z] HEAD /download/agentpay-latest.apk | 500 | 4ms | unknown
+[ERROR] 2026-04-11T08:28:49.719Z | Request: req-1775896129718-9y29slk41 | Wallet: unknown
+[ERROR] Not Found
+[ERROR] Stack: NotFoundError: Not Found
+    at createHttpError (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:861:12)
+    at SendStream.error (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:168:31)
+    at SendStream.pipe (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:468:14)
+    at sendfile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:1014:8)
+    at ServerResponse.sendFile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:411:3)
+    at ServerResponse.download (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:488:15)
+    at file:///root/.openclaw/workspace/x402-agent-network/dist/app.js:75:9
+    at Layer.handleRequest (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:152:17)
+    at next (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:117:3)
+[2026-04-11T08:28:49.718Z] GET /download/agentpay-latest.apk | 500 | 2ms | unknown
+
+> x402-agent-network@1.0.0 start
+> node dist/app.js
+
+◇ injected env (7) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+Attempting to download APK from: /root/.openclaw/workspace/x402-agent-network/x402-agent-network/public/apk/agentpay-latest.apk
+APK not found at /root/.openclaw/workspace/x402-agent-network/x402-agent-network/public/apk/agentpay-latest.apk
+[2026-04-11T08:29:18.780Z] GET /download/agentpay-latest.apk | 404 | 2ms | unknown
+Attempting to download APK from: /root/.openclaw/workspace/x402-agent-network/x402-agent-network/public/apk/agentpay-latest.apk
+APK not found at /root/.openclaw/workspace/x402-agent-network/x402-agent-network/public/apk/agentpay-latest.apk
+[2026-04-11T08:29:20.354Z] GET /download/agentpay-latest.apk | 404 | 1ms | unknown
+
+> x402-agent-network@1.0.0 start
+> node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ override existing { override: true }
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+[ERROR] 2026-04-11T08:29:40.205Z | Request: req-1775896180201-edz18qhmo | Wallet: unknown
+[ERROR] Not Found
+[ERROR] Stack: NotFoundError: Not Found
+    at createHttpError (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:861:12)
+    at SendStream.error (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:168:31)
+    at SendStream.pipe (/root/.openclaw/workspace/x402-agent-network/node_modules/send/index.js:468:14)
+    at sendfile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:1014:8)
+    at ServerResponse.sendFile (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:411:3)
+    at ServerResponse.download (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:488:15)
+    at file:///root/.openclaw/workspace/x402-agent-network/dist/app.js:68:9
+    at Layer.handleRequest (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:152:17)
+    at next (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/route.js:117:3)
+[2026-04-11T08:29:40.201Z] HEAD /download/agentpay-latest.apk | 500 | 4ms | unknown
