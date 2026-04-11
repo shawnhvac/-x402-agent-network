@@ -16,11 +16,12 @@
 - Autonomous commerce: **$100B+** emerging market
 
 **Traction:**
-- ✅ SmartEscrow smart contract deployed to Solana mainnet ($239 cost, production-ready)
+- ✅ SmartEscrow smart contract **DEPLOYED TO SOLANA MAINNET** (live now, $239 cost, production-ready)
 - ✅ Android app built (29MB, all features working, voice commands, wallet integration)
 - ✅ GitHub repo public (55+ commits, 33.5K lines production code)
 - ✅ Website live (6 example use cases, video carousel, full branding)
 - ✅ Security audit completed (5 vulnerabilities found, all fixed)
+- ✅ Founder: Crypto OG (2014), built & launched live crypto coin with 1.5+ years active community
 
 **Ask:** $5M Series A to build:
 1. Real Phantom wallet integration (Phases 1-2: $10K, 3 weeks)
@@ -420,11 +421,14 @@ Solana Program ID: 6Pi1hfuX8x3vzF3EW1YEN43ZkCdNdQDpHRdzg47CnBED
 
 ## 📞 How to reach out
 
-- **Email:** shawnlippert383@gmail.com
+**Shawn (Founder)**
+- **Email (Direct):** shawnlippert383@gmail.com
 - **Website:** https://x402-agent-pay.com
-- **GitHub:** https://github.com/shawnhvac/-x402-agent-network
-- **Demo:** Download APK from website, test on Android phone
 - **Investor Materials:** https://x402-agent-pay.com/investor-pitch
+- **GitHub:** https://github.com/shawnhvac/-x402-agent-network
+- **Demo:** Download APK from x402-agent-pay.com, test on Android phone
+
+**Schedule a call directly with Shawn:** Email shawnlippert383@gmail.com
 
 ---
 
