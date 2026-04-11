@@ -12584,3 +12584,18 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
     at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
 [2026-04-10T23:40:47.562Z] GET /health | 200 | 4ms | unknown
 [2026-04-10T23:56:18.854Z] GET /health | 200 | 1ms | unknown
+
+> x402-agent-network@1.0.0 start
+> node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+[2026-04-11T00:08:34.341Z] GET /health | 200 | 5ms | unknown

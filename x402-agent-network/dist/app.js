@@ -4,6 +4,10 @@
  */
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import cookieParser from "cookie-parser";
+import crypto from "crypto";
 import { x402Middleware } from "./middleware/x402.js";
 import { initializeDatabase, getQuota, decrementQuota, recordPayment } from "./db-sqlite.js";
 import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logging.js";
@@ -12,10 +16,45 @@ import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
 dotenv.config();
 const app = express();
+// ✅ SECURITY: CORS Protection
+app.use(cors({
+    origin: (process.env.ALLOWED_ORIGINS || 'https://x402-agent-pay.com').split(','),
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+// ✅ SECURITY: Cookie Parser for HttpOnly cookies
+app.use(cookieParser());
 app.use(express.json());
 app.use(timeoutMiddleware(30000)); // 30 second timeout
 app.use(loggingMiddleware); // Log all requests
 app.use(x402Middleware);
+// ✅ SECURITY: Rate limiting for login attempts
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts
+    message: 'Too many login attempts, please try again later',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+// ✅ SECURITY: Rate limiting for API endpoints
+const apiLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 100, // 100 requests per minute
+    skip: (req) => req.path === '/health' || req.path === '/',
+});
+app.use('/api/', apiLimiter);
+// ✅ SECURITY: Session token storage (in-memory for this deployment)
+const sessionTokens = new Map();
+// ✅ SECURITY: Validate session token
+function validateSessionToken(token) {
+    const expiry = sessionTokens.get(token);
+    if (!expiry || expiry < Date.now()) {
+        sessionTokens.delete(token);
+        return false;
+    }
+    return true;
+}
 // Serve static files (landing page)
 app.use(express.static("public"));
 // Marketplace and Dashboard routes
@@ -42,13 +81,63 @@ app.get("/admin", (req, res) => {
     res.sendFile("public/admin.html", { root: process.cwd() });
 });
 /**
- * Admin API - Get all contacts
+ * ✅ SECURITY: Admin Login Endpoint
+ * Validates password, creates secure HttpOnly session cookie
+ */
+app.post("/api/admin/login", loginLimiter, (req, res) => {
+    try {
+        const { password } = req.body;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (!adminPassword) {
+            console.error("❌ ADMIN_PASSWORD not set in environment");
+            return res.status(500).json({ error: "Server configuration error" });
+        }
+        if (!password || password !== adminPassword) {
+            console.warn(`❌ Unauthorized login attempt at ${new Date().toISOString()}`);
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+        // ✅ SECURITY: Create secure session token
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiryTime = Date.now() + 3600000; // 1 hour
+        sessionTokens.set(token, expiryTime);
+        // ✅ SECURITY: Set HttpOnly cookie (cannot be accessed by JavaScript)
+        res.cookie('adminSession', token, {
+            httpOnly: true, // Prevents JavaScript access
+            secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+            sameSite: 'strict', // CSRF protection
+            maxAge: 3600000, // 1 hour
+            path: '/api/admin' // Scope to admin endpoints
+        });
+        console.log(`✅ Admin login successful`);
+        res.json({ success: true, message: 'Login successful' });
+    }
+    catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+/**
+ * ✅ SECURITY: Admin Logout Endpoint
+ * Clears session token and cookie
+ */
+app.post("/api/admin/logout", (req, res) => {
+    const token = req.cookies.adminSession;
+    if (token) {
+        sessionTokens.delete(token);
+    }
+    res.clearCookie('adminSession');
+    res.json({ success: true, message: 'Logged out' });
+});
+/**
+ * ✅ SECURITY: Admin API - Get all contacts
+ * Validates secure session token from HttpOnly cookie
  */
 app.get("/api/admin/contacts", (req, res) => {
     try {
-        // Simple session check (in production, use proper JWT/sessions)
-        if (req.headers['x-admin-session'] !== 'true') {
-            return res.status(401).json({ error: "Unauthorized" });
+        // ✅ SECURITY: Validate session token from secure HttpOnly cookie
+        const token = req.cookies.adminSession;
+        if (!token || !validateSessionToken(token)) {
+            return res.status(401).json({ error: "Unauthorized - please login" });
         }
         const contactsFile = pathJoin(process.cwd(), 'contacts.jsonl');
         if (!existsSync(contactsFile)) {
