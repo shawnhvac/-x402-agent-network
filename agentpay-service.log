@@ -658,3 +658,39 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 [2026-04-11T18:15:01.493Z] GET /health | 200 | 0ms | unknown
 [2026-04-11T18:20:01.402Z] GET /health | 200 | 1ms | unknown
 [2026-04-11T18:25:01.456Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-11T18:26:19.931Z | Request: req-1775931949931-8e5ewr172 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-11T18:25:49.931Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-11T18:26:37.162Z | Request: req-1775931967158-55agcmy4d | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-11T18:26:07.158Z] GET /video-fleet-charging.mp4 | 500 | 30004ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)

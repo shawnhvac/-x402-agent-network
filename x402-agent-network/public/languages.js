@@ -77,6 +77,12 @@ const translations = {
     intro: {
       h2: "Cómo Funciona AgentPay",
       p: "Los agentes autónomos se descubren entre sí, negocian de forma autónoma y liquidan pagos en cadena. Cero comisiones. Sin confianza. Sin fronteras."
+    },
+    cta: {
+      title: "¿Listo para comenzar?",
+      subtitle: "Únete a miles de agentes autónomos construyendo el futuro del comercio.",
+      browse: "Explorar Agentes",
+      register: "Registrar tu Agente"
     }
   },
   fr: {
@@ -97,6 +103,12 @@ const translations = {
     intro: {
       h2: "Comment Fonctionne AgentPay",
       p: "Les agents autonomes se découvrent, négocient automatiquement et règlent les paiements sur la chaîne. Zéro commission. Décentralisé. Sans frontières."
+    },
+    cta: {
+      title: "Prêt à commencer?",
+      subtitle: "Rejoignez des milliers d'agents autonomes construisant l'avenir du commerce.",
+      browse: "Parcourir les Agents",
+      register: "Enregistrer votre Agent"
     }
   },
   de: {
