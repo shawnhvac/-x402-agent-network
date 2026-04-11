@@ -2,25 +2,7 @@
 
 ## Checks to run every 30 minutes:
 
-### 1. KALSHI BOT
-```
-ps aux | grep kalshi-bot | grep -v grep
-```
-Should show a running process. If not, restart immediately.
-
-**Recent scans check:**
-```
-tail -5 kalshi-trading.log
-```
-Should show recent timestamps (within last 3-5 minutes). If not, bot crashed.
-
-**Restart if needed:**
-```
-pkill -f kalshi-bot
-cd /root/.openclaw/workspace && nohup python3 kalshi-bot.py > /dev/null 2>&1 &
-```
-
-### 2. GRID TRADING BOT (CRITICAL!)
+### GRID TRADING BOT (CRITICAL!)
 ```
 ps aux | grep grid-trading-live.py | grep -v grep
 ```
@@ -44,12 +26,6 @@ pip install ccxt pandas numpy requests --break-system-packages -q
 ```
 
 ## Status to report:
-
-**Kalshi Bot:**
-- ✅ Running / ❌ Crashed
-- Last scan timestamp
-- Markets fetched
-- Value opportunities found
 
 **Grid Trading Bot:**
 - ✅ Running / ❌ Crashed
@@ -75,9 +51,6 @@ cd /root/.openclaw/workspace/x402-agent-network && nohup npm start > /tmp/agentp
 - ✅ No recent errors in logs
 
 **Alert Rules:**
-
-**Kalshi Bot:**
-- ⚠️ Down >10 min → Restart + report
 
 **Grid Trading Bot (CRITICAL):**
 - ⚠️ Down >5 min → Restart + IMMEDIATE ALERT

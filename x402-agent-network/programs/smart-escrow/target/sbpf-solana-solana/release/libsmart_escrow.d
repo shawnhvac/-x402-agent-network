@@ -1,0 +1,1 @@
+/root/.openclaw/workspace/x402-agent-network/programs/smart-escrow/target/sbpf-solana-solana/release/libsmart_escrow.rlib: /root/.openclaw/workspace/x402-agent-network/programs/smart-escrow/src/lib.rs
