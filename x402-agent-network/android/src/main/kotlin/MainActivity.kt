@@ -152,22 +152,86 @@ fun HistoryScreen() {
 
 @Composable
 fun WalletScreen() {
+    var showTopUpDialog by remember { mutableStateOf(false) }
+    var walletBalance by remember { mutableStateOf(0.50) }
+    
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text("💰 Wallet", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("0.50 SOL", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF06B6D4), modifier = Modifier.padding(top = 24.dp))
+        Text("${"%.2f".format(walletBalance)} SOL", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF06B6D4), modifier = Modifier.padding(top = 24.dp))
         
         Button(
-            onClick = {},
+            onClick = { showTopUpDialog = true },
             modifier = Modifier
                 .padding(top = 40.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth(0.8f),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))
         ) {
             Text("Top Up", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
         }
     }
+    
+    if (showTopUpDialog) {
+        TopUpDialog(
+            onDismiss = { showTopUpDialog = false },
+            onConfirm = { amount ->
+                walletBalance += amount
+                showTopUpDialog = false
+            }
+        )
+    }
+}
+
+@Composable
+fun TopUpDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
+    var selectedAmount by remember { mutableStateOf(1.0) }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Top Up Wallet", color = Color(0xFFA78BFA)) },
+        text = {
+            Column(
+                modifier = Modifier.padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("Select amount (SOL):", color = Color(0xFF94A3B8), fontSize = 14.sp)
+                
+                // Amount buttons in grid
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Button(onClick = { selectedAmount = 0.5 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("0.5", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selectedAmount = 1.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("1.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                }
+                
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Button(onClick = { selectedAmount = 5.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("5.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selectedAmount = 10.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("10.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                }
+                
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Button(onClick = { selectedAmount = 25.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("25.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                    Button(onClick = { selectedAmount = 50.0 }, modifier = Modifier.weight(1f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("50.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
+                }
+                
+                Text("Selected: $selectedAmount SOL", color = Color(0xFF06B6D4), fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+        },
+        confirmButton = {
+            Button(onClick = { onConfirm(selectedAmount) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
+                Text("Confirm", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64748B))) {
+                Text("Cancel", color = Color.White)
+            }
+        },
+        containerColor = Color(0xFF0F172A),
+        titleContentColor = Color(0xFFA78BFA)
+    )
 }
