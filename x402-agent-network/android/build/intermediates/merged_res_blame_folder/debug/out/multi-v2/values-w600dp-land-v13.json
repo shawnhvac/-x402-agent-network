@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.agentpay.android-mergeDebugResources-58:/values-w600dp-land-v13/values-w600dp-land-v13.xml",
+            "outputFile": "com.agentpay.android-mergeDebugResources-59:/values-w600dp-land-v13/values-w600dp-land-v13.xml",
             "map": [
                 {
                     "source": "/root/.gradle/caches/transforms-3/e03158ffc1c15c475f6f140dfd4ca23c/transformed/material-1.10.0/res/values-w600dp-land-v13/values-w600dp-land-v13.xml",

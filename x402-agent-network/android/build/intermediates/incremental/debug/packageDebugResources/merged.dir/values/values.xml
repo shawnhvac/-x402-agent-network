@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_description">Autonomous Agent Payment Network</string>
-    <string name="app_name">AgentPay</string>
-    <style name="Theme.AgentPay" parent="Theme.MaterialComponents">
-        <item name="colorPrimary">@android:color/darker_gray</item>
-    </style>
-</resources>

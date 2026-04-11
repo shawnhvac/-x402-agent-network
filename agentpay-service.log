@@ -393,3 +393,40 @@ Serving APK from: /root/.openclaw/workspace/x402-agent-network/public/apk/agentp
 🏥 Health: http://localhost:3001/health
 📊 Metrics: http://localhost:3001/metrics
 ⚙️ Status: http://localhost:3001/status
+
+> x402-agent-network@1.0.0 start
+> cd /root/.openclaw/workspace/x402-agent-network && node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ override existing { override: true }
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+
+> x402-agent-network@1.0.0 start
+> cd /root/.openclaw/workspace/x402-agent-network && node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+[2026-04-11T09:38:55.025Z] GET /api/app-version | 200 | 15ms | unknown
+[2026-04-11T09:39:24.664Z] GET /api/app-version | 200 | 1ms | unknown
+[2026-04-11T09:39:32.642Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T09:40:01.490Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T09:43:54.526Z] GET /api/app-version | 200 | 1ms | unknown
+[2026-04-11T09:45:01.548Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T09:50:01.518Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T09:55:01.584Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T09:56:40.060Z] GET /health | 200 | 1ms | unknown
