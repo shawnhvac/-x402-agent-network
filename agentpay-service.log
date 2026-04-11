@@ -558,3 +558,4 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
     at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
     at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
 [2026-04-11T15:05:01.877Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T15:07:57.080Z] GET /health | 200 | 1ms | unknown
