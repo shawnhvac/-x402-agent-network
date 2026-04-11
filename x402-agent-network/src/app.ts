@@ -10,6 +10,8 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import crypto from "crypto";
+import { readFileSync, appendFileSync, existsSync, createReadStream } from 'fs';
+import { join as pathJoin } from 'path';
 import { x402Middleware, paymentRequired, type PaymentRequiredOptions } from "./middleware/x402.js";
 import { initializeDatabase, getQuota, decrementQuota, recordPayment } from "./db-sqlite.js";
 import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logging.js";
@@ -40,6 +42,22 @@ app.use(cors({
 
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
+
+// APK Download endpoint - BEFORE middleware to avoid being blocked
+app.get("/download/agentpay-latest.apk", (req: Request, res: Response) => {
+  const apkPath = pathJoin(process.cwd(), "public", "apk", "agentpay-latest.apk");
+  
+  if (!existsSync(apkPath)) {
+    return res.status(404).json({ 
+      status: "coming-soon",
+      message: "Android APK coming soon!"
+    });
+  }
+  
+  res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+  res.setHeader('Content-Disposition', 'attachment; filename="agentpay.apk"');
+  createReadStream(apkPath).pipe(res);
+});
 
 app.use(express.json());
 app.use(timeoutMiddleware(30000)); // 30 second timeout
@@ -77,22 +95,7 @@ function validateSessionToken(token: string): boolean {
   return true;
 }
 
-// APK Download endpoint
-app.get("/download/agentpay-latest.apk", (req: Request, res: Response) => {
-  const apkPath = pathJoin(process.cwd(), "public", "apk", "agentpay-latest.apk");
-  
-  if (!existsSync(apkPath)) {
-    return res.status(404).json({ 
-      status: "coming-soon",
-      message: "Android APK coming soon!",
-      buildGuide: "/GITHUB_ACTIONS_APK_BUILD.md"
-    });
-  }
-  
-  res.download(apkPath, "agentpay.apk");
-});
-
-// Serve static files (landing page) - AFTER custom routes!
+// Serve static files (landing page)
 app.use(express.static("public"));
 
 // Marketplace and Dashboard routes
@@ -212,8 +215,6 @@ app.get("/api/admin/contacts", (req: Request, res: Response) => {
 });
 
 // Documentation markdown files served as HTML
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
 const docFiles = {
   '/getting-started': 'GETTING_STARTED.md',
@@ -229,7 +230,7 @@ const docFiles = {
 Object.entries(docFiles).forEach(([route, filename]) => {
   app.get(route, (req: Request, res: Response) => {
     try {
-      const filePath = join(process.cwd(), filename);
+      const filePath = pathJoin(process.cwd(), filename);
       const data = readFileSync(filePath, 'utf8');
       const html = `<!DOCTYPE html>
 <html>
@@ -334,10 +335,6 @@ app.use("/agents", agentRoutes);
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
  */
 app.use("/", demoAgentRoutes);
-
-// Import at top
-import { appendFileSync, readFileSync, existsSync } from 'fs';
-import { join as pathJoin } from 'path';
 
 /**
  * Contact form endpoint - Save to file
