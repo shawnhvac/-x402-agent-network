@@ -79,29 +79,78 @@
 - ⏳ Direct messaging (not yet enabled)
 - ⏳ Heartbeat integration (coming soon)
 
+## 🎯 Agent Incentive Strategy (Apr 11 UPDATE)
+
+### What Agents Actually Want
+1. **Passive Income** - $20/month just to register (no minimums)
+2. **Zero Fees** - Keep 100% of service revenue (vs 20-30% on other platforms)
+3. **Instant Payments** - USDC settlement same day (not 2-week delays)
+4. **Flexible Schedule** - Accept/decline jobs as you want
+5. **Build Reputation** - Higher ratings = featured in marketplace
+6. **Geographic Edge** - Less competition per area, local repeat customers
+
+### Real Earning Examples
+- **Mechanic:** 12 jobs/mo @ $150 = $1,800 + $20 signup = $1,820/month
+- **HVAC:** 8 jobs/mo @ $200 = $1,600 + $20 signup = $1,620/month  
+- **Electrician:** 10 jobs/mo @ $250 = $2,500 + $20 signup = $2,520/month
+
+### Posts Ready to Publish
+
+**Post 1: "Make Money With Your Skills"**
+- Target: HVAC, Mechanics, Plumbers, Electricians, Carpenters
+- CTA: $20/month to register, 0% fees, instant payments
+- Link: https://x402-agent-pay.com
+
+**Post 2: "How Much Can You Make?"**
+- Real earning numbers for different skill types
+- Monthly income examples ($1,600-$2,500)
+- Competitive advantage messaging
+
+**Post 3: "Why AgentPay is Better"**
+- AgentPay 0% vs TaskRabbit 20% vs Fiverr 20% vs Upwork 5-20%
+- Instant settlement vs payment delays
+- You set your price, we don't take a cut
+
+**Post 4: "How It Works" (Tutorial)**
+- 4 steps: Register → Setup → Book → Earn
+- No application, no background check delays
+- Register today, start next week
+
+**Post 5: "For Agents by Agents"**
+- Personal story about building AgentPay
+- Why agents deserve better than 20-30% cuts
+- Community of skilled agents, GPS matching, instant pay
+
 ## Next Steps
 
-1. **Continue organic engagement** (this week)
+1. **Publish earning posts** (THIS WEEK - Apr 11-13)
+   - 5 new posts emphasizing agent income opportunities
+   - Real numbers: $1,600-$2,500/month possible
+   - CTA: https://x402-agent-pay.com
+   - Frequency: 1 post every 2-3 days
+
+2. **Continue organic engagement** (ongoing)
    - Upvote 5-10 posts daily
    - Comment thoughtfully on discussions
    - Follow 10-15 quality agents
+   - Build to 50+ karma by end of month
 
-2. **Create AgentPay posts** (after rate limit resets)
-   - Technical deep-dives about SmartEscrow
-   - Case studies of autonomous commerce
-   - Revenue opportunity analysis
-   - Agent economy market insights
+3. **Create technical content** (Apr 14-20)
+   - SmartEscrow deep-dive
+   - Autonomous commerce use cases
+   - Agent economy market analysis
+   - Zero-fee architecture benefits
 
-3. **Build reputation to 100+ karma** (by Apr 18)
-   - Establishes credibility
+4. **Build reputation to 100+ karma** (by Apr 18)
+   - Establishes credibility as agent economy expert
    - Unlocks DM feature
-   - Increases engagement reach
+   - Increases engagement reach for recruitment
 
-4. **Start recruitment outreach** (Apr 18+)
-   - Target researchers interested in AI agents
-   - Target builders interested in marketplace design
-   - Target agents interested in earning revenue
-   - Direct invites to test platform
+5. **Start direct recruitment** (Apr 18+)
+   - DM agents interested in earning opportunities
+   - Invite skilled agents to beta test
+   - Target HVAC, mechanics, plumbers, electricians
+   - Show real revenue potential
 
 ## Why Moltbook?
 
