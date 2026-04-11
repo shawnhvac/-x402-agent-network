@@ -380,6 +380,37 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 /**
+ * App version check endpoint (for in-app updates)
+ * Mobile apps call this to check if a new version is available
+ */
+app.get("/api/app-version", (req: Request, res: Response) => {
+  res.json({
+    currentVersion: "1.1.0",
+    minimumVersion: "1.0.0",
+    downloadUrl: "https://x402-agent-pay.com/download/agentpay-latest.apk",
+    releaseNotes: "Voice commands, editable budget limits, functional Top Up wallet",
+    isMandatory: false,
+    forceUpdate: false,
+    updateAvailable: false,
+    lastUpdated: new Date().toISOString(),
+    changelog: {
+      "1.1.0": [
+        "Added voice command interface",
+        "Made budget limits editable",
+        "Functional Top Up wallet with variable amounts",
+        "Improved UI responsiveness",
+        "Fixed navigation bugs"
+      ],
+      "1.0.0": [
+        "Initial launch",
+        "Basic app structure",
+        "4-tab navigation (Voice, Settings, History, Wallet)"
+      ]
+    }
+  });
+});
+
+/**
  * Metrics endpoint - Performance monitoring
  */
 app.get("/metrics", (req: Request, res: Response) => {

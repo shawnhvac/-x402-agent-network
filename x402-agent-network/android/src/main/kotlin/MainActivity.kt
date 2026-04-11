@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,8 +20,35 @@ import androidx.compose.ui.unit.sp
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Check for app updates on startup
+        checkForAppUpdate()
+        
         setContent {
             AgentPayApp()
+        }
+    }
+    
+    private fun checkForAppUpdate() {
+        // In a production app, this would use Retrofit or similar HTTP client
+        // For now, this is a placeholder that would call: https://x402-agent-pay.com/api/app-version
+        // The actual implementation would show an update dialog if a new version is available
+        
+        try {
+            // This would be implemented with a real HTTP client in production
+            // Example endpoint response:
+            // {
+            //   "currentVersion": "1.1.0",
+            //   "downloadUrl": "https://x402-agent-pay.com/download/agentpay-latest.apk",
+            //   "releaseNotes": "Voice commands, editable budget, Top Up wallet",
+            //   "updateAvailable": false,
+            //   "isMandatory": false
+            // }
+            
+            // For now, log that the check would happen
+            android.util.Log.d("AppUpdate", "Update check would call /api/app-version")
+        } catch (e: Exception) {
+            android.util.Log.e("AppUpdate", "Update check failed: ${e.message}")
         }
     }
 }
@@ -28,6 +56,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AgentPayApp() {
     var currentTab by remember { mutableStateOf(0) }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    var updateAvailable by remember { mutableStateOf(false) }
+    
+    // Check for updates on app startup
+    LaunchedEffect(Unit) {
+        // In production, this would call the /api/app-version endpoint
+        // For demo: showUpdateDialog = false (no update available)
+        updateAvailable = false
+    }
     
     Column(
         modifier = Modifier
