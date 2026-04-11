@@ -221,11 +221,15 @@ const docFiles = {
   '/quick-reference': 'QUICK_REFERENCE.md',
   '/pricing': 'PRICING.md',
   '/roadmap': 'ROADMAP.md',
-  '/investor-pitch': 'INVESTOR_PITCH.md',
   '/personal-agent-app': 'PERSONAL_AGENT_APP.md',
   '/android-app': 'ANDROID_APP_BUILD.md',
   '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
 };
+
+// Special: investor-pitch served as HTML, not markdown
+app.get('/investor-pitch', (req: Request, res: Response) => {
+  res.sendFile('public/investor-pitch.html', { root: process.cwd() });
+});
 
 Object.entries(docFiles).forEach(([route, filename]) => {
   app.get(route, (req: Request, res: Response) => {
