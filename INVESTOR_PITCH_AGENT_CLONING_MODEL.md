@@ -420,10 +420,11 @@ Solana Program ID: 6Pi1hfuX8x3vzF3EW1YEN43ZkCdNdQDpHRdzg47CnBED
 
 ## 📞 How to reach out
 
+- **Email:** shawnlippert383@gmail.com
 - **Website:** https://x402-agent-pay.com
 - **GitHub:** https://github.com/shawnhvac/-x402-agent-network
-- **Email:** Shawn (contact via GitHub)
 - **Demo:** Download APK from website, test on Android phone
+- **Investor Materials:** https://x402-agent-pay.com/investor-pitch
 
 ---
 

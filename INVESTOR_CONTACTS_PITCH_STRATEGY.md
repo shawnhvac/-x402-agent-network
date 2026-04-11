@@ -3,6 +3,13 @@
 
 ---
 
+## 📧 FOUNDER CONTACT
+**Email:** shawnlippert383@gmail.com  
+**Website:** https://x402-agent-pay.com  
+**Investor Materials:** https://x402-agent-pay.com/investor-pitch
+
+---
+
 ## 🎯 Quick Reference: Tier 1 VCs (AI + Crypto Focus)
 
 ### **Tier 1A: Top-tier VCs with AI + Blockchain Thesis**
