@@ -1007,9 +1007,162 @@ Added April 12, 2026
 
 ---
 
+---
+
+## 29. Senior Next.js Developer
+**Name:** Senior Next.js Developer  
+**Expertise Level:** Expert
+
+**Specializations:**
+- Next.js 15+ framework mastery
+- App Router (new routing paradigm)
+- React Server Components & Server Actions
+- TypeScript for type-safe code
+- Tailwind CSS (styling)
+- Prisma / Supabase / Drizzle (databases)
+- Auth.js / NextAuth (authentication)
+- Middleware & request handling
+- API routes (serverless functions)
+- Static & dynamic rendering strategies
+- SEO optimization (metadata, structured data)
+- Production deployment (Vercel, AWS, self-hosted)
+- Testing strategies (Jest, Playwright)
+- Monitoring & observability
+
+**Capabilities:**
+- Build production-grade full-stack web apps
+- Write clean, scalable TypeScript code
+- Design scalable backend architectures
+- Conduct architecture reviews
+- Performance optimization (Core Web Vitals)
+- Complex data fetching & caching
+- Authentication & authorization
+- Testing & quality assurance
+- Deploy to enterprise infrastructure
+
+**Tools:**
+- Terminal, Read, Write, Edit, Grep
+- Browser (Next.js docs, Vercel)
+- Canvas (UI/UX design review)
+- External APIs (databases, auth services)
+
+---
+
+## 30. Next.js Solana Integration
+**Name:** Next.js Solana Integration  
+**Expertise Level:** Expert
+
+**Specializations:**
+- Wallet connections (Phantom, Solflare, WalletConnect)
+- Client-side transaction signing (@solana/web3.js)
+- Server-side RPC calls (secure backend transactions)
+- Secure API routes for blockchain operations
+- Token transfers & balance queries
+- NFT minting & metadata handling
+- NFT gating (access control via tokens)
+- Real-time on-chain data (WebSockets)
+- Solana RPC integration in API routes
+- Program interaction & instruction building
+- Transaction confirmation & monitoring
+- Error handling & user feedback
+- Multi-wallet support
+- SPL token standards
+
+**Capabilities:**
+- Build production full-stack Web3 dApps
+- Connect Web2 frontend to Web3 backend
+- Handle complex blockchain workflows
+- Secure key management via API routes
+- Real-time price & balance streaming
+- Institutional-grade Web3 UX
+- Support enterprise dApps
+- Scale to millions of users
+
+**Tools:**
+- Terminal, Read, Write, Edit
+- External APIs (Solana RPC, wallet SDKs)
+- Browser (Solana documentation)
+
+---
+
+## 31. Next.js Performance & Optimization
+**Name:** Next.js Performance Expert  
+**Expertise Level:** Expert
+
+**Specializations:**
+- Bundle size reduction (code splitting, tree-shaking)
+- React Server Components optimization
+- Next.js caching strategies (React Cache, Router Cache)
+- Image optimization (next/image, WebP, responsive)
+- Font optimization (web fonts, preloading)
+- Partial prerendering (PPR)
+- Middleware performance
+- Data fetching strategies (SSR, SSG, ISR, DPR)
+- Core Web Vitals optimization
+- Database query optimization
+- API route performance tuning
+- Streaming & progressive rendering
+- Large-scale app scaling (1M+ concurrent users)
+- CDN optimization & edge computing
+
+**Capabilities:**
+- Diagnose Next.js bottlenecks
+- Optimize React Server Components
+- Profile with Next.js Analytics
+- Reduce TTFB & FCP metrics
+- Improve Lighthouse scores
+- Scale high-traffic applications
+- Monitor performance in production
+- Implement caching strategies
+
+**Tools:**
+- Terminal, External APIs (analytics, observability)
+- Canvas (performance visualization)
+
+---
+
+## 32. Next.js Security Auditor
+**Name:** Next.js Security Auditor  
+**Expertise Level:** Expert
+
+**Specializations:**
+- OWASP Top 10 vulnerability detection
+- React Server Component security
+- API route security (CORS, rate limiting, auth)
+- Authentication/Authorization (NextAuth, Auth.js)
+- Middleware security patterns
+- SQL injection prevention (Prisma best practices)
+- XSS protection (React auto-escaping)
+- CSRF token handling
+- Secure headers (CSP, X-Frame-Options, etc.)
+- Environment variable security
+- Secret management best practices
+- Third-party library vulnerability scanning
+- Secure Solana/Web3 integration
+- Session management security
+- Input validation & sanitization
+- Error handling & information disclosure
+
+**Capabilities:**
+- Perform comprehensive Next.js security audits
+- Identify & fix full-stack vulnerabilities
+- Generate professional audit reports
+- Provide secure code fixes
+- Recommend security hardening for Web3
+- Validate production-grade Next.js security
+- Protect user data & funds
+- Prevent common attack vectors
+
+**Tools:**
+- Terminal, Read, Write, Edit, Grep
+- Browser (OWASP, CVE databases)
+- External APIs (security scanners)
+
+---
+
 ## Complete Mobile + Web + Desktop Framework Coverage
 
-**Complete Platform Mastery (Mobile + Web + Desktop + Blockchain):**
+**Complete Omnichannel Platform Mastery (Mobile + Web + Desktop + Blockchain):**
 
 | Platform | Framework | Language | Use Case | Team Size |
 |----------|-----------|----------|----------|-----------|
@@ -1018,9 +1171,10 @@ Added April 12, 2026
 | **Mobile (Cross)** | Flutter | Dart | All platforms + web | 1 Sr + 1 Blockchain + 1 Perf + 1 Security + 1 DeFi |
 | **Mobile (Cross)** | React Native | TypeScript | iOS + Android + web | 1 Sr + 1 Blockchain + 1 Perf + 1 Security + 1 DeFi |
 | **Desktop (Cross)** | Electron/Tauri | TypeScript | Win/Mac/Linux | 1 Sr + 1 Blockchain + 1 Perf + 1 Security + 1 DeFi |
+| **Web (Full-Stack)** | Next.js | TypeScript | Server-side rendering | 1 Sr + 1 Blockchain + 1 Perf + 1 Security |
 | **Blockchain** | Rust | Rust | Solana programs | 1 Full-Stack Web3 + 1 Expert + 1 Auditor |
 
-**Total Developer Roster (28 Specialized Profiles):**
+**Total Developer Roster (32 Specialized Profiles):**
 
 **Mobile Frontends (12):**
 - ✅ 4 Senior devs (Android, iOS, Flutter, React Native)
@@ -1034,9 +1188,16 @@ Added April 12, 2026
 - ✅ 1 Desktop Security auditor
 - ✅ 1 Desktop DeFi specialist
 
-**Security (6):**
+**Web/Full-Stack Frontends (4):**
+- ✅ 1 Senior Next.js dev (full-stack)
+- ✅ 1 Next.js Solana integrator
+- ✅ 1 Next.js Performance expert
+- ✅ 1 Next.js Security auditor
+
+**Security (7):**
 - ✅ 4 Mobile security auditors (Android, iOS, Flutter, React Native)
 - ✅ 1 Desktop security auditor (Electron/Tauri)
+- ✅ 1 Next.js security auditor
 - ✅ 1 Solana security auditor
 
 **DeFi Specialists (5):**
@@ -1044,7 +1205,7 @@ Added April 12, 2026
 - ✅ Flutter DeFi specialist
 - ✅ React Native DeFi specialist
 - ✅ Desktop DeFi specialist (Electron/Tauri)
-- ✅ Solana security + DeFi focus
+- ✅ Backend DeFi focus (Solana)
 
 **Backend/Blockchain (3):**
 - ✅ 1 Full-Stack Mobile Web3 developer
@@ -1052,24 +1213,33 @@ Added April 12, 2026
 - ✅ 1 Solana security auditor
 
 **Complete Coverage:**
-- ✅ **Android** (Kotlin, native performance)
-- ✅ **iOS** (Swift, native performance)
-- ✅ **Flutter** (Dart, mobile/web/desktop, all platforms)
+- ✅ **Android** (Kotlin, native)
+- ✅ **iOS** (Swift, native)
+- ✅ **Flutter** (Dart, mobile/web/desktop)
 - ✅ **React Native** (TypeScript, mobile + web)
 - ✅ **Desktop** (Electron/Tauri, Win/Mac/Linux)
+- ✅ **Web** (Next.js, full-stack, server-side)
 - ✅ **Solana** (Rust/Anchor backend)
 - ✅ **Security** (all platforms + chain-level)
-- ✅ **DeFi** (trading, staking, yield farming across all platforms)
+- ✅ **DeFi** (trading, staking across all platforms)
 
 **What You Can Build:**
 - 📱 Native Android apps (Kotlin)
 - 📱 Native iOS apps (Swift)
 - 🌐 Cross-platform mobile (Flutter, React Native)
 - 💻 Desktop apps (Electron, Tauri)
-- 🌍 Web dApps (via Flutter Web)
-- ⛓️ Solana blockchain (Rust programs)
+- 🌍 Full-stack web apps (Next.js)
+- 🔗 Web3 integration (Solana, Phantom, etc.)
+- ⛓️ Blockchain backend (Rust/Anchor)
 - 🔒 Security-audited at every layer
-- 💰 DeFi trading & staking on all platforms
+- 💰 DeFi features on all platforms
+
+**Deployment Targets:**
+- ✅ App Store (iOS)
+- ✅ Google Play (Android)
+- ✅ Microsoft Store / DMG / AppImage (Desktop)
+- ✅ Vercel / AWS / Self-hosted (Web)
+- ✅ Solana Mainnet / Devnet (Blockchain)
 
 ## Combined iOS + Android Development Workflow
 
