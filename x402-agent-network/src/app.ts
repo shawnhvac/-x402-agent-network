@@ -20,6 +20,7 @@ import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
+import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
 
 // Extend Express Response type
 declare global {
@@ -75,6 +76,15 @@ if (zoAccessToken) {
   } catch (error) {
     console.warn('⚠️ Zo Agent Bridge initialization skipped:', error);
   }
+}
+
+// ✅ Initialize Telegram Collaboration Bot
+let collabBot: TelegramCollabBot | null = null;
+try {
+  collabBot = new TelegramCollabBot();
+  console.log('✅ Telegram Collaboration Bot initialized');
+} catch (error) {
+  console.warn('⚠️ Telegram Collaboration Bot initialization skipped:', error);
 }
 
 // APK Download endpoint - BEFORE middleware to avoid being blocked
@@ -388,6 +398,14 @@ if (telegramBridge) {
 if (zoBridge) {
   app.use("/webhooks/zo", zoBridge.getRouter());
   console.log('✅ Zo agent bridge routes registered at /webhooks/zo/*');
+}
+
+/**
+ * Telegram Collaboration Bot - 3-Way Agent Communication
+ */
+if (collabBot) {
+  app.use("/webhooks", collabBot.getRouter());
+  console.log('✅ Telegram collaboration bot routes registered at /webhooks/*');
 }
 
 /**
