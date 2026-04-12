@@ -18,6 +18,7 @@ import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logg
 import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeoutMiddleware } from "./middleware/errorHandler.js";
 import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
+import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 
 // Extend Express Response type
 declare global {
@@ -42,6 +43,26 @@ app.use(cors({
 
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
+
+// ✅ Initialize Telegram Agent Bridge
+const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || '';
+const webhookSecret = process.env.WEBHOOK_SECRET || crypto.randomBytes(32).toString('hex');
+
+let telegramBridge: TelegramAgentBridge | null = null;
+if (telegramBotToken) {
+  try {
+    // Placeholder for SmartEscrow and Solana clients (would initialize in real deployment)
+    telegramBridge = new TelegramAgentBridge(
+      webhookSecret,
+      telegramBotToken,
+      null as any, // SmartEscrowClient
+      null as any  // SolanaIntegration
+    );
+    console.log('✅ Telegram Agent Bridge initialized');
+  } catch (error) {
+    console.warn('⚠️ Telegram Agent Bridge initialization skipped:', error);
+  }
+}
 
 // APK Download endpoint - BEFORE middleware to avoid being blocked
 app.get("/download/agentpay-latest.apk", (req: Request, res: Response) => {
@@ -339,6 +360,14 @@ app.use("/agents", agentRoutes);
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
  */
 app.use("/", demoAgentRoutes);
+
+/**
+ * Telegram Agent Bridge - Webhook for agent-to-agent communication
+ */
+if (telegramBridge) {
+  app.use("/webhooks", telegramBridge.getRouter());
+  console.log('✅ Telegram webhook routes registered at /webhooks/*');
+}
 
 /**
  * Contact form endpoint - Save to file
