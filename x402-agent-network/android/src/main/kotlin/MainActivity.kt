@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,10 +27,16 @@ import android.util.Log
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import com.agentpay.solana.MultiWalletManager
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+    private lateinit var walletManager: MultiWalletManager
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        walletManager = MultiWalletManager(this)
         
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -37,406 +44,321 @@ class MainActivity : ComponentActivity() {
         }
         
         setContent {
-            AgentPayApp(this)
+            AgentPayApp(this, walletManager)
         }
     }
 }
 
 @Composable
-fun AgentPayApp(context: Context) {
+fun AgentPayApp(context: Context, walletManager: MultiWalletManager) {
     var currentTab by remember { mutableStateOf(0) }
-    var walletAddress by remember { mutableStateOf(generateWalletAddress()) }
+    var walletAddress by remember { mutableStateOf("") }
+    var isWalletConnected by remember { mutableStateOf(false) }
+    var selectedWalletType by remember { mutableStateOf<MultiWalletManager.WalletType?>(null) }
+    var showWalletSelector by remember { mutableStateOf(false) }
+    var installedWallets by remember { mutableStateOf(listOf<MultiWalletManager.WalletInfo>()) }
+    var showWalletModal by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    
+    // Load wallet state on app start
+    LaunchedEffect(Unit) {
+        isWalletConnected = walletManager.isWalletConnected()
+        selectedWalletType = walletManager.getConnectedWalletType()
+        walletAddress = walletManager.getConnectedWalletAddress() ?: generateWalletAddress()
+        installedWallets = walletManager.discoverInstalledWallets()
+        
+        Log.d("AgentPay", "🟢 App started - Wallets detected: ${installedWallets.size}")
+        installedWallets.forEach {
+            Log.d("AgentPay", "   ✅ ${it.displayName} installed")
+        }
+    }
     
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F172A))
+            .background(Color(0xFF0f172a))
     ) {
-        Box(
+        // Header
+        Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF1E293B))
-                .padding(16.dp)
+                .height(60.dp),
+            color = Color(0xFF1e293b)
         ) {
-            Text(
-                "AgentPay™",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFA78BFA)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "🤖 AgentPay",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF60a5fa)
+                )
+                
+                // Wallet status indicator
+                if (isWalletConnected && selectedWalletType != null) {
+                    Chip(
+                        onClick = { showWalletModal = true },
+                        colors = ChipDefaults.chipColors(
+                            containerColor = Color(0xFF10b981)
+                        ),
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text("✅ ${selectedWalletType?.name}", fontSize = 12.sp)
+                        }
+                    }
+                } else {
+                    Button(
+                        onClick = { showWalletModal = true },
+                        modifier = Modifier.height(36.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3b82f6)
+                        )
+                    ) {
+                        Text("Connect Wallet", fontSize = 12.sp)
+                    }
+                }
+            }
         }
         
+        // Tab content
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(16.dp)
         ) {
             when (currentTab) {
-                0 -> VoiceScreen()
-                1 -> SettingsScreen()
-                2 -> HistoryScreen(context, walletAddress)
-                3 -> WalletScreen(context, walletAddress)
+                0 -> VoiceTab(context, isWalletConnected)
+                1 -> SettingsTab()
+                2 -> HistoryTab()
+                3 -> WalletTab(walletAddress, isWalletConnected, { showWalletModal = true })
             }
         }
         
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1E293B))
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        // Bottom navigation
+        NavigationBar(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = Color(0xFF1e293b)
         ) {
-            NavItem("🎤", "Voice", currentTab == 0) { currentTab = 0 }
-            NavItem("⚙️", "Settings", currentTab == 1) { currentTab = 1 }
-            NavItem("📋", "History", currentTab == 2) { currentTab = 2 }
-            NavItem("💰", "Wallet", currentTab == 3) { currentTab = 3 }
+            NavigationBarItem(
+                icon = { Text("🎤", fontSize = 20.sp) },
+                label = { Text("Voice", fontSize = 12.sp) },
+                selected = currentTab == 0,
+                onClick = { currentTab = 0 }
+            )
+            NavigationBarItem(
+                icon = { Text("⚙️", fontSize = 20.sp) },
+                label = { Text("Settings", fontSize = 12.sp) },
+                selected = currentTab == 1,
+                onClick = { currentTab = 1 }
+            )
+            NavigationBarItem(
+                icon = { Text("📋", fontSize = 20.sp) },
+                label = { Text("History", fontSize = 12.sp) },
+                selected = currentTab == 2,
+                onClick = { currentTab = 2 }
+            )
+            NavigationBarItem(
+                icon = { Text("💰", fontSize = 20.sp) },
+                label = { Text("Wallet", fontSize = 12.sp) },
+                selected = currentTab == 3,
+                onClick = { currentTab = 3 }
+            )
+        }
+    }
+    
+    // Wallet selection modal
+    if (showWalletModal) {
+        WalletSelectionModal(
+            installedWallets = installedWallets,
+            isConnected = isWalletConnected,
+            currentWallet = selectedWalletType,
+            onWalletSelected = { wallet ->
+                scope.launch {
+                    if (walletManager.connectWallet(wallet.type)) {
+                        isWalletConnected = true
+                        selectedWalletType = wallet.type
+                        walletAddress = generateWalletAddress() // Mock address
+                        showWalletModal = false
+                        Toast.makeText(context, "✅ Connected to ${wallet.displayName}", Toast.LENGTH_SHORT).show()
+                        Log.d("AgentPay", "✅ Connected to ${wallet.displayName}")
+                    } else {
+                        Toast.makeText(context, "❌ Failed to connect wallet", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            onDisconnect = {
+                walletManager.disconnectWallet()
+                isWalletConnected = false
+                selectedWalletType = null
+                showWalletModal = false
+                Toast.makeText(context, "Wallet disconnected", Toast.LENGTH_SHORT).show()
+            },
+            onDismiss = { showWalletModal = false }
+        )
+    }
+}
+
+@Composable
+fun WalletSelectionModal(
+    installedWallets: List<MultiWalletManager.WalletInfo>,
+    isConnected: Boolean,
+    currentWallet: MultiWalletManager.WalletType?,
+    onWalletSelected: (MultiWalletManager.WalletInfo) -> Unit,
+    onDisconnect: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (isConnected) "Wallet Connected" else "Select Wallet") },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (installedWallets.isEmpty()) {
+                    Text("❌ No wallets installed.\n\nInstall Phantom, Solflare, or Jupiter wallet app to continue.")
+                } else {
+                    installedWallets.forEach { wallet ->
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onWalletSelected(wallet) }
+                                .padding(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = if (currentWallet == wallet.type) Color(0xFF10b981) else Color(0xFF1e293b)
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(wallet.displayName, fontWeight = FontWeight.Bold)
+                                    Text("${wallet.packageName}", fontSize = 10.sp, color = Color.Gray)
+                                }
+                                if (currentWallet == wallet.type) {
+                                    Text("✅", fontSize = 18.sp)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            if (isConnected) {
+                Button(onClick = onDisconnect, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFef4444))) {
+                    Text("Disconnect")
+                }
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Close")
+            }
+        }
+    )
+}
+
+@Composable
+fun VoiceTab(context: Context, isWalletConnected: Boolean) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text(
+            if (isWalletConnected) "🎤 Ready to Book" else "⚠️ Connect Wallet First",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (isWalletConnected) Color(0xFF10b981) else Color(0xFFf59e0b)
+        )
+        
+        if (isWalletConnected) {
+            Button(
+                onClick = { Toast.makeText(context, "Say: 'Book HVAC in Phoenix'", Toast.LENGTH_LONG).show() },
+                modifier = Modifier
+                    .size(120.dp)
+                    .background(Color(0xFF3b82f6), CircleShape),
+                shape = CircleShape
+            ) {
+                Text("🎤", fontSize = 48.sp)
+            }
+            
+            Text("Tap mic and say:\n'Book [SERVICE] in [LOCATION]'", fontSize = 14.sp, color = Color.Gray)
+        } else {
+            Text("Connect wallet to book services", fontSize = 14.sp, color = Color.Gray)
+        }
+    }
+}
+
+@Composable
+fun SettingsTab() {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("⚙️ Settings", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Coming soon...", fontSize = 14.sp, color = Color.Gray)
+    }
+}
+
+@Composable
+fun HistoryTab() {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text("📋 History", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("No transactions yet", fontSize = 14.sp, color = Color.Gray)
+    }
+}
+
+@Composable
+fun WalletTab(walletAddress: String, isConnected: Boolean, onConnect: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Text("💰 Wallet", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        
+        if (isConnected) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Wallet Address", fontSize = 12.sp, color = Color.Gray)
+                    Text(walletAddress.take(12) + "...", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("0.00 SOL (placeholder)", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+                }
+            }
+            
+            Text("⚠️ Wallet integration in progress", fontSize = 12.sp, color = Color(0xFFf59e0b))
+        } else {
+            Text("Connect wallet to see balance", fontSize = 14.sp, color = Color.Gray)
+            Button(onClick = onConnect, modifier = Modifier.fillMaxWidth()) {
+                Text("Connect Wallet")
+            }
         }
     }
 }
 
 fun generateWalletAddress(): String {
-    val chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
-    return (1..44).map { chars.random() }.joinToString("")
-}
-
-@Composable
-fun NavItem(emoji: String, label: String, selected: Boolean, onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(8.dp)
-            .clickable { onClick() }
-    ) {
-        Text(emoji, fontSize = 20.sp)
-        Text(
-            label,
-            fontSize = 10.sp,
-            color = if (selected) Color(0xFFA78BFA) else Color(0xFF64748B)
-        )
-    }
-}
-
-@Composable
-fun VoiceScreen() {
-    var isListening by remember { mutableStateOf(false) }
-    var lastCommand by remember { mutableStateOf("") }
-    
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text("🎤 Voice Commands", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("Real Android SpeechRecognizer API", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
-        
-        Button(
-            onClick = { isListening = !isListening },
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .size(120.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (isListening) Color(0xFF06B6D4) else Color(0xFFA78BFA)
-            ),
-            shape = CircleShape
-        ) {
-            Text(if (isListening) "🎙️" else "🎤", fontSize = 50.sp)
-        }
-        
-        Text(
-            if (isListening) "Listening..." else "Ready",
-            fontSize = 14.sp,
-            color = if (isListening) Color(0xFF06B6D4) else Color(0xFF94A3B8),
-            modifier = Modifier.padding(top = 16.dp)
-        )
-        
-        if (lastCommand.isNotEmpty()) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(top = 24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Last Command:", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                    Text(lastCommand, color = Color(0xFF06B6D4), fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-        
-        Text("Quick Commands:", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 32.dp))
-        
-        Column(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .padding(top = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ServiceButton("🔧 HVAC") { lastCommand = "Booking HVAC service..." }
-                ServiceButton("🚗 Mechanic") { lastCommand = "Booking Mechanic service..." }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ServiceButton("💧 Plumber") { lastCommand = "Booking Plumber service..." }
-                ServiceButton("⚡ Electrician") { lastCommand = "Booking Electrician service..." }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ServiceButton("🪵 Carpenter") { lastCommand = "Booking Carpenter service..." }
-                ServiceButton("👥 Show Agents") { lastCommand = "Loading marketplace..." }
-            }
-        }
-    }
-}
-
-@Composable
-fun ServiceButton(label: String, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .height(40.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))
-    ) {
-        Text(label, fontSize = 11.sp, color = Color(0xFFA78BFA))
-    }
-}
-
-@Composable
-fun SettingsScreen() {
-    var budget by remember { mutableStateOf(1000.0) }
-    var showDialog by remember { mutableStateOf(false) }
-    
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .verticalScroll(rememberScrollState())) {
-        Text("⚙️ Settings", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .clickable { showDialog = true },
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text("Budget Limit", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                Text("$${"%.0f".format(budget)}/month", color = Color(0xFFA78BFA), fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("(Tap to edit)", color = Color(0xFF64748B), fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
-            }
-        }
-    }
-    
-    if (showDialog) {
-        BudgetDialog(budget, { showDialog = false }) { newBudget ->
-            budget = newBudget
-            showDialog = false
-        }
-    }
-}
-
-@Composable
-fun BudgetDialog(currentBudget: Double, onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
-    var selected by remember { mutableStateOf(currentBudget) }
-    var customInput by remember { mutableStateOf("") }
-    
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Budget Limit", color = Color(0xFFA78BFA)) },
-        text = {
-            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Enter custom amount:", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                
-                OutlinedTextField(
-                    value = customInput,
-                    onValueChange = { customInput = it; if (it.isNotEmpty()) selected = it.toDoubleOrNull() ?: selected },
-                    modifier = Modifier.fillMaxWidth(0.9f),
-                    placeholder = { Text("e.g., 2500") },
-                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = Color(0xFFA78BFA))
-                )
-                
-                Text("Or preset:", color = Color(0xFF94A3B8), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = { selected = 500.0; customInput = "500" }, modifier = Modifier.fillMaxWidth(0.5f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$500", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selected = 1000.0; customInput = "1000" }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$1K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = { selected = 5000.0; customInput = "5000" }, modifier = Modifier.fillMaxWidth(0.5f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$5K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selected = 25000.0; customInput = "25000" }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("$25K", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                
-                Text("Selected: $${"%.0f".format(selected)}", color = Color(0xFF06B6D4), fontSize = 14.sp, fontWeight = FontWeight.Bold)
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(selected) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
-                Text("Confirm", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64748B))) {
-                Text("Cancel", color = Color.White)
-            }
-        },
-        containerColor = Color(0xFF0F172A)
-    )
-}
-
-@Composable
-fun HistoryScreen(context: Context, walletAddress: String) {
-    var transactions by remember { mutableStateOf(listOf<String>()) }
-    var creatingEscrow by remember { mutableStateOf(false) }
-    
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .verticalScroll(rememberScrollState())) {
-        Text("📋 Transaction History", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("SmartEscrow: 6Pi1hfuX8x3vzF3EW1YEN43ZkCdNdQDpHRdzg47CnBED", fontSize = 10.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
-        
-        Button(
-            onClick = { 
-                creatingEscrow = true
-                val escrowId = "escrow_${System.currentTimeMillis()}"
-                transactions = listOf("✅ $escrowId - 150 USDC locked for HVAC service") + transactions
-                creatingEscrow = false
-            },
-            modifier = Modifier.padding(top = 16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))
-        ) {
-            Text(if (creatingEscrow) "Creating..." else "📝 Create Test Escrow", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
-        }
-        
-        if (transactions.isEmpty()) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("No escrows yet", color = Color(0xFF94A3B8), fontWeight = FontWeight.Bold)
-                    Text("Tap 'Create Test Escrow' to lock USDC payment on-chain", color = Color(0xFF94A3B8), fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
-                }
-            }
-        } else {
-            transactions.forEach { txn ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Text(txn, color = Color(0xFF06B6D4), fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                        Text("View on: solscan.io/tx/...", color = Color(0xFF94A3B8), fontSize = 10.sp, modifier = Modifier.padding(top = 4.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun WalletScreen(context: Context, walletAddress: String) {
-    var balance by remember { mutableStateOf(0.0) }
-    var showTopUpDialog by remember { mutableStateOf(false) }
-    
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
-        .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("💰 Solana Wallet", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color(0xFFA78BFA))
-        Text("Connected to Mainnet-Beta", fontSize = 12.sp, color = Color(0xFF94A3B8), modifier = Modifier.padding(top = 8.dp))
-        
-        // Wallet Status Card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B))
-        ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Text("⏳ Wallet Connection Status", color = Color(0xFF94A3B8), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text("Connecting to Phantom/Magic Eden...", color = Color(0xFF06B6D4), fontSize = 11.sp, modifier = Modifier.padding(top = 4.dp))
-                Text("Real wallet connection coming soon. Don't send funds yet.", color = Color(0xFFEF4444), fontSize = 10.sp, modifier = Modifier.padding(top = 8.dp))
-            }
-        }
-        
-        // Balance Display
-        Text("${"%.2f".format(balance)} SOL", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Color(0xFF06B6D4), modifier = Modifier.padding(top = 32.dp))
-        Text("≈ $${String.format("%.2f", balance * 150)}", fontSize = 14.sp, color = Color(0xFF94A3B8))
-        
-        // Top Up Button
-        Button(
-            onClick = { showTopUpDialog = true },
-            modifier = Modifier
-                .padding(top = 40.dp)
-                .fillMaxWidth(0.8f),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))
-        ) {
-            Text("💾 Top Up", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
-        }
-    }
-    
-    if (showTopUpDialog) {
-        TopUpDialog(
-            onDismiss = { showTopUpDialog = false },
-            onConfirm = { amount ->
-                balance += amount
-                showTopUpDialog = false
-            }
-        )
-    }
-}
-
-@Composable
-fun TopUpDialog(onDismiss: () -> Unit, onConfirm: (Double) -> Unit) {
-    var customInput by remember { mutableStateOf("") }
-    var selected by remember { mutableStateOf(1.0) }
-    
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Top Up Wallet", color = Color(0xFFA78BFA)) },
-        text = {
-            Column(modifier = Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Enter SOL amount:", color = Color(0xFF94A3B8), fontSize = 12.sp)
-                
-                OutlinedTextField(
-                    value = customInput,
-                    onValueChange = { customInput = it; if (it.isNotEmpty()) selected = it.toDoubleOrNull() ?: selected },
-                    modifier = Modifier.fillMaxWidth(0.9f),
-                    placeholder = { Text("e.g., 2.5") },
-                    textStyle = androidx.compose.material3.LocalTextStyle.current.copy(color = Color(0xFFA78BFA))
-                )
-                
-                Text("Or preset:", color = Color(0xFF94A3B8), fontSize = 11.sp)
-                
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = { selected = 0.5; customInput = "0.5" }, modifier = Modifier.fillMaxWidth(0.5f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("0.5", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selected = 1.0; customInput = "1.0" }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("1.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.fillMaxWidth()) {
-                    Button(onClick = { selected = 5.0; customInput = "5.0" }, modifier = Modifier.fillMaxWidth(0.5f), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("5.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                    Button(onClick = { selected = 10.0; customInput = "10.0" }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E293B))) { Text("10.0", fontSize = 10.sp, color = Color(0xFFA78BFA)) }
-                }
-                
-                Text("Amount: $selected SOL", color = Color(0xFF06B6D4), fontSize = 12.sp, fontWeight = FontWeight.Bold)
-            }
-        },
-        confirmButton = {
-            Button(onClick = { onConfirm(selected) }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFA78BFA))) {
-                Text("Confirm", color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
-            }
-        },
-        dismissButton = {
-            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64748B))) {
-                Text("Cancel")
-            }
-        },
-        containerColor = Color(0xFF0F172A)
-    )
+    return "AgentPay_" + (System.currentTimeMillis() % 1000000).toString()
 }

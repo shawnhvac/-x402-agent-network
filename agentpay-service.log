@@ -695,3 +695,474 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
     at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
     at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
 [2026-04-11T18:30:01.505Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T18:35:01.559Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T18:40:01.610Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T18:43:55.835Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T18:45:01.669Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T18:50:01.596Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T18:55:01.640Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:00:01.702Z] GET /health | 200 | 2ms | unknown
+[2026-04-11T19:05:01.181Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:10:01.227Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:13:56.134Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:15:01.279Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:20:01.269Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:25:01.318Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:30:01.369Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:35:01.420Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:40:01.472Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:42:01.590Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T19:45:01.524Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:50:01.475Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T19:55:01.525Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:00:01.589Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:05:01.737Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:10:01.781Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:11:54.005Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:15:01.830Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-11T20:16:41.033Z | Request: req-1775938571028-uqjnwl82i | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-11T20:16:11.028Z] GET /video-fleet-charging.mp4 | 500 | 30005ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-11T20:16:55.455Z | Request: req-1775938585451-rlsz2scuk | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-11T20:16:25.451Z] GET /video-fleet-charging.mp4 | 500 | 30004ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-11T20:17:01.617Z | Request: req-1775938591610-9mal9g7i5 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-11T20:16:31.610Z] GET /video-fleet-charging.mp4 | 500 | 30007ms | unknown
+[2026-04-11T20:20:01.815Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:25:01.863Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:30:01.910Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:35:01.955Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:40:02.003Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:41:54.517Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T20:45:01.055Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:50:02.013Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T20:55:01.057Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:00:01.120Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:05:01.184Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:10:01.233Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:11:55.075Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:15:01.279Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:20:01.459Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:25:01.508Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:30:01.558Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:35:01.605Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:40:01.648Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:41:55.977Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:45:01.703Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T21:50:01.648Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T21:55:01.690Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:00:01.750Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:05:01.643Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T22:10:01.693Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:11:53.959Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:15:01.737Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T22:20:01.706Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:25:01.751Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:30:01.802Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T22:35:01.856Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:40:01.906Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:41:54.173Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T22:45:01.954Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T22:50:01.904Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T22:55:01.947Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:00:02.020Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:05:01.392Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:10:01.433Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T23:11:55.248Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:15:01.475Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T23:20:01.419Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:25:01.470Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:30:01.519Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:35:01.567Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:40:01.610Z] GET /health | 200 | 1ms | unknown
+[2026-04-11T23:41:53.803Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:45:01.658Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:50:01.764Z] GET /health | 200 | 0ms | unknown
+[2026-04-11T23:55:01.808Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:00:01.953Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:05:01.464Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:10:01.506Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:11:54.013Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:15:01.550Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:20:01.481Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:25:01.526Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:30:01.567Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:35:01.615Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:40:01.666Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:41:54.025Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:45:01.713Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T00:50:01.908Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T00:55:01.956Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T01:00:02.030Z] GET /health | 200 | 2ms | unknown
+[2026-04-12T01:05:01.601Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:10:01.652Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T01:11:54.070Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:15:01.706Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:20:01.810Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T01:25:01.863Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:30:01.912Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T01:35:01.963Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:40:02.011Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:41:53.929Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:45:01.057Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T01:50:01.205Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T01:55:01.248Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:00:01.299Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:05:01.745Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:10:01.790Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:11:54.046Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:15:01.834Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:20:01.797Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:25:01.851Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:30:01.907Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:35:01.955Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:40:01.999Z] GET /health | 200 | 1ms | unknown
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:342:13)
+    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:656:22)
+    at Object.keyGenerator (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:759:20)
+    at file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:823:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:801:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+[2026-04-12T02:41:54.446Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:45:01.048Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T02:50:01.217Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T02:55:01.260Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T03:00:01.333Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:05:01.444Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T03:10:01.495Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:11:54.529Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T03:15:01.544Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T03:20:01.737Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:25:01.782Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:30:01.836Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T03:35:01.884Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:40:01.929Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:41:54.329Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:45:01.972Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:50:01.908Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T03:55:01.955Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:00:02.018Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:05:01.110Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:10:01.152Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:11:53.309Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:15:01.195Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:20:01.134Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:25:01.187Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:30:01.238Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:35:01.285Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:40:01.329Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:41:52.640Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:45:01.374Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T04:50:01.549Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T04:55:01.601Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:00:01.674Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T05:05:01.804Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T05:10:01.855Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:11:52.597Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T05:15:01.901Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:20:01.163Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:25:01.210Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T05:30:01.260Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:35:01.303Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T05:40:01.351Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:41:52.793Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:45:01.398Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:50:01.572Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T05:55:01.618Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:00:01.686Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:05:01.421Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:10:01.467Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:11:52.679Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:15:01.509Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:20:01.667Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:25:01.729Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:30:01.777Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:35:01.828Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:40:01.873Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:41:52.529Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:45:01.924Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T06:50:01.208Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T06:55:01.252Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T07:00:01.301Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:05:01.684Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:10:01.731Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:11:53.191Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T07:15:01.780Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-12T07:19:43.539Z | Request: req-1775978353529-j97vupsyq | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-12T07:19:13.529Z] GET /video-fleet-charging.mp4 | 500 | 30010ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-12T07:20:01.988Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:25:02.045Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T07:30:01.087Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T07:35:01.127Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:40:01.170Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:41:52.370Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:45:01.218Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:50:01.412Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T07:55:01.458Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:00:01.527Z] GET /health | 200 | 2ms | unknown
+[2026-04-12T08:05:01.493Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:10:01.542Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:11:52.468Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:15:01.587Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T08:20:01.692Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:25:01.734Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:30:01.782Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:35:01.827Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:40:01.871Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:41:53.431Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:45:01.919Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T08:50:01.854Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T08:55:01.908Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:00:01.966Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:05:01.326Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:10:01.374Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:11:52.569Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:15:01.419Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:20:01.575Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:25:01.618Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:30:01.665Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:35:01.711Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:40:01.758Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:41:52.797Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:45:01.808Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T09:50:01.958Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T09:55:02.010Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T10:00:01.079Z] GET /health | 200 | 2ms | unknown
+[2026-04-12T10:05:01.293Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:10:01.335Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:11:53.027Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:15:01.387Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T10:20:01.389Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:25:01.436Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T10:30:01.479Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:35:01.522Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:40:01.564Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:41:52.794Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T10:45:01.611Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T10:50:01.767Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T10:55:01.820Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:00:01.883Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:05:01.277Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T11:10:01.318Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:11:52.920Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:15:01.366Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T11:20:01.944Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T11:25:01.991Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:30:02.046Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:35:01.091Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:40:01.139Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:41:53.019Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:45:01.186Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T11:50:01.324Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T11:55:01.367Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T12:00:01.428Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T12:05:01.566Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:10:01.623Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:11:53.055Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T12:15:01.672Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:20:01.827Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:25:01.879Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:30:01.925Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T12:35:01.972Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:40:02.015Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:41:53.517Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T12:45:01.058Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:50:01.161Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T12:55:01.203Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:00:01.254Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T13:05:01.368Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:10:01.411Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:11:52.704Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:15:01.461Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T13:20:01.428Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:25:01.478Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T13:30:01.523Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:35:01.571Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T13:40:01.614Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:41:52.805Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:45:01.662Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T13:50:01.823Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T13:55:01.869Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:00:01.946Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T14:05:01.041Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:10:01.091Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:11:53.354Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:15:01.136Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:20:01.514Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:25:01.571Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:30:01.614Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T14:35:01.658Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T14:40:01.708Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:41:53.723Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T14:45:01.756Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T14:50:01.938Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T14:55:01.987Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T15:00:02.052Z] GET /health | 200 | 2ms | unknown
+[2026-04-12T15:05:01.170Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:10:01.219Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:11:55.327Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T15:15:01.277Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T15:20:01.484Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:25:01.532Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T15:30:01.579Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:35:01.626Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:40:01.673Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T15:41:53.033Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:45:01.727Z] GET /health | 200 | 3ms | unknown
+[2026-04-12T15:50:01.750Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T15:55:01.802Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:00:01.877Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T16:05:01.397Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:10:01.444Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:11:55.232Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:15:01.490Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:20:01.683Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:25:01.730Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:30:01.788Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:35:01.836Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T16:40:01.879Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:41:52.654Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:45:01.929Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-12T16:46:53.232Z | Request: req-1776012383228-j09ye8odo | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-12T16:46:23.228Z] GET /video-fleet-charging.mp4 | 500 | 30005ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-12T16:46:53.904Z | Request: req-1776012383903-cplcxiw1w | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-12T16:46:23.903Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-12T16:50:01.072Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T16:55:01.119Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:00:01.185Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:05:01.306Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:10:01.351Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T17:11:52.888Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:15:01.396Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:20:01.325Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:25:01.374Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:30:01.421Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:35:01.474Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:40:01.515Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:41:53.640Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:45:01.559Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:50:01.696Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T17:55:01.748Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:00:01.825Z] GET /health | 200 | 2ms | unknown
+[2026-04-12T18:05:01.179Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:10:01.223Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:11:52.687Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:15:01.272Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:20:01.449Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:25:01.494Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:30:01.541Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:35:01.587Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:40:01.634Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T18:41:52.708Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:45:01.682Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:50:01.852Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T18:55:01.906Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:00:01.968Z] GET /health | 200 | 4ms | unknown
+[2026-04-12T19:05:01.965Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:10:02.019Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:11:53.029Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:15:01.066Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:20:01.234Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:25:01.278Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:30:01.322Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:35:01.372Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:40:01.414Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:41:53.192Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:45:01.460Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T19:50:01.199Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T19:55:01.245Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T20:00:01.300Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T20:05:01.726Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T20:10:01.769Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T20:11:54.066Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T20:15:01.814Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T20:20:02.004Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T20:25:01.050Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T20:30:01.097Z] GET /health | 200 | 0ms | unknown
