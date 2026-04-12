@@ -17,6 +17,7 @@ import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeou
 import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
+import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 dotenv.config();
 const app = express();
 // ✅ SECURITY: CORS Protection
@@ -42,6 +43,18 @@ if (telegramBotToken) {
     }
     catch (error) {
         console.warn('⚠️ Telegram Agent Bridge initialization skipped:', error);
+    }
+}
+// ✅ Initialize Zo Agent Bridge (direct agent-to-agent communication)
+const zoAccessToken = process.env.ZO_ACCESS_TOKEN || '';
+let zoBridge = null;
+if (zoAccessToken) {
+    try {
+        zoBridge = new ZoAgentBridge(zoAccessToken);
+        console.log('✅ Zo Agent Bridge initialized');
+    }
+    catch (error) {
+        console.warn('⚠️ Zo Agent Bridge initialization skipped:', error);
     }
 }
 // APK Download endpoint - BEFORE middleware to avoid being blocked
@@ -304,8 +317,15 @@ app.use("/", demoAgentRoutes);
  * Telegram Agent Bridge - Webhook for agent-to-agent communication
  */
 if (telegramBridge) {
-    app.use("/webhooks", telegramBridge.getRouter());
-    console.log('✅ Telegram webhook routes registered at /webhooks/*');
+    app.use("/webhooks/telegram", telegramBridge.getRouter());
+    console.log('✅ Telegram webhook routes registered at /webhooks/telegram/*');
+}
+/**
+ * Zo Agent Bridge - Direct agent-to-agent communication
+ */
+if (zoBridge) {
+    app.use("/webhooks/zo", zoBridge.getRouter());
+    console.log('✅ Zo agent bridge routes registered at /webhooks/zo/*');
 }
 /**
  * Contact form endpoint - Save to file
