@@ -28,15 +28,44 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
 import com.agentpay.solana.MultiWalletManager
+import com.agentpay.agents.AgentIntegration
+import com.agentpay.agents.AgentConfig
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var walletManager: MultiWalletManager
+    private var agent: AgentIntegration? = null
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         walletManager = MultiWalletManager(this)
+        
+        // Initialize autonomous agent system
+        try {
+            val config = AgentConfig(
+                autoStart = true,
+                port = 8000,
+                rpcEndpoint = "https://api.mainnet-beta.solana.com",
+                maxRequestAmount = 100.0,
+                minRequestAmount = 0.5,
+                requiredMinBalance = 10.0
+            )
+            agent = AgentIntegration(this, config)
+            
+            if (agent!!.initialize()) {
+                Log.d("AgentPay", "✅ Agent initialized")
+                if (agent!!.start()) {
+                    Log.d("AgentPay", "✅ Agent started on port 8000")
+                } else {
+                    Log.e("AgentPay", "❌ Failed to start agent")
+                }
+            } else {
+                Log.e("AgentPay", "❌ Failed to initialize agent")
+            }
+        } catch (e: Exception) {
+            Log.e("AgentPay", "❌ Agent initialization error: ${e.message}", e)
+        }
         
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
@@ -44,13 +73,19 @@ class MainActivity : ComponentActivity() {
         }
         
         setContent {
-            AgentPayApp(this, walletManager)
+            AgentPayApp(this, walletManager, agent)
         }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        agent?.stop()
+        Log.d("AgentPay", "✅ Agent stopped")
     }
 }
 
 @Composable
-fun AgentPayApp(context: Context, walletManager: MultiWalletManager) {
+fun AgentPayApp(context: Context, walletManager: MultiWalletManager, agent: AgentIntegration?) {
     var currentTab by remember { mutableStateOf(0) }
     var walletAddress by remember { mutableStateOf("") }
     var isWalletConnected by remember { mutableStateOf(false) }
@@ -58,6 +93,7 @@ fun AgentPayApp(context: Context, walletManager: MultiWalletManager) {
     var showWalletSelector by remember { mutableStateOf(false) }
     var installedWallets by remember { mutableStateOf(listOf<MultiWalletManager.WalletInfo>()) }
     var showWalletModal by remember { mutableStateOf(false) }
+    var agentStatus by remember { mutableStateOf(agent?.getStatus()) }
     val scope = rememberCoroutineScope()
     
     // Load wallet state on app start
@@ -140,6 +176,7 @@ fun AgentPayApp(context: Context, walletManager: MultiWalletManager) {
                 1 -> SettingsTab()
                 2 -> HistoryTab()
                 3 -> WalletTab(walletAddress, isWalletConnected, { showWalletModal = true })
+                4 -> AgentTab(agent)
             }
         }
         
@@ -150,27 +187,33 @@ fun AgentPayApp(context: Context, walletManager: MultiWalletManager) {
         ) {
             NavigationBarItem(
                 icon = { Text("🎤", fontSize = 20.sp) },
-                label = { Text("Voice", fontSize = 12.sp) },
+                label = { Text("Voice", fontSize = 11.sp) },
                 selected = currentTab == 0,
                 onClick = { currentTab = 0 }
             )
             NavigationBarItem(
                 icon = { Text("⚙️", fontSize = 20.sp) },
-                label = { Text("Settings", fontSize = 12.sp) },
+                label = { Text("Settings", fontSize = 11.sp) },
                 selected = currentTab == 1,
                 onClick = { currentTab = 1 }
             )
             NavigationBarItem(
                 icon = { Text("📋", fontSize = 20.sp) },
-                label = { Text("History", fontSize = 12.sp) },
+                label = { Text("History", fontSize = 11.sp) },
                 selected = currentTab == 2,
                 onClick = { currentTab = 2 }
             )
             NavigationBarItem(
                 icon = { Text("💰", fontSize = 20.sp) },
-                label = { Text("Wallet", fontSize = 12.sp) },
+                label = { Text("Wallet", fontSize = 11.sp) },
                 selected = currentTab == 3,
                 onClick = { currentTab = 3 }
+            )
+            NavigationBarItem(
+                icon = { Text("🤖", fontSize = 20.sp) },
+                label = { Text("Agent", fontSize = 11.sp) },
+                selected = currentTab == 4,
+                onClick = { currentTab = 4 }
             )
         }
     }
@@ -357,6 +400,134 @@ fun WalletTab(walletAddress: String, isConnected: Boolean, onConnect: () -> Unit
             }
         }
     }
+}
+
+@Composable
+fun AgentTab(agent: AgentIntegration?) {
+    var agentStatus by remember { mutableStateOf(agent?.getStatus()) }
+    var agentStats by remember { mutableStateOf(agent?.getStatistics()) }
+    
+    // Update status every 5 seconds
+    LaunchedEffect(Unit) {
+        while (true) {
+            try {
+                agentStatus = agent?.getStatus()
+                agentStats = agent?.getStatistics()
+            } catch (e: Exception) {
+                Log.e("AgentTab", "Error updating status: ${e.message}")
+            }
+            kotlinx.coroutines.delay(5000)
+        }
+    }
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text("🤖 Agent System", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color(0xFF60a5fa))
+        
+        if (agent == null) {
+            Text("Agent not initialized", fontSize = 14.sp, color = Color(0xFFef4444))
+            return@Column
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Status Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
+            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3b82f6))
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Status:", color = Color(0xFF cbd5e1), fontSize = 14.sp)
+                    Text(
+                        if (agentStatus?.isRunning == true) "✅ RUNNING" else "⏸️ STOPPED",
+                        fontWeight = FontWeight.Bold,
+                        color = if (agentStatus?.isRunning == true) Color(0xFF10b981) else Color(0xFFef4444),
+                        fontSize = 14.sp
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Text("Port: 8000 (HTTP API)", fontSize = 12.sp, color = Color(0xFF94a3b8))
+                
+                if (agentStatus?.agentAddress != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Address:", fontSize = 12.sp, color = Color(0xFF94a3b8))
+                    Text(agentStatus!!.agentAddress!!.take(25) + "...", fontSize = 11.sp, color = Color(0xFF60a5fa))
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Stats
+        Text("Statistics", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF60a5fa))
+        
+        agentStats?.let { stats ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    StatRow("Total Requests", stats.optInt("totalRequests", 0).toString(), Color(0xFF60a5fa))
+                    StatRow("Accepted", stats.optInt("acceptedRequests", 0).toString(), Color(0xFF10b981))
+                    StatRow("Rejected", stats.optInt("rejectedRequests", 0).toString(), Color(0xFFef4444))
+                    StatRow("Balance", "${stats.optDouble("currentBalance", 0.0)} USDC", Color(0xFF10b981))
+                }
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Features
+        Text("Features", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF60a5fa))
+        
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                FeatureRow("✅ Autonomous Decisions")
+                FeatureRow("✅ SmartEscrow Integration")
+                FeatureRow("✅ Transaction Signing")
+                FeatureRow("✅ HTTP API (6 endpoints)")
+                FeatureRow("✅ Real-time Monitoring")
+            }
+        }
+    }
+}
+
+@Composable
+fun StatRow(label: String, value: String, color: Color) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(label, fontSize = 12.sp, color = Color(0xFF cbd5e1))
+        Text(value, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = color)
+    }
+}
+
+@Composable
+fun FeatureRow(feature: String) {
+    Text(feature, fontSize = 12.sp, color = Color(0xFF cbd5e1))
 }
 
 fun generateWalletAddress(): String {
