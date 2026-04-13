@@ -18,6 +18,7 @@ import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logg
 import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeoutMiddleware } from "./middleware/errorHandler.js";
 import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
+import apkRoutes from "./routes/apk.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -378,6 +379,11 @@ app.post("/api/agent/execute", async (req: Request, res: Response) => {
  * DAYS 3-4: Agent Registry Routes
  */
 app.use("/agents", agentRoutes);
+
+/**
+ * APK Download & Status Routes
+ */
+app.use("/api/apk", apkRoutes);
 
 /**
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
