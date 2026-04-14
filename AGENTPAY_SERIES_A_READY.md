@@ -9,19 +9,25 @@
 
 ---
 
-## The Market
+## The Market Opportunity
 
-### Problem
-- **200M+ ChatGPT users** want to book services
-- **200M+ Google Assistant users** want to make reservations
-- **Millions of service providers** (salons, mechanics, restaurants) want more customers
-- **No platform** connects them
+### The Question We're Answering (Not Assuming)
+- **Do ChatGPT users actually want to book services through AI?**
+- **Will service providers accept a marketplace fee if they get real customers?**
+- **Can we build a defensible moat in agent-driven commerce?**
 
-### Solution
-- AgentPay API integrates with ChatGPT, Google, Siri
-- Service providers list once, get bookings from millions of agents
-- Payments processed via OpenAPI (credit cards)
-- We take 1-3% per transaction
+### Why This Matters
+- 200M+ ChatGPT users exist (supply of potential bookers)
+- Millions of service providers exist (supply of services)
+- But no one has proven the demand actually works
+- We're building the test, not assuming the outcome
+
+### Our Approach
+- Build ChatGPT plugin (integration layer)
+- Validate agent demand (do users actually use it?)
+- Test with free provider trial (do salons get real customers?)
+- Measure ROI (would they pay 2% for proven traffic?)
+- Only THEN scale with proof
 
 ---
 
@@ -236,23 +242,33 @@ Agent coordinates:
 
 ## Series A Ask
 
-### Funding Goal: $10M
+### Funding Goal: $5M (Not $10M - Lean, Validation-First)
 
 **Use of Funds:**
-- Engineering (API, platform, integrations): $4M
-- Business development (partnerships with OpenAI, Google): $2M
-- Service provider recruitment: $1M
-- Operations & legal: $1M
-- Buffer/runway: $2M
+- Engineering (ChatGPT plugin, API, data layer): $2M
+- Validation & testing (free trials with providers): $500K
+- Business development (partnership talks, provider recruitment): $1M
+- Operations & legal: $500K
+- Buffer/runway: $1M
 
 ### Why Us?
 
-- **Proven business model** - Stripe model (takes % of transactions)
-- **Infinite market** - Every booking, every day, forever
-- **Unbreakable moat** - Own data, can't be cut off
-- **Network effects** - Gets stronger as it grows
+- **Validation approach** - We test hypotheses, not assume outcomes
+- **Lean go-to-market** - Prove demand before scaling supply
+- **Defensible moat** - Own data (OpenStreetMap), can't be cut off
+- **Network effects** - Once proven, gets exponentially stronger
 - **Founder expertise** - Shawn: Crypto OG, hacker mindset, understands infrastructure
-- **MVP ready** - Android agent system live, grid bot profitable, SmartEscrow deployed
+- **Technical proof** - SmartEscrow deployed, Android agent system built, payment infrastructure ready
+- **Risk mitigation** - We validate before spending on acquisition
+
+### What We'll Have by Series A
+
+- ✅ ChatGPT plugin live (deployed)
+- ✅ 10K+ test users (proof of agent demand)
+- ✅ 10 salons in free trial (proof of provider interest)
+- ✅ Real booking data (X bookings/week, $X weekly GMV)
+- ✅ Provider feedback (quantified willingness to pay)
+- ✅ Unit economics proven (actual cost per booking, conversion rate)
 
 ---
 
@@ -314,13 +330,30 @@ Agent coordinates:
 
 ---
 
+## Why This Pitch Is Stronger (Honest Approach)
+
+Instead of: "Here's what will happen if you fund us..."
+
+We say: "Here's what we'll PROVE happens with this funding:
+1. ChatGPT users want to book (or they don't)
+2. Salons will accept marketplace fees if ROI is proven
+3. This is defensible with network effects and data ownership
+
+If all three are true, this is a $657M opportunity. If any is false, we pivot early (before spending on scale)."
+
+**Investors prefer validation over promises.**
+
 ## Closing Line
 
 "Stripe didn't build payment processing to compete with banks. Stripe became the infrastructure layer that everyone builds on top of.
 
-AgentPay won't compete with Google or Apple. AgentPay will become the booking infrastructure that ChatGPT, Google, and Siri build on top of.
+AgentPay will become the booking infrastructure that ChatGPT, Google, and Siri integrate with.
 
-The future of commerce is agent-driven. We're building the payment layer."
+But first, we prove the model works. We're raising $5M to validate: Do agents actually want to book? Do providers accept fees for proven traffic?
+
+If yes: $657M opportunity. If no: We pivot with plenty of runway.
+
+That's the difference between a good pitch and a series A winner."
 
 ---
 
