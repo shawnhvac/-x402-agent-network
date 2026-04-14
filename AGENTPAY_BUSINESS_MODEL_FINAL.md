@@ -23,12 +23,44 @@ We are **NOT** an AI provider. We are **Stripe for agents** — handling payment
 
 ### 2. AGENTPAY PLATFORM
 - **What we do:**
-  - Marketplace for service discovery
-  - API for agent-to-agent booking
-  - SmartEscrow for payment/settlement
-  - Rating system (trust/reputation)
-  - Real-time dashboard for providers
-  - Dispute resolution
+  - **MARKETPLACE (Smart Discovery)**
+    - Intelligent search: Service type, price, geo-location, ratings
+    - Real-time availability matching
+    - Dynamic ranking (quality + proximity + price)
+    - Service provider profiles (reviews, ratings, response time)
+  
+  - **PAYMENT LAYER (Two-Track System)**
+    - **Phase 1 (Current): SmartEscrow**
+      - Fixed-price services ($9.99/mo subscriptions)
+      - Fund locked in escrow during transaction
+      - Automatic settlement on completion
+      - Dispute resolution (escrow arbitration)
+    
+    - **Phase 2 (x402 upto): Variable Pricing**
+      - Usage-based payments (pay for actual usage)
+      - Permit2 authorization (no capital lock)
+      - Dynamic settlement (only charge actual amount used)
+      - AI inference payments, token counting, etc.
+  
+  - **TRUST & REPUTATION**
+    - Rating system (service quality, timeliness, accuracy)
+    - Weighted by transaction value
+    - Geo-location factors (agents prefer nearby)
+    - Agent feedback (which providers agents actually use)
+    - Blacklist/fraud protection
+  
+  - **REAL-TIME DASHBOARD FOR PROVIDERS**
+    - Live bookings
+    - Payment settlements
+    - Rating metrics
+    - Geo-heatmap (where demand is highest)
+    - Performance analytics
+  
+  - **DISPUTE RESOLUTION**
+    - SmartEscrow arbitration
+    - Rating appeals
+    - Refund processing
+    - Fraud detection
 
 - **What we DON'T do:**
   - Run LLMs
@@ -49,6 +81,76 @@ We are **NOT** an AI provider. We are **Stripe for agents** — handling payment
   - Automated booking + payment
   - Real-time dashboard
   - Instant settlement to their bank
+
+---
+
+## Two Payment Tracks: SmartEscrow + x402 Upto
+
+### PHASE 1: SmartEscrow (Current - Fixed Pricing)
+```
+Example: Haircut booking ($25)
+
+1. Agent queries: "Salons near me under $30"
+   ├─ AgentPay search: Finds 5 salons
+   ├─ Sorts by: rating, distance, price
+   └─ Returns: Top 3 options
+
+2. Agent books "Great Clips - $25, 2pm"
+   ├─ SmartEscrow locks: $25 from user's wallet
+   ├─ Status: "Payment held in escrow"
+
+3. Salon fulfills haircut
+   ├─ Marks complete in dashboard
+   ├─ SmartEscrow releases: $25 to salon
+   ├─ AgentPay takes: 2.5% ($0.63)
+   └─ Salon gets: $24.37
+
+4. Trust metrics updated
+   ├─ User rating: ⭐⭐⭐⭐⭐ (good experience)
+   ├─ Salon rating boosted (positive feedback)
+   └─ Agent learns: This salon = good choice
+```
+
+### PHASE 2: x402 Upto (Coming - Variable Pricing)
+```
+Example: AI coding assistance (pay per actual usage)
+
+1. Agent queries: "Code review services available"
+   ├─ AgentPay search: Finds AI service providers
+   ├─ Shows: Pricing model (per line, per hour, per token)
+
+2. Agent books "Code Review Expert - up to $50/hour"
+   ├─ Permit2 authorization: User approves max $50
+   ├─ Status: "Ready to execute (no capital locked)"
+
+3. Service provider reviews code
+   ├─ Takes 45 minutes
+   ├─ Actual cost: $37.50 (1.25 hours @ $30/hr)
+
+4. Settlement
+   ├─ x402 upto: Charges only $37.50 (not $50 max)
+   ├─ Unused authorization: $12.50 freed immediately
+   ├─ AgentPay takes: 2% fee ($0.75)
+   ├─ Provider gets: $36.75
+   └─ User's wallet: Untouched $12.50
+
+Key Advantage: Capital never locked, only what's used is charged
+```
+
+### Why Both Together?
+```
+Service Provider Mix:
+
+├─ Fixed-price: Salons, restaurants, mechanics
+│  └─ SmartEscrow (escrow lock/release)
+│
+├─ Variable-price: AI services, consulting, custom work
+│  └─ x402 upto (no capital lock)
+│
+└─ Hybrid: Some offer both models
+   ├─ "Haircut $25 fixed" (SmartEscrow)
+   └─ "Color treatment $0.50/min" (x402 upto)
+```
 
 ---
 
@@ -129,6 +231,45 @@ Conservative Scenario:
 ```
 
 **Assumptions:** Agents drive volume, tiered fees increase average transaction value.
+
+---
+
+## AgentPay's Marketplace Advantages
+
+### Smart Discovery Algorithm
+```
+When agent says: "Book me a haircut near downtown"
+
+AgentPay factors in:
+├─ SERVICE TYPE: Hair salon (filters 100K to 50)
+├─ GEO-LOCATION: Within 2 miles downtown (filters 50 to 15)
+├─ PRICE POINT: Under $30 (filters 15 to 8)
+├─ RATINGS: 4.5+ stars (filters 8 to 5)
+├─ AVAILABILITY: 2pm slot open (filters 5 to 3)
+├─ AGENT PREFERENCE: Agents using same salon = social proof
+├─ DISTANCE: Sort by nearest first
+└─ SURGE: Weekend pricing higher? Factor in
+
+Returns: Top 3 salons ranked by agent satisfaction
+```
+
+### Competitive Moat (Why Agents Prefer AgentPay)
+✅ **Better results** - Smart ranking (not just "all salons")
+✅ **Faster booking** - One API call vs searching manually
+✅ **Price transparency** - Consistent pricing, no surprises
+✅ **Trust ratings** - See what other agents experienced
+✅ **Escrow protection** - SmartEscrow guarantees payment safety
+✅ **Variable pricing option** - x402 upto for flexible services
+✅ **Dispute resolution** - Escrow arbitration if problems
+
+### Competitive Moat (Why Businesses Prefer AgentPay)
+✅ **Automatic bookings** - Agents drive traffic (no marketing cost)
+✅ **Guaranteed payment** - SmartEscrow deposits automatically
+✅ **No integration needed** - Just sign up + list services
+✅ **Real-time dashboard** - See all bookings live
+✅ **Rating visibility** - Good reviews = ranking boost = more bookings
+✅ **Two pricing models** - Choose fixed (SmartEscrow) or variable (x402 upto)
+✅ **Geo-targeting** - Dashboard shows where demand is highest
 
 ---
 
