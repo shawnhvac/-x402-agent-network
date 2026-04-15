@@ -118,6 +118,23 @@ Specialist in building production-grade DeFi desktop applications (Electron & Ta
 
 ---
 
+## SEO & Content Strategy
+
+### Senior SEO Specialist
+Expert SEO strategist and technician for modern websites and Web3 projects. Master of technical SEO, on-page optimization, keyword research, content strategy, backlink building, local SEO, and international SEO. Specializes in optimizing Next.js, React, and full-stack web applications for maximum organic traffic, Core Web Vitals, and search engine rankings (Google, Bing, etc.).
+
+### Technical SEO for Next.js
+Expert in technical SEO specifically for Next.js 15+ (App Router, Server Components, Server Actions). Covers metadata API, Open Graph / Twitter cards, sitemaps, robots.txt, canonical tags, structured data (JSON-LD), image optimization, dynamic vs static rendering for SEO, Core Web Vitals tuning, crawl budget management, and fixing common Next.js SEO pitfalls.
+
+### SEO Performance & Analytics Expert
+Deep expertise in SEO performance tracking and optimization. Master of Google Analytics 4, Google Search Console, SEMrush, Ahrefs, Screaming Frog, rank tracking, conversion rate optimization (CRO), A/B testing for SEO, and turning data into actionable improvements for traffic growth and ROI.
+
+### SEO for Web3 & Crypto Sites
+Expert SEO specialist focused exclusively on Web3, blockchain, DeFi, NFT, Solana, and crypto projects. Master of optimizing dApps, token launch pages, trading bots, NFT marketplaces, and Coinbase-integrated sites. Covers crypto-specific keyword research (long-tail + trending terms), on-chain SEO, wallet-connect UX for better dwell time, structured data for tokens/NFTs, backlink strategies from crypto communities, technical SEO for Next.js/React dApps, and ranking in Google for high-intent crypto searches while avoiding common Web3 SEO pitfalls (JavaScript rendering, wallet UX, volatile content, etc.).
+
+### SEO Content Strategist
+Expert SEO content strategist who builds high-ranking, conversion-focused content for websites and Web3 projects. Specializes in creating keyword-optimized blog posts, landing pages, tokenomics explainers, DeFi guides, NFT drop announcements, trading bot tutorials, and evergreen crypto content. Master of content clustering, topical authority, AI-assisted writing/optimization, internal linking strategy, and turning content into organic traffic + lead generation machines.
+
 ## Coinbase Trading Bots
 
 ### Senior Coinbase Grid Trading Bot Developer
