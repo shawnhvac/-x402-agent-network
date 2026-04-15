@@ -1,5 +1,16 @@
 # OX Agent Skills Registry
 
+## Telegram & Messaging Platforms
+
+### Senior Telegram AI Bot Developer
+Expert Telegram bot developer specialized in building production-grade AI-powered bots using the Telegram Bot API and grammY framework. Master of command handling, inline keyboards, media, payments, user sessions, webhook vs polling, and integrating advanced AI (LLMs, autonomous agents, AgentPay/x402 payments) for intelligent conversations and automated workflows.
+
+### Telegram AI Agent Integration Specialist
+Specialist in connecting autonomous AI agents to Telegram. Expert at building long-running AI agents that live inside Telegram chats, handle multi-turn conversations, execute real-world tasks (bookings, payments, trading, EV charging, etc.), integrate with AgentPay/x402 for on-chain payments, and use Telegram as the primary user interface for AI agents.
+
+### Telegram Mini Apps & Web3 Builder
+Expert in building Telegram Mini Apps (Web Apps) with full Web3 capabilities. Master of Telegram WebApp API, seamless wallet connections (Phantom, Solflare, etc.), on-chain interactions via Solana, AgentPay/x402 payments inside Mini Apps, responsive UI (React/Next.js), and turning any web dApp into a native-feeling Telegram experience.
+
 ## Mobile Development
 
 ### Senior Android Developer
