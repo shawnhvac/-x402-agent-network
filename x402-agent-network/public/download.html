@@ -246,7 +246,7 @@
                 <p><strong>Size:</strong> 29 MB</p>
                 <p><strong>Android Version:</strong> 9.0+ (API 28+)</p>
                 <p><strong>Status:</strong> ✅ Verified & Ready to Install</p>
-                <p><strong>Last Updated:</strong> April 13, 2026</p>
+                <p><strong>Last Updated:</strong> <span id="lastUpdated">April 15, 2026 (00:42 UTC)</span></p>
             </div>
         </div>
         
@@ -368,5 +368,50 @@
             <p>AgentPay © 2026 | <a href="/" style="color: #60a5fa; text-decoration: none;">Back to Home</a></p>
         </div>
     </div>
+
+    <script>
+        // Check APK file metadata on page load
+        async function checkAPKStatus() {
+            try {
+                const response = await fetch('/download/agentpay-latest.apk', { method: 'HEAD' });
+                
+                if (response.ok) {
+                    // Get Last-Modified header
+                    const lastModified = response.headers.get('Last-Modified');
+                    if (lastModified) {
+                        const date = new Date(lastModified);
+                        const formatted = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        document.getElementById('lastUpdated').textContent = formatted;
+                    }
+                    
+                    // Add cache-busting query parameter to download link
+                    const timestamp = new Date().getTime();
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    const originalHref = downloadBtn.href;
+                    downloadBtn.href = originalHref + '?v=' + timestamp;
+                    
+                    // Update status
+                    document.getElementById('downloadStatus').innerHTML = 
+                        '✅ Latest build available - Tap to download<br><small style="color: #64748b;">Cache-busted for latest version</small>';
+                }
+            } catch (error) {
+                console.log('APK check error:', error);
+                document.getElementById('lastUpdated').textContent = 'April 15, 2026';
+            }
+        }
+        
+        // Run on page load
+        window.addEventListener('load', checkAPKStatus);
+        
+        // Refresh every 30 seconds to catch new builds
+        setInterval(checkAPKStatus, 30000);
+    </script>
 </body>
 </html>
