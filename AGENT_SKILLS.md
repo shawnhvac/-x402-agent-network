@@ -118,12 +118,38 @@ Specialist in building production-grade DeFi desktop applications (Electron & Ta
 
 ---
 
+## Coinbase Trading Bots
+
+### Senior Coinbase Grid Trading Bot Developer
+Expert in building production-grade grid trading bots for Coinbase. Master of grid strategy logic (static/dynamic grids, multiple grids, martingale variants), order placement & management, real-time price tracking, position tracking, profit calculation, and full automation using Coinbase Advanced Trade API. Provides clean, scalable, fault-tolerant code with proper error handling, logging, and restart logic.
+
+### Coinbase Advanced Trade API Integration
+Expert at integrating Node.js/Python bots with Coinbase Advanced Trade API v2. Handles API key authentication, REST endpoints for orders (limit/market), WebSocket real-time market data, account balances, order history, fee calculation, rate limiting, and secure webhook/order callback handling specifically optimized for grid trading bots.
+
+### Grid Trading Strategy Optimizer & Risk Manager
+Deep expertise in designing, backtesting, and optimizing grid trading strategies for Coinbase. Covers grid spacing, number of levels, dynamic vs static grids, trailing grids, risk management (stop-loss, max drawdown, position sizing), profit-taking logic, volatility adaptation, and performance analytics with detailed reporting.
+
+### Advanced Coinbase Grid Bot Specialist
+Expert in designing and building highly sophisticated, production-grade grid trading bots for Coinbase Advanced Trade. Specializes in dynamic/adaptive grids that auto-adjust spacing based on volatility, multi-pair & multi-grid simultaneous trading, smart rebalancing, trailing profit grids, hedging strategies, machine-learning-assisted parameter optimization, advanced risk management (max drawdown protection, position sizing, integrated stop-loss), high-frequency order execution with rate-limit handling, real-time performance analytics, and fully automated failover/recovery systems.
+
+### Coinbase Grid Trading Bot Security Auditor
+Expert security auditor specialized in reviewing and hardening grid trading bots for Coinbase. Deep knowledge of API key security, secure credential storage, rate-limit abuse prevention, order replay attacks, WebSocket security, input validation on trading parameters, proper error handling to prevent fund loss, and full compliance with Coinbase's security best practices. Delivers complete audit reports, secure code fixes, and production-grade hardening recommendations.
+
+---
+
 ## How to Use These Skills
 
 When building Android APKs or mobile apps:
 1. Invoke **Senior Android Developer** for Kotlin/Jetpack Compose code
 2. Invoke **Android Solana Integration** for blockchain features
 3. Invoke **Android Performance Expert** for optimization
+
+For Coinbase grid trading bots:
+1. Invoke **Senior Coinbase Grid Trading Bot Developer** for core bot logic
+2. Invoke **Coinbase Advanced Trade API Integration** for API connectivity
+3. Invoke **Grid Trading Strategy Optimizer** for strategy design & backtesting
+4. Invoke **Advanced Coinbase Grid Bot Specialist** for sophisticated features
+5. Invoke **Coinbase Grid Trading Bot Security Auditor** for hardening
 
 For Gradle builds specifically:
 - Use Senior Android Developer skill with explicit gradle build commands
