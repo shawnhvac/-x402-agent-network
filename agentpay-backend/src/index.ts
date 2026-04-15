@@ -310,3 +310,12 @@ process.on('SIGINT', async () => {
 });
 
 export default app;
+
+import dashboardRoutes from './routes/dashboard';
+import { initializePayoutJobs } from './jobs/payout.job';
+
+// Initialize payout scheduler
+initializePayoutJobs();
+
+// Dashboard routes
+app.use('/api/v1/provider', dashboardRoutes);
