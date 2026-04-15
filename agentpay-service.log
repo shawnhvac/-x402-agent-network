@@ -1231,3 +1231,344 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 [2026-04-12T23:35:02.008Z] GET /health | 200 | 1ms | unknown
 [2026-04-12T23:40:01.050Z] GET /health | 200 | 0ms | unknown
 [2026-04-12T23:43:29.977Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T23:45:01.096Z] GET /health | 200 | 1ms | unknown
+[2026-04-12T23:50:01.258Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T23:55:01.304Z] GET /health | 200 | 0ms | unknown
+[2026-04-12T23:56:50.760Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:00:01.362Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:05:01.674Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:05:30.678Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:08:26.890Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:10:01.722Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:15:01.775Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:20:01.749Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:25:01.803Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:30:01.854Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:34:47.446Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:35:01.900Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:40:01.946Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:45:01.987Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:47:19.922Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T00:50:01.944Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T00:55:01.986Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:00:02.035Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T01:05:01.390Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:10:01.435Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:15:01.477Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:17:16.494Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:20:01.671Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T01:25:01.713Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T01:30:01.760Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:35:00.355Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:35:01.817Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:40:01.862Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-13T01:42:57.108Z | Request: req-1776044547105-k5gon37i | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T01:42:27.105Z] GET /video-fleet-charging.mp4 | 500 | 30004ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-13T01:45:01.913Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T01:46:44.928Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:50:01.089Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-13T01:51:31.418Z | Request: req-1776045061413-ddamdvndt | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T01:51:01.413Z] GET /video-fleet-charging.mp4 | 500 | 30005ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-13T01:51:31.572Z | Request: req-1776045061571-0q6ew6wv6 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T01:51:01.571Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-13T01:55:01.136Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T01:57:26.604Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:00:01.216Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:05:01.675Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:10:01.718Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:15:01.769Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:20:01.778Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:25:01.828Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:27:20.933Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:30:01.890Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:35:01.943Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:40:01.996Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:45:01.042Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T02:46:58.530Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:50:02.031Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T02:55:01.075Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:00:01.157Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T03:02:59.096Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:05:01.299Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T03:09:42.406Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:10:01.350Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:13:49.860Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:15:01.397Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:20:01.572Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:25:01.618Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:30:01.667Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:35:01.721Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:40:01.763Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T03:43:45.129Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T03:45:01.808Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T03:50:02.009Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T04:13:44.899Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T04:43:44.387Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T05:13:44.658Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T05:43:45.251Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T06:13:44.191Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T06:43:44.749Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T07:13:44.736Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T07:43:44.877Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T08:13:44.742Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T08:43:44.273Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T09:13:44.666Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T09:43:45.225Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T10:13:44.931Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T10:43:44.882Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T11:13:45.056Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T11:43:44.966Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T12:13:44.653Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T12:43:44.722Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T13:13:44.812Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T13:43:45.113Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T14:13:45.380Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T14:38:01.226Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T14:39:39.069Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T14:58:44.835Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T15:08:12.674Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T15:09:34.352Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T15:39:52.005Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T16:09:34.203Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T16:39:34.123Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T17:09:34.055Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T17:12:06.825Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-13T17:12:18.772Z | Request: req-1776100308771-eltrn5iy5 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T17:11:48.771Z] GET /video-fleet-charging.mp4 | 500 | 30002ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-13T17:41:59.099Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-13T17:57:03.925Z | Request: req-1776102993926-xjbxcxdk0 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T17:56:33.926Z] GET /video-fleet-charging.mp4 | 500 | 29999ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-13T17:57:04.664Z | Request: req-1776102994663-kw70mbrxo | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T17:56:34.663Z] GET /video-fleet-charging.mp4 | 500 | 30002ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-13T17:57:10.254Z | Request: req-1776103000249-cs7ujd3ui | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T17:56:40.249Z] GET /video-fleet-charging.mp4 | 500 | 30005ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-13T17:57:11.060Z | Request: req-1776103001059-jviwfp48r | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-13T17:56:41.059Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-13T18:11:59.706Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T18:41:59.340Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T19:11:59.207Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T19:41:58.984Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T20:11:59.750Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T20:41:58.959Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T21:11:59.498Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T21:41:59.158Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T22:11:59.691Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T22:33:32.825Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T23:03:23.937Z] GET /health | 200 | 1ms | unknown
+[2026-04-13T23:23:20.581Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T23:26:51.314Z] GET /health | 200 | 0ms | unknown
+[2026-04-13T23:37:41.001Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T00:07:34.958Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T00:37:34.578Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T01:03:54.541Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T01:33:47.659Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T02:03:47.790Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T02:33:48.264Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-14T03:02:05.081Z | Request: req-1776135695058-aae35vz7i | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-14T03:01:35.058Z] GET /video-fleet-charging.mp4 | 500 | 30024ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-14T03:03:49.247Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-14T03:07:55.141Z | Request: req-1776136045125-nv7ycyho1 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-14T03:07:25.125Z] GET /video-fleet-charging.mp4 | 500 | 30017ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-14T03:33:47.603Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T04:03:48.474Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T04:33:48.815Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T05:03:47.488Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T05:33:47.954Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T06:03:48.656Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T06:33:48.308Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T07:03:47.855Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T07:33:48.479Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T08:03:48.109Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T08:33:48.036Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T09:03:47.983Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T09:33:48.220Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T10:03:48.264Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T10:33:48.226Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T11:03:48.300Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T11:33:47.801Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T12:03:48.846Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T12:33:48.167Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T13:03:48.392Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T13:33:52.013Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T13:58:37.983Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T14:03:48.154Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T14:33:48.487Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T15:03:49.964Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T15:33:48.207Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T16:03:49.204Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T16:33:48.500Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T17:03:48.856Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T17:33:49.495Z] GET /health | 200 | 4ms | unknown
+[2026-04-14T18:03:48.551Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T18:33:48.447Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T19:03:48.341Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T19:33:48.185Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T20:03:48.483Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T20:33:53.874Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T21:03:54.846Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T21:33:53.773Z] GET /health | 200 | 1ms | unknown
+[2026-04-14T22:03:53.835Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T22:33:53.622Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T23:03:53.369Z] GET /health | 200 | 0ms | unknown
+[2026-04-14T23:33:54.063Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T00:04:06.776Z] GET /health | 200 | 0ms | unknown
