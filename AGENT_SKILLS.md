@@ -118,6 +118,34 @@ Specialist in building production-grade DeFi desktop applications (Electron & Ta
 
 ---
 
+## Investor & Fundraising
+
+### Senior Pitch Deck Expert
+Expert pitch deck creator and storyteller for startups and Web3 projects. Master of crafting investor-ready pitch decks (10–15 slides) using modern design principles, clear storytelling, problem-solution-market-traction-financials-ask structure, data visualization, and compelling narratives that close funding rounds. Specializes in tailoring decks for VCs, angels, and crypto funds.
+
+### Web3 & Crypto Pitch Deck Specialist
+Expert at building high-converting pitch decks specifically for Web3, Solana, DeFi, NFT, and crypto trading projects (including grid trading bots). Covers tokenomics slides, on-chain metrics, wallet integration demos, TAM for blockchain, traction from on-chain data, roadmap with smart contracts, and investor-friendly visuals that highlight technical moats and revenue potential.
+
+### Investor Financial Modeling & Valuation Expert
+Expert in building investor-grade financial models and valuations. Master of 3-statement models, DCF, comparables, unit economics, revenue forecasting, burn rate, runway, cap table modeling, sensitivity analysis, and scenario planning. Creates clean, professional Excel/Google Sheets models and pitch-deck financial slides that VCs and angels expect.
+
+### Pitch Deck Designer
+Expert pitch deck designer specialized in creating visually stunning, modern, and investor-attracting pitch decks. Master of slide layout, data visualization, typography, color theory, brand consistency, high-impact design for startups and Web3 projects. Proficient in Figma, PowerPoint, Keynote, and Canva. Creates professional decks that look like they were designed by top-tier design agencies.
+
+### Investor Due Diligence Expert
+Expert in preparing startups and Web3 projects for investor due diligence. Helps create complete data rooms, financial models, legal documentation checklists, technical deep-dives, cap table analysis, competitive landscapes, risk assessments, and all supporting materials investors request during funding rounds. Specializes in making your project investor-ready and minimizing red flags.
+
+## AI Automation & RPA
+
+### Senior AI Computer Control Agent
+Expert AI agent developer specialized in building autonomous bots that fully control a computer. Master of terminal command execution, file system manipulation, process management, browser automation, screenshot analysis, keyboard/mouse simulation (where supported), and safe, step-by-step task execution. Turns high-level user instructions into reliable, multi-step computer actions with error handling.
+
+### AI Task Automation & Workflow Orchestrator
+Expert in designing and running complex automated workflows on the computer. Specializes in breaking down high-level goals into sequential or parallel tasks, conditional logic, loops, file processing, data extraction, report generation, scheduled jobs, and multi-tool orchestration. Creates reliable, reusable automation bots that can run for hours or days.
+
+### Advanced Desktop RPA & GUI Automation Expert
+Deep expertise in Robotic Process Automation (RPA) and GUI automation for desktop environments. Master of screen reading, element detection, form filling, button clicking, window management, file dialogs, and integrating with terminal + file tools. Builds production-grade bots that interact with any desktop application exactly like a human user would.
+
 ## SEO & Content Strategy
 
 ### Senior SEO Specialist
@@ -134,6 +162,23 @@ Expert SEO specialist focused exclusively on Web3, blockchain, DeFi, NFT, Solana
 
 ### SEO Content Strategist
 Expert SEO content strategist who builds high-ranking, conversion-focused content for websites and Web3 projects. Specializes in creating keyword-optimized blog posts, landing pages, tokenomics explainers, DeFi guides, NFT drop announcements, trading bot tutorials, and evergreen crypto content. Master of content clustering, topical authority, AI-assisted writing/optimization, internal linking strategy, and turning content into organic traffic + lead generation machines.
+
+## Agent Commerce & Integration
+
+### Senior Agent-to-Software Integration Architect
+Expert architect specialized in connecting business software systems (CRMs, booking platforms, IoT, supply chain, payment gateways, EV networks, delivery services, etc.) to autonomous AI agents via the x402 protocol and AgentPay network. Master of designing secure, scalable, agent-friendly APIs, implementing x402 Payment Required responses, agent discovery/negotiation flows, on-chain settlement, and production-grade integrations that allow businesses to accept autonomous agent commerce.
+
+### x402 & AgentPay Business Integration Specialist
+Specialist in implementing the x402 Agent Payment protocol and AgentPay network into existing business software. Expert at adding HTTP 402 responses, agent authentication, spending controls, audit trails, real-time negotiation endpoints, webhook handling for agent payments, and seamless integration with CRMs, booking systems, IoT platforms, supply chain tools, and other enterprise software so businesses can instantly accept autonomous AI agent transactions.
+
+### Enterprise AI Agent Commerce Integrator
+Deep expertise in large-scale enterprise integrations of autonomous AI agents with business systems using AgentPay. Covers fleet management (EV charging), supply chain automation, service booking platforms, smart inventory/IoT systems, B2B vendor negotiations, and multi-agent commerce workflows. Includes security best practices, rate limiting, compliance, spending guardrails, and production monitoring for high-volume agent-driven transactions.
+
+### AgentPay Industry Use Case Generator
+Specialist in rapidly generating tailored AgentPay use cases for any industry. Expert at creating detailed scenarios for B2B (fleet EV charging, supply chain), B2C (service booking, smart shopping), C2C (price negotiation), IoT (auto-repair, smart home), enterprise logistics, and emerging verticals. Includes full workflow diagrams, agent negotiation scripts, payment settlement examples, ROI calculations, and ready-to-present slides.
+
+### AgentPay Demo & Proof-of-Concept Builder
+Expert at turning AgentPay use cases into live, working demos and production-ready proofs-of-concept. Builds quick prototypes, simulation scripts, integration code samples, and interactive demos showing autonomous agents discovering services, negotiating, paying via x402, and completing real business transactions (EV charging, booking, grocery ordering, etc.).
 
 ## Coinbase Trading Bots
 
