@@ -1593,3 +1593,183 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
 [2026-04-15T00:55:39.376Z] GET /health | 200 | 1ms | unknown
 [2026-04-15T01:25:38.822Z] GET /health | 200 | 1ms | unknown
 [2026-04-15T01:45:57.423Z] GET /health | 200 | 0ms | unknown
+
+> x402-agent-network@1.0.0 start
+> cd /root/.openclaw/workspace/x402-agent-network && node dist/app.js
+
+◇ injected env (7) from .env // tip: ⌘ suppress logs { quiet: true }
+✅ Telegram Collaboration Bot initialized
+📊 Initializing SQLite database...
+✅ SQLite database initialized successfully
+📁 Database file: /root/.openclaw/workspace/x402-agent-network/x402.db
+✅ Database ready
+✅ Telegram collaboration bot routes registered at /webhooks/*
+✅ MUSKOX x402 Agent Network running on port 3001
+📝 API: http://localhost:3001/api/agent/execute
+🏥 Health: http://localhost:3001/health
+📊 Metrics: http://localhost:3001/metrics
+⚙️ Status: http://localhost:3001/status
+ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.
+    at Object.xForwardedForHeader (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:342:13)
+    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:656:22)
+    at Object.keyGenerator (file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:759:20)
+    at file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:823:32
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async file:///root/.openclaw/workspace/x402-agent-network/node_modules/express-rate-limit/dist/index.mjs:801:5 {
+  code: 'ERR_ERL_UNEXPECTED_X_FORWARDED_FOR',
+  help: 'https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/'
+}
+[2026-04-15T02:42:02.894Z] GET /health | 200 | 55ms | unknown
+[2026-04-15T02:45:58.177Z] GET /health | 200 | 30ms | unknown
+[2026-04-15T02:46:36.099Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T02:53:23.666Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T03:12:08.019Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T03:26:55.615Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T03:56:54.434Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T04:26:55.728Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T04:56:55.641Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-15T05:22:06.111Z | Request: req-1776230496103-kndbyuzkf | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T05:21:36.103Z] GET /video-fleet-charging.mp4 | 500 | 30009ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-15T05:26:55.885Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T05:56:55.869Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T06:26:56.080Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T06:56:57.146Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T07:26:56.093Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T07:56:56.084Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T08:26:55.959Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T08:56:56.495Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T09:26:55.908Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-15T09:27:53.191Z | Request: req-1776245243182-k237gsmk1 | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T09:27:23.182Z] GET /video-fleet-charging.mp4 | 500 | 30009ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[ERROR] 2026-04-15T09:36:48.978Z | Request: req-1776245778964-8qu988ozn | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T09:36:18.964Z] GET /video-fleet-charging.mp4 | 500 | 30015ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-15T09:56:58.713Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T10:26:56.282Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T10:56:55.472Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T11:26:59.294Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T11:56:56.322Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T12:26:55.922Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T12:56:56.371Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T13:26:57.643Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T13:56:56.251Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T14:26:57.067Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T14:56:55.850Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T15:26:56.051Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T15:56:56.193Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T16:26:56.124Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T16:56:55.821Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-15T17:21:46.468Z | Request: req-1776273676467-ammecz0hk | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T17:21:16.467Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-15T17:26:57.102Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T17:56:56.502Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T18:26:56.263Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T18:56:56.776Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T19:26:56.534Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T19:56:56.013Z] GET /health | 200 | 0ms | unknown
+[ERROR] 2026-04-15T20:25:22.386Z | Request: req-1776284692385-ook3s7hmw | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T20:24:52.385Z] GET /video-fleet-charging.mp4 | 500 | 30001ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)
+[2026-04-15T20:26:55.973Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T20:56:57.245Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T21:26:58.643Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T21:56:57.022Z] GET /health | 200 | 1ms | unknown
+[2026-04-15T22:26:56.255Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T22:56:57.145Z] GET /health | 200 | 0ms | unknown
+[2026-04-15T23:26:55.761Z] GET /health | 200 | 1ms | unknown
+[ERROR] 2026-04-15T23:43:28.498Z | Request: req-1776296578497-8he9fu25i | Wallet: unknown
+[ERROR] Request timeout
+[ERROR] Stack: Error: Request timeout
+    at Timeout._onTimeout (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:84:25)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+[2026-04-15T23:42:58.497Z] GET /apk/agentpay-latest.apk | 500 | 30002ms | unknown
+Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:700:11)
+    at ServerResponse.header (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:686:10)
+    at ServerResponse.send (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:163:12)
+    at ServerResponse.json (/root/.openclaw/workspace/x402-agent-network/node_modules/express/lib/response.js:252:15)
+    at res.json (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/logging.js:47:16)
+    at errorHandler (file:///root/.openclaw/workspace/x402-agent-network/dist/middleware/errorHandler.js:55:28)
+    at Layer.handleError (/root/.openclaw/workspace/x402-agent-network/node_modules/router/lib/layer.js:116:17)
+    at trimPrefix (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:340:13)
+    at /root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:297:9
+    at processParams (/root/.openclaw/workspace/x402-agent-network/node_modules/router/index.js:582:12)

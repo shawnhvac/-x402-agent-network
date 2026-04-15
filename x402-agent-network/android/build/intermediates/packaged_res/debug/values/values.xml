@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_description">Autonomous Agent Commerce on Solana</string>
-    <string name="app_name">AgentPay</string>
-    <style name="Theme.AgentPay" parent="Theme.MaterialComponents.Light.DarkActionBar">
-    </style>
-</resources>
