@@ -89,3 +89,56 @@ router.post('/refund', async (req: Request, res: Response) => {
 });
 
 export default router;
+
+import OpenAPIService from '../services/openapi.service';
+
+/**
+ * POST /api/v1/payments/openapi
+ * Process a payment via OpenAPI (fallback)
+ */
+router.post('/openapi', async (req: Request, res: Response) => {
+  try {
+    const {
+      bookingId,
+      amount,
+      cardToken,
+      userEmail,
+    } = req.body;
+
+    // Validate input
+    if (!bookingId || !amount || !cardToken || !userEmail) {
+      return res.status(400).json({
+        error: 'Missing required fields: bookingId, amount, cardToken, userEmail',
+      });
+    }
+
+    // Process payment
+    const result = await OpenAPIService.processBookingPayment(
+      bookingId,
+      amount,
+      cardToken,
+      userEmail
+    );
+
+    if (!result.success) {
+      return res.status(400).json({
+        error: result.error,
+      });
+    }
+
+    res.json({
+      success: true,
+      bookingId,
+      chargeId: result.chargeId,
+      amount: result.amount,
+      fee: result.fee,
+      providerAmount: result.providerAmount,
+      provider: 'openapi',
+    });
+  } catch (error: any) {
+    console.error('OpenAPI payment error:', error);
+    res.status(500).json({
+      error: 'OpenAPI payment processing failed',
+    });
+  }
+});
