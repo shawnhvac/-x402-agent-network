@@ -1,7 +1,7 @@
 // Language translations for AgentPay website
 const translations = {
   en: {
-    title: "AgentPay - Autonomous AI Agent Commerce Network",
+    title: "AgentPay - Complete AI Agent Commerce (Services + Products)",
     betaWarning: "⚠️ BETA TESTING - This platform is in active development. Features are being added weekly. Do not send real funds yet.",
     nav: {
       home: "Home",
@@ -12,7 +12,7 @@ const translations = {
       github: "💻 GitHub"
     },
     header: {
-      title: "The Universal x402 Agent Payment Network",
+      title: "The Universal Agent Marketplace - Services + Products",
       tagline: "AgentPay™ is a trademark of AgentPay, Inc. All rights reserved."
     },
     intro: {
