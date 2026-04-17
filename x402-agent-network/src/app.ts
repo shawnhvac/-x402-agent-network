@@ -13,6 +13,7 @@ import crypto from "crypto";
 import { readFileSync, appendFileSync, existsSync, createReadStream } from 'fs';
 import { join as pathJoin } from 'path';
 import { x402Middleware, paymentRequired, type PaymentRequiredOptions } from "./middleware/x402.js";
+import { setupX402Middleware, getX402PaymentInfo } from "./middleware/x402-payment.js";
 import { initializeDatabase, getQuota, decrementQuota, recordPayment } from "./db-sqlite.js";
 import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logging.js";
 import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeoutMiddleware } from "./middleware/errorHandler.js";
@@ -46,6 +47,12 @@ app.use(cors({
 
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
+
+// ✅ x402 PAYMENT MIDDLEWARE - Register Bazaar endpoints
+// Enables autonomous payment for: /api/v1/search, /api/v1/book, /api/v1/pay
+console.log('🔗 Initializing x402 Bazaar payment middleware...');
+setupX402Middleware(app);
+console.log('✅ x402 Bazaar middleware active (agents can now make x402 payments)');
 
 // ✅ Initialize Telegram Agent Bridge
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || '';
