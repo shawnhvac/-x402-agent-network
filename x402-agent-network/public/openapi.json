@@ -1,0 +1,254 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AgentPay x402 API",
+    "description": "Autonomous service booking and payment API with x402 protocol support. Agents can search for services, book appointments, and make payments without human intervention.",
+    "version": "1.0.0",
+    "contact": {
+      "email": "x402agentpay@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://agentpay.com",
+      "description": "Production API"
+    }
+  ],
+  "paths": {
+    "/api/v1/search": {
+      "post": {
+        "summary": "Search for available services",
+        "description": "Find services by category, location, and date. Returns ranked list with pricing, ratings, and availability. Requires x402 payment of $0.001.",
+        "operationId": "searchServices",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "description": "Service category: salon, restaurant, mechanic, plumber, electrician, etc",
+                    "example": "salon"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "Location (address or coordinates)",
+                    "example": "New York, NY"
+                  },
+                  "date": {
+                    "type": "string",
+                    "description": "Desired service date (ISO 8601)",
+                    "example": "2026-04-20T14:00:00Z"
+                  },
+                  "duration": {
+                    "type": "integer",
+                    "description": "Service duration in minutes (optional)",
+                    "example": 60
+                  }
+                },
+                "required": ["category", "location"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Services found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "services": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "description": "Unique service ID"
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Service provider name"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "rating": {
+                            "type": "number",
+                            "description": "Rating from 0-5"
+                          },
+                          "price_min": {
+                            "type": "number",
+                            "description": "Minimum price in USD"
+                          },
+                          "price_max": {
+                            "type": "number",
+                            "description": "Maximum price in USD"
+                          },
+                          "distance_miles": {
+                            "type": "number"
+                          },
+                          "availability": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Available time slots"
+                          }
+                        },
+                        "required": ["id", "name", "price_min", "availability"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required (x402 protocol)"
+          }
+        }
+      }
+    },
+    "/api/v1/book": {
+      "post": {
+        "summary": "Book a service appointment",
+        "description": "Reserve a service at specific time. Requires x402 payment of $0.002 plus service cost via escrow.",
+        "operationId": "bookService",
+        "x-openai-isConsequential": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": {
+                    "type": "string",
+                    "description": "Service ID from search results"
+                  },
+                  "booking_time": {
+                    "type": "string",
+                    "description": "Desired booking time (ISO 8601)"
+                  },
+                  "customer_wallet": {
+                    "type": "string",
+                    "description": "Customer's Ethereum wallet address"
+                  },
+                  "customer_name": {
+                    "type": "string",
+                    "description": "Customer name for booking"
+                  }
+                },
+                "required": ["service_id", "booking_time", "customer_wallet"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Booking confirmed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "booking_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["confirmed", "pending", "cancelled"]
+                    },
+                    "service_date": {
+                      "type": "string"
+                    },
+                    "service_name": {
+                      "type": "string"
+                    },
+                    "provider": {
+                      "type": "string"
+                    },
+                    "price": {
+                      "type": "number"
+                    },
+                    "confirmation_code": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment required"
+          }
+        }
+      }
+    },
+    "/api/v1/pay": {
+      "post": {
+        "summary": "Complete payment for booked service",
+        "description": "Lock funds in SmartEscrow and confirm booking. Funds released upon service completion.",
+        "operationId": "payForService",
+        "x-openai-isConsequential": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "booking_id": {
+                    "type": "string"
+                  },
+                  "service_price": {
+                    "type": "number"
+                  },
+                  "customer_wallet": {
+                    "type": "string"
+                  }
+                },
+                "required": ["booking_id", "service_price", "customer_wallet"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment processed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transaction_hash": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "escrow_address": {
+                      "type": "string"
+                    },
+                    "booking_id": {
+                      "type": "string"
+                    },
+                    "amount": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
