@@ -1,0 +1,26 @@
+{
+  "grid_bot": {
+    "status": "checking",
+    "pid": null,
+    "checked": null,
+    "ttl_seconds": 1800
+  },
+  "agentpay": {
+    "status": "checking",
+    "port": 3001,
+    "checked": null,
+    "ttl_seconds": 300
+  },
+  "dns": {
+    "x402-agent-pay.com": "85.239.236.56",
+    "checked": null,
+    "ttl_seconds": 3600
+  },
+  "contabo": {
+    "ip": "85.239.236.56",
+    "password": "Test123456!",
+    "status": "online",
+    "checked": null,
+    "ttl_seconds": 900
+  }
+}
