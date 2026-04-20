@@ -11,11 +11,13 @@ import crypto from "crypto";
 import { readFileSync, appendFileSync, existsSync, createReadStream } from 'fs';
 import { join as pathJoin } from 'path';
 import { x402Middleware } from "./middleware/x402.js";
+import { setupX402Middleware } from "./middleware/x402-payment.js";
 import { initializeDatabase, getQuota, decrementQuota, recordPayment } from "./db-sqlite.js";
 import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logging.js";
 import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeoutMiddleware } from "./middleware/errorHandler.js";
 import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
+import apkRoutes from "./routes/apk.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -30,6 +32,11 @@ app.use(cors({
 }));
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
+// ✅ x402 PAYMENT MIDDLEWARE - Register Bazaar endpoints
+// Enables autonomous payment for: /api/v1/search, /api/v1/book, /api/v1/pay
+console.log('🔗 Initializing x402 Bazaar payment middleware...');
+setupX402Middleware(app);
+console.log('✅ x402 Bazaar middleware active (agents can now make x402 payments)');
 // ✅ Initialize Telegram Agent Bridge
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || '';
 const webhookSecret = process.env.WEBHOOK_SECRET || crypto.randomBytes(32).toString('hex');
@@ -319,6 +326,10 @@ app.post("/api/agent/execute", async (req, res) => {
  * DAYS 3-4: Agent Registry Routes
  */
 app.use("/agents", agentRoutes);
+/**
+ * APK Download & Status Routes
+ */
+app.use("/api/apk", apkRoutes);
 /**
  * DAYS 5-7: Demo Agent Endpoints (Grid Trader + Sniper Bot)
  */
