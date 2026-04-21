@@ -25,7 +25,7 @@ Manifest URL: https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
 
 OpenAPI Spec: https://x402-agent-pay.com/openapi.json
 
-Contact Email: shawnhvac@x402-agent-pay.com
+Contact Email: x402agentpay@gmail.com
 
 Website: https://x402-agent-pay.com
 
@@ -165,7 +165,7 @@ Unlike traditional service booking APIs:
 CONTACT & SUPPORT
 ──────────────────
 
-Email: shawnhvac@x402-agent-pay.com
+Email: x402agentpay@gmail.com
 Website: https://x402-agent-pay.com
 Technical Support: Available 24/7
 
@@ -208,7 +208,7 @@ Best regards,
 
 Shawn (shawnhvac)
 AgentPay Team
-shawnhvac@x402-agent-pay.com
+x402agentpay@gmail.com
 https://x402-agent-pay.com
 
 ───────────────────────────────────────────────────────────────────────────────
