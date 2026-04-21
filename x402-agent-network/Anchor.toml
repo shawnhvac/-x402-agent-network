@@ -1,0 +1,9 @@
+[programs.smart_escrow]
+program_id = "SmartEscrowProgramIdHere1234567890123456789"
+
+[registry]
+url = "https://api.devnet.solana.com"
+
+[provider]
+cluster = "https://api.devnet.solana.com"
+wallet = "/root/buyer.json"

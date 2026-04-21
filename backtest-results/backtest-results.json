@@ -1,0 +1,56 @@
+{
+  "Aggressive (1.5% dev, 0.5% EMA)": {
+    "scenario": {
+      "dev": 1.5,
+      "ema_spread": 0.5,
+      "name": "Aggressive (1.5% dev, 0.5% EMA)"
+    },
+    "metrics": {
+      "num_trades": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "max_drawdown": 0,
+      "total_return": 0,
+      "sharpe_ratio": 0,
+      "avg_hold_minutes": 0,
+      "losing_streaks": []
+    },
+    "final_capital": 1300
+  },
+  "Default (2.0% dev, 1.0% EMA)": {
+    "scenario": {
+      "dev": 2.0,
+      "ema_spread": 1.0,
+      "name": "Default (2.0% dev, 1.0% EMA)"
+    },
+    "metrics": {
+      "num_trades": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "max_drawdown": 0,
+      "total_return": 0,
+      "sharpe_ratio": 0,
+      "avg_hold_minutes": 0,
+      "losing_streaks": []
+    },
+    "final_capital": 1300
+  },
+  "Conservative (2.5% dev, 1.5% EMA)": {
+    "scenario": {
+      "dev": 2.5,
+      "ema_spread": 1.5,
+      "name": "Conservative (2.5% dev, 1.5% EMA)"
+    },
+    "metrics": {
+      "num_trades": 0,
+      "win_rate": 0,
+      "profit_factor": 0,
+      "max_drawdown": 0,
+      "total_return": 0,
+      "sharpe_ratio": 0,
+      "avg_hold_minutes": 0,
+      "losing_streaks": []
+    },
+    "final_capital": 1300
+  }
+}

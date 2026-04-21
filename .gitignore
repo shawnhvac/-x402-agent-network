@@ -1,0 +1,12 @@
+venv/
+x_env/
+kalshi-bot/
+muskox-bot/
+grid-trading*
+snipe*
+starship*
+*arb*
+prediction*
+muskox*
+MUSKOX*
+.credentials/

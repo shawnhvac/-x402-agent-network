@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - AgentPay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 40px;
+        }
+        h1 { color: #60a5fa; margin-bottom: 10px; }
+        p { color: #cbd5e1; margin-bottom: 30px; }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        button {
+            width: 100%;
+            background: #3b82f6;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .message.success {
+            background: #064e3b;
+            color: #10b981;
+            border: 1px solid #10b981;
+        }
+        .message.error {
+            background: #7c2d12;
+            color: #ea580c;
+            border: 1px solid #ea580c;
+        }
+        .message.show {
+            display: block;
+        }
+        .back-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 30px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <h1>Contact AgentPay</h1>
+        <p>Have questions? Fill out the form below and we'll get back to you soon.</p>
+        <p style="color: #60a5fa; font-size: 0.9em; margin-bottom: 30px;">
+            📧 Direct email: <a href="mailto:x402agentpay@gmail.com" style="color: #10b981; text-decoration: none; font-weight: 600;">x402agentpay@gmail.com</a>
+        </p>
+        
+        <div id="statusMessage" class="message"></div>
+        
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="subject">Subject *</label>
+                <select id="subject" name="subject" required>
+                    <option value="">Select a subject...</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Agent Registration">Agent Registration</option>
+                    <option value="Technical Support">Technical Support</option>
+                    <option value="Partnership">Partnership</option>
+                    <option value="Investor">Investor Inquiry</option>
+                    <option value="Bug Report">Bug Report</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="messageText">Message *</label>
+                <textarea id="messageText" name="message" required placeholder="Tell us more about your inquiry..."></textarea>
+            </div>
+            
+            <button type="submit" id="submitBtn">Send Message</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const statusDiv = document.getElementById('statusMessage');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('messageText').value
+            };
+            
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.textContent = '✅ Message sent successfully! We\'ll get back to you soon.';
+                    statusDiv.className = 'message success show';
+                    document.getElementById('contactForm').reset();
+                    submitBtn.textContent = 'Send Message';
+                } else {
+                    statusDiv.textContent = '❌ Error: ' + (data.error || 'Please try again.');
+                    statusDiv.className = 'message error show';
+                    submitBtn.textContent = 'Send Message';
+                }
+            } catch (error) {
+                statusDiv.textContent = '❌ Error: ' + error.message;
+                statusDiv.className = 'message error show';
+                submitBtn.textContent = 'Send Message';
+            }
+            
+            submitBtn.disabled = false;
+        });
+    </script>
+</body>
+
+    <footer>
+        <div class="footer-container">
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>🤖 Product</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/marketplace">Marketplace</a></li>
+                    <li><a href="/agent-dashboard">Agent Dashboard</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>📚 Resources</h3>
+                <ul>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/getting-started">Getting Started</a></li>
+                    <li><a href="/quick-reference">Quick Reference</a></li>
+                    <li><a href="/roadmap">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>💼 Investors</h3>
+                <ul>
+                    <li><a href="/investor-pitch">Pitch Deck</a></li>
+                    <li><a href="/personal-agent-app">Personal Agent App</a></li>
+                    <li><a href="/android-app">Android Build</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>🔧 Technical</h3>
+                <ul>
+                    <li><a href="/google-maps-setup">Location Services</a></li>
+                    <li><a href="/admin">🔐 Admin</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>🦬 AgentPay — The Operating System for Autonomous Agent Commerce</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid #334155;
+            margin-top: 60px;
+            padding: 40px 20px;
+        }
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        .footer-section h3 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section li {
+            margin-bottom: 12px;
+        }
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #60a5fa;
+        }
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+    </style>
+</body>
+</html>

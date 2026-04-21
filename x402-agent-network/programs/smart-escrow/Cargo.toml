@@ -1,0 +1,17 @@
+[package]
+name = "smart_escrow"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anchor-lang = "0.28"
+anchor-spl = "0.28"
+spl-token = "3.5"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[profile.release]
+overflow-checks = true
+
+

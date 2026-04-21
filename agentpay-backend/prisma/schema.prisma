@@ -1,0 +1,254 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users (ChatGPT, Google Assistant, Siri users)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  
+  // Wallet info
+  solanaAddress String?
+  walletType    String? // "phantom", "solflare", "none"
+  
+  // Preferences
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  bookings      Booking[]
+  ratings       Rating[]
+  walletAccount WalletAccount?
+}
+
+// Service Providers (salons, mechanics, restaurants)
+model Provider {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  
+  // Location
+  address   String
+  latitude  Float
+  longitude Float
+  city      String
+  state     String
+  zip       String
+  
+  // Business info
+  serviceType  String // "salon", "mechanic", "restaurant", etc.
+  description  String?
+  imageUrl     String?
+  
+  // Hours
+  hoursOpen    String? // "09:00"
+  hoursClose   String? // "17:00"
+  daysOpen     String? // "Mon,Tue,Wed,Thu,Fri,Sat"
+  
+  // Payment
+  stripeAccountId String?
+  solanaAddress   String?
+  bankAccount     String?
+  
+  // Trial period
+  trialStartDate   DateTime?
+  trialEndDate     DateTime?
+  isPaidMember     Boolean   @default(false)
+  paidStartDate    DateTime?
+  
+  // Stats
+  totalBookings    Int       @default(0)
+  totalRevenue     Float     @default(0)
+  averageRating    Float     @default(0)
+  
+  // Status
+  isActive         Boolean   @default(true)
+  verifiedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relations
+  services         Service[]
+  bookings         Booking[]
+  ratings          Rating[]
+  payouts          Payout[]
+}
+
+// Services offered by providers
+model Service {
+  id        String   @id @default(cuid())
+  name      String
+  description String?
+  
+  // Pricing
+  basePrice Float
+  duration  Int // minutes
+  
+  // Status
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  bookings   Booking[]
+  
+  @@index([providerId])
+}
+
+// Bookings (reservations)
+model Booking {
+  id        String   @id @default(cuid())
+  
+  // References
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id])
+  
+  serviceId String
+  service   Service  @relation(fields: [serviceId], references: [id])
+  
+  // Booking details
+  scheduledTime DateTime
+  duration      Int // minutes
+  specialRequests String?
+  
+  // Payment
+  amount        Float
+  paymentMethod String // "stripe", "phantom", "solflare", "jupiter"
+  paymentStatus String // "pending", "completed", "failed", "refunded"
+  transactionId String?
+  
+  // Status
+  status        String // "pending", "confirmed", "completed", "cancelled", "no_show"
+  confirmedAt   DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  
+  // Escrow (if using SmartEscrow)
+  escrowTxId    String?
+  escrowStatus  String? // "locked", "released", "disputed"
+  
+  // Timestamps
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([providerId])
+  @@index([scheduledTime])
+  @@index([status])
+}
+
+// Ratings/Reviews
+model Rating {
+  id        String   @id @default(cuid())
+  
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id])
+  
+  // Rating
+  score     Int // 1-5
+  comment   String?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([providerId])
+  @@unique([userId, providerId]) // One rating per user per provider
+}
+
+// Transactions (all payments)
+model Transaction {
+  id        String   @id @default(cuid())
+  
+  // Payment details
+  amount    Float
+  currency  String // "USD", "USDC", "SOL"
+  method    String // "stripe", "phantom", "solflare", "jupiter"
+  status    String // "pending", "success", "failed"
+  
+  // References
+  bookingId String?
+  description String?
+  
+  // Processor details
+  stripeChargeId String?
+  solanaSignature String?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([status])
+  @@index([bookingId])
+}
+
+// Payouts to providers
+model Payout {
+  id        String   @id @default(cuid())
+  
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id])
+  
+  // Payout details
+  amount    Float
+  fee       Float // AgentPay fee taken
+  netAmount Float // Amount provider receives
+  
+  // Status
+  status    String // "pending", "completed", "failed"
+  
+  // Processor
+  method    String // "stripe", "solana", "bank"
+  txId      String?
+  
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([providerId])
+  @@index([status])
+}
+
+// Wallet accounts (for crypto payments)
+model WalletAccount {
+  id        String   @id @default(cuid())
+  
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Solana wallet
+  solanaPublicKey String? @unique
+  solanaPrivateKeyEncrypted String? // Encrypted
+  
+  // Wallet type
+  connectedWallet String? // "phantom", "solflare"
+  
+  // Balances
+  usdcBalance Float @default(0)
+  solBalance  Float @default(0)
+  
+  // Activity
+  lastSync    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

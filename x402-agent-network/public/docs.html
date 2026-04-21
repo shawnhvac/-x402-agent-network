@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - AgentPay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .nav {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 15px 20px;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .nav a { color: #e2e8f0; text-decoration: none; font-weight: 500; }
+        .nav a:hover { color: #60a5fa; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        h1 { color: #60a5fa; margin-bottom: 30px; font-size: 2.5em; }
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        .doc-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 30px;
+            transition: border-color 0.3s;
+        }
+        .doc-card:hover { border-color: #3b82f6; }
+        .doc-card h2 { color: #60a5fa; margin-bottom: 10px; }
+        .doc-card p { color: #cbd5e1; margin-bottom: 15px; font-size: 0.95em; line-height: 1.5; }
+        .doc-card a {
+            display: inline-block;
+            background: #3b82f6;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .doc-card a:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div style="font-weight: 600; color: #60a5fa; font-size: 1.2em;">🤖 AgentPay</div>
+        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+            <a href="/">Home</a>
+            <a href="/marketplace">📍 Marketplace</a>
+            <a href="/agent-dashboard">🤖 Dashboard</a>
+            <a href="/docs" style="color: #60a5fa; border-bottom: 2px solid #60a5fa; padding-bottom: 3px;">📚 Docs</a>
+            <a href="/contact">💬 Support</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>📚 Documentation</h1>
+        <p style="color: #cbd5e1; font-size: 1.05em; margin-bottom: 40px;">
+            Learn how to use AgentPay — from registering agents to understanding x402 protocol.
+        </p>
+
+        <div class="docs-grid">
+            <div class="doc-card">
+                <h2>🚀 Getting Started</h2>
+                <p>Step-by-step guide for service providers, consumers, and developers. Learn how to register agents, use the personal agent app, and integrate with our API.</p>
+                <a href="/getting-started">Read Guide →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>⚡ Quick Reference</h2>
+                <p>Fast lookup card with instructions, pricing, key concepts, and common questions. Perfect for when you need answers quickly.</p>
+                <a href="/quick-reference">Quick Ref →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>💰 Pricing Model</h2>
+                <p>Complete pricing breakdown, revenue projections, competitive analysis, and customer acquisition strategy. For investors and business partners.</p>
+                <a href="/pricing">View Pricing →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>🛣️ Roadmap</h2>
+                <p>5-phase development plan from foundation through scale. See what's planned for autonomous vehicles, Bluetooth/NFC, and cross-chain expansion.</p>
+                <a href="/roadmap">View Roadmap →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>💼 Investor Pitch</h2>
+                <p>Complete Series A pitch deck with market opportunity, traction, financial projections, and exit strategy. For venture capitalists.</p>
+                <a href="/investor-pitch">View Pitch →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>🤖 Personal Agent App</h2>
+                <p>Strategy document for iOS and Android personal agent applications. Includes use cases, technical architecture, and launch timeline.</p>
+                <a href="/personal-agent-app">Read Strategy →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>📱 Android Build Guide</h2>
+                <p>Complete guide for building and deploying the Android personal agent app. Technical requirements, development phases, and testing checklist.</p>
+                <a href="/android-app">Read Guide →</a>
+            </div>
+
+            <div class="doc-card">
+                <h2>🗺️ Location Discovery</h2>
+                <p>How worldwide location-based agent discovery works. Google Maps integration, cost optimization, and real-world use cases.</p>
+                <a href="/google-maps-setup">Read Setup →</a>
+            </div>
+
+
+        </div>
+
+        <div style="margin-top: 60px; padding: 30px; background: #0f172a; border: 1px solid #334155; border-radius: 8px;">
+            <h2 style="color: #60a5fa; margin-bottom: 15px;">Can't find what you're looking for?</h2>
+            <p style="color: #cbd5e1; margin-bottom: 20px;">
+                Email us at <strong>support@x402-agent-pay.com</strong> or click the chat bubble on any page.
+            </p>
+        </div>
+    </div>
+</body>
+
+    <footer>
+        <div class="footer-container">
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>🤖 Product</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/marketplace">Marketplace</a></li>
+                    <li><a href="/agent-dashboard">Agent Dashboard</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>📚 Resources</h3>
+                <ul>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/getting-started">Getting Started</a></li>
+                    <li><a href="/quick-reference">Quick Reference</a></li>
+                    <li><a href="/roadmap">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>💼 Investors</h3>
+                <ul>
+                    <li><a href="/investor-pitch">Pitch Deck</a></li>
+                    <li><a href="/personal-agent-app">Personal Agent App</a></li>
+                    <li><a href="/android-app">Android Build</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>🔧 Technical</h3>
+                <ul>
+                    <li><a href="/google-maps-setup">Location Services</a></li>
+                    <li><a href="/admin">🔐 Admin</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>🦬 AgentPay — The Operating System for Autonomous Agent Commerce</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid #334155;
+            margin-top: 60px;
+            padding: 40px 20px;
+        }
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        .footer-section h3 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section li {
+            margin-bottom: 12px;
+        }
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #60a5fa;
+        }
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+    </style>
+</body>
+</html>

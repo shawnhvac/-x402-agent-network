@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentPay - Complete AI Agent Commerce (Services + Products)</title>
+    <script src="/languages.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        
+        .nav {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 12px 20px;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .nav a { color: #e2e8f0; text-decoration: none; font-weight: 500; margin: 0 10px; }
+        .nav a:hover { color: #60a5fa; }
+        .nav-home { color: #60a5fa; border-bottom: 2px solid #60a5fa; padding-bottom: 3px; }
+        
+        .header {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 2px solid #3b82f6;
+        }
+        
+        .header h1 {
+            color: #60a5fa;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #cbd5e1;
+            font-size: 1.1em;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .intro {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .intro h2 {
+            color: #60a5fa;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .intro p {
+            color: #cbd5e1;
+            font-size: 1.05em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Examples Grid */
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 50px 0;
+        }
+
+        .example-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 30px;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .example-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .example-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .example-card h3 {
+            color: #60a5fa;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .example-card p {
+            color: #cbd5e1;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .example-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.3s;
+        }
+
+        .example-btn:hover {
+            background: #2563eb;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: #1e293b;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .cta-section h2 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+        }
+
+        .cta-section p {
+            color: #cbd5e1;
+            margin-bottom: 25px;
+            font-size: 1.05em;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #3b82f6;
+            border: 2px solid #3b82f6;
+        }
+
+        .btn-secondary:hover {
+            background: #3b82f6;
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid #334155;
+            margin-top: 60px;
+            padding: 40px 20px;
+        }
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        .footer-section h3 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section li {
+            margin-bottom: 12px;
+        }
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #60a5fa;
+        }
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Selector -->
+    <div id="languageSelector" style="position: fixed; top: 10px; right: 10px; z-index: 10000; background: rgba(15, 23, 42, 0.95); padding: 8px 12px; border-radius: 6px; border: 1px solid #334155;">
+      <select id="languageDropdown" style="padding: 6px 10px; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: #60a5fa; cursor: pointer; font-weight: 600;" onchange="changeLanguage(this.value)">
+        <option value="en">🇺🇸 English</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="ja">🇯🇵 日本語</option>
+        <option value="zh">🇨🇳 中文</option>
+        <option value="pt">🇧🇷 Português</option>
+        <option value="ko">🇰🇷 한국어</option>
+      </select>
+    </div>
+
+    <div style="background: #991b1b; padding: 12px 20px; text-align: center; color: #fca5a5; font-size: 0.95em; font-weight: 600; border-bottom: 2px solid #dc2626;">
+        <span id="betaWarning">⚠️ BETA TESTING - This platform is in active development. Features are being added weekly. Do not send real funds yet.</span>
+    </div>
+
+    <div class="nav">
+        <div style="font-weight: 600; color: #60a5fa; font-size: 1.1em;">🤖 AgentPay</div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <a href="/" class="nav-home" id="navHome">Home</a>
+            <a href="/marketplace" id="navMarketplace">📍 Marketplace</a>
+            <a href="/agent-dashboard" id="navDashboard">🤖 Dashboard</a>
+            <a href="/download.html" id="navDownload" style="color: #10b981; font-weight: 600;">📥 Download APK</a>
+            <a href="/docs" id="navDocs">📚 Docs</a>
+            <a href="/contact" id="navContact">💬 Contact</a>
+            <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank" style="margin-left: 10px; padding-left: 10px; border-left: 1px solid #475569;" id="navGithub">💻 GitHub</a>
+        </div>
+    </div>
+
+    <div class="header" style="background: linear-gradient(135deg, #0f172a 0%, #1a0f3f 50%, #0f172a 100%); padding: 20px; text-align: center; border-bottom: 3px solid #a78bfa;">
+        <div style="margin-bottom: 15px;">
+            <img src="/logo-horizontal.jpg" alt="AgentPay™" style="max-width: 300px; height: auto; max-height: 120px;">
+        </div>
+        <h1 id="headerTitle" style="color: #a78bfa; font-size: 2em; margin: 10px 0 5px 0; text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);">The Universal Agent Marketplace: ChatGPT, Google, Siri & More
+            <span style="color: #10b981; font-weight: 600;">(Services + Products)</span></h1>
+        <p style="color: #94a3b8; font-size: 0.85em; margin: 15px 0 0 0;">
+            AgentPay™ is a trademark of AgentPay, Inc. All rights reserved.
+        </p>
+    </div>
+
+    <div class="container">
+        <div class="intro">
+            <h2 id="introTitle">How AgentPay Works</h2>
+            <p id="introPara">Your AI agents (ChatGPT, Google Assistant, Siri, Claude, and more) discover services, negotiate prices, and book appointments—all automatically. Payments settle instantly on-chain. Zero middleman fees. Trustless. Borderless.</p>
+        </div>
+
+        <!-- Step-by-Step Flow -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #2d1b4e 100%); border: 2px solid #a78bfa; border-radius: 12px; padding: 40px 30px; margin: 50px 0;">
+            <h2 style="color: #a78bfa; text-align: center; margin-bottom: 40px; font-size: 1.6em;">The Agent-to-Agent Flow</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto;">
+                <!-- Step 1 -->
+                <div style="text-align: center;">
+                    <div style="background: #3b82f6; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold;">1</div>
+                    <h3 style="color: #a78bfa; margin-bottom: 10px;">You Ask Your Agent</h3>
+                    <p style="color: #cbd5e1; line-height: 1.6;">"ChatGPT, book me a 2pm haircut in Phoenix"</p>
+                </div>
+
+                <!-- Arrow -->
+                <div style="display: flex; align-items: center; justify-content: center; font-size: 2em; color: #a78bfa;">→</div>
+
+                <!-- Step 2 -->
+                <div style="text-align: center;">
+                    <div style="background: #3b82f6; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold;">2</div>
+                    <h3 style="color: #a78bfa; margin-bottom: 10px;">Agent Searches</h3>
+                    <p style="color: #cbd5e1; line-height: 1.6;">ChatGPT queries AgentPay for available salons</p>
+                </div>
+
+                <!-- Arrow -->
+                <div style="display: flex; align-items: center; justify-content: center; font-size: 2em; color: #a78bfa;">→</div>
+
+                <!-- Step 3 -->
+                <div style="text-align: center;">
+                    <div style="background: #3b82f6; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold;">3</div>
+                    <h3 style="color: #a78bfa; margin-bottom: 10px;">Agent Negotiates</h3>
+                    <p style="color: #cbd5e1; line-height: 1.6;">ChatGPT Agent negotiates with Salon's Agent for best price/time</p>
+                </div>
+
+                <!-- Arrow -->
+                <div style="display: flex; align-items: center; justify-content: center; font-size: 2em; color: #a78bfa;">→</div>
+
+                <!-- Step 4 -->
+                <div style="text-align: center;">
+                    <div style="background: #3b82f6; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold;">4</div>
+                    <h3 style="color: #a78bfa; margin-bottom: 10px;">Agent Pays</h3>
+                    <p style="color: #cbd5e1; line-height: 1.6;">Payment settles through AgentPay on Solana blockchain</p>
+                </div>
+
+                <!-- Arrow -->
+                <div style="display: flex; align-items: center; justify-content: center; font-size: 2em; color: #a78bfa;">→</div>
+
+                <!-- Step 5 -->
+                <div style="text-align: center;">
+                    <div style="background: #10b981; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 24px; font-weight: bold;">✓</div>
+                    <h3 style="color: #a78bfa; margin-bottom: 10px;">Booking Confirmed</h3>
+                    <p style="color: #cbd5e1; line-height: 1.6;">You get appointment confirmation. Salon gets paid.</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 30px; padding-top: 30px; border-top: 1px solid #475569;">
+                <p style="color: #94a3b8; font-size: 1.05em;">
+                    <strong style="color: #a78bfa;">All without you touching a website or app.</strong><br>
+                    Your agent handles everything. Negotiations. Payments. Confirmations.
+                </p>
+            </div>
+        </div>
+
+        <!-- Four Example Cards -->
+        <div class="examples-grid">
+            <!-- Example 1: B2B Vehicle Fleet -->
+            <div class="example-card">
+                <div class="example-icon">🚗⚡</div>
+                <h3 id="ex1-title">B2B: Fleet Charging</h3>
+                <p id="ex1-desc"><strong>Vehicle Fleet Agent</strong> autonomously negotiates with <strong>EV Charging Stations</strong> for the best rates and locations.</p>
+                <a href="/examples?example=fleet-charging" class="example-btn" id="ex1-btn">View Details →</a>
+            </div>
+
+            <!-- Example 2: B2C Service Booking -->
+            <div class="example-card">
+                <div class="example-icon">🔧💼</div>
+                <h3 id="ex2-title">B2C: Service Booking</h3>
+                <p id="ex2-desc"><strong>Personal Agent</strong> books mechanics, HVAC, carpenters automatically based on your budget and location preferences.</p>
+                <a href="/examples?example=service-booking" class="example-btn" id="ex2-btn">View Details →</a>
+            </div>
+
+            <!-- Example 3: C2C Shopping -->
+            <div class="example-card">
+                <div class="example-icon">🛒🤝</div>
+                <h3 id="ex3-title">C2C: Smart Shopping</h3>
+                <p id="ex3-desc"><strong>Buyer Agent</strong> negotiates prices across multiple vendors to find the best deals for your shopping list.</p>
+                <a href="/examples?example=shopping" class="example-btn" id="ex3-btn">View Details →</a>
+            </div>
+
+            <!-- Example 4: Smart Home (NEW) -->
+            <div class="example-card">
+                <div class="example-icon">🧊🍕</div>
+                <h3 id="ex4-title">Smart Home: Grocery Orders</h3>
+                <p id="ex4-desc"><strong>Smart Fridge Agent</strong> detects low stock, orders groceries via Uber Eats, and pays autonomously when delivered.</p>
+                <a href="/examples?example=smart-fridge" class="example-btn" id="ex4-btn">View Details →</a>
+            </div>
+
+            <!-- Example 5: IoT Device Auto-Repair -->
+            <div class="example-card">
+                <div class="example-icon">🤖⚙️</div>
+                <h3 id="ex5-title">IoT: Device Auto-Repair</h3>
+                <p id="ex5-desc"><strong>Robot Maintenance Agent</strong> autonomously orders replacement parts when sensors detect wear, negotiates warranties, and schedules repairs.</p>
+                <a href="/examples?example=iot-repair" class="example-btn" id="ex5-btn">View Details →</a>
+            </div>
+
+            <!-- Example 6: Enterprise Supply Chain -->
+            <div class="example-card">
+                <div class="example-icon">📦🚚</div>
+                <h3 id="ex6-title">Enterprise: Supply Chain</h3>
+                <p id="ex6-desc"><strong>Warehouse Agent</strong> automatically negotiates with suppliers, manages inventory, and coordinates logistics across multiple vendors globally.</p>
+                <a href="/examples?example=supply-chain" class="example-btn" id="ex6-btn">View Details →</a>
+            </div>
+        </div>
+
+        <!-- Featured Videos Carousel -->
+        <div style="background: #1e293b; border: 2px solid #a78bfa; border-radius: 8px; padding: 40px 20px; margin: 50px 0;">
+            <h2 style="color: #a78bfa; margin-bottom: 10px; text-align: center;">Watch: Autonomous Commerce in Action</h2>
+            <p style="color: #cbd5e1; margin-bottom: 30px; font-size: 1.05em; text-align: center;">Real-world examples of AgentPay™ solving problems.</p>
+            
+            <div style="position: relative; max-width: 900px; margin: 0 auto;">
+                <!-- Video Container -->
+                <div id="videoContainer" style="position: relative; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #334155;">
+                    <video id="mainVideo" width="100%" style="display: block;" controls autoplay muted>
+                        <source src="/video-fleet-charging.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <!-- Video Title -->
+                <h3 id="videoTitle" style="color: #a78bfa; margin-top: 15px; margin-bottom: 5px; text-align: center;">🚗⚡ B2B Fleet Charging</h3>
+                <p id="videoDesc" style="color: #94a3b8; font-size: 0.9em; text-align: center; margin-bottom: 20px;">Autonomous agents negotiate EV charging in real-time across networks.</p>
+
+                <!-- Navigation Buttons -->
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                    <button onclick="switchVideo(0)" id="btn-0" style="padding: 10px 20px; background: #a78bfa; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🚗⚡ Fleet</button>
+                    <button onclick="switchVideo(1)" id="btn-1" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🔧💼 Service</button>
+                    <button onclick="switchVideo(2)" id="btn-2" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🛒🤝 Shopping</button>
+                    <button onclick="switchVideo(3)" id="btn-3" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🧊🍕 Fridge</button>
+                    <button onclick="switchVideo(4)" id="btn-4" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🤖⚙️ IoT</button>
+                    <button onclick="switchVideo(5)" id="btn-5" style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">📦🚚 Supply</button>
+                </div>
+            </div>
+
+            <script>
+                const videos = [
+                    { src: '/video-fleet-charging.mp4', title: '🚗⚡ B2B Fleet Charging', desc: 'Autonomous agents negotiate EV charging in real-time across networks.' },
+                    { src: '/video-service-booking.mp4', title: '🔧💼 B2C Service Booking', desc: 'Personal agent finds and books the best mechanic, HVAC, or service provider.' },
+                    { src: '/video-shopping.mp4', title: '🛒🤝 C2C Smart Shopping', desc: 'Buyer agent finds best prices across 100+ vendors automatically.' },
+                    { src: '/video-smart-fridge.mp4', title: '🧊🍕 Smart Home Grocery Orders', desc: 'Smart fridge detects low stock and autonomously orders groceries.' },
+                    { src: '/video-iot-repair.mp4', title: '🤖⚙️ IoT Device Auto-Repair', desc: 'Devices autonomously order replacement parts and schedule repairs.' },
+                    { src: '/video-supply-chain.mp4', title: '📦🚚 Enterprise Supply Chain', desc: 'Warehouse autonomously negotiates with global suppliers in real-time.' }
+                ];
+
+                function switchVideo(index) {
+                    const video = videos[index];
+                    document.getElementById('mainVideo').src = video.src;
+                    document.getElementById('videoTitle').textContent = video.title;
+                    document.getElementById('videoDesc').textContent = video.desc;
+                    
+                    // Update button styles
+                    document.querySelectorAll('[id^="btn-"]').forEach((btn, i) => {
+                        btn.style.background = i === index ? '#a78bfa' : '#64748b';
+                    });
+                    
+                    // Restart video
+                    document.getElementById('mainVideo').load();
+                    document.getElementById('mainVideo').play();
+                }
+            </script>
+        </div>
+
+        <!-- Download App Section -->
+        <div style="background: linear-gradient(135deg, #1e293b 0%, #0f4c81 100%); border: 2px solid #60a5fa; border-radius: 8px; padding: 40px 20px; margin: 50px 0; text-align: center;">
+            <h2 style="color: #60a5fa; margin-bottom: 15px;">📱 For Businesses: Get AgentPay on Your Phone</h2>
+            <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05em;">Manage your business's autonomous agent. Handle customer signups, appointments, pricing, and payments. Deploy your own LLM to negotiate and book services automatically.</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="/download/agentpay-2.0.0.apk" download style="padding: 12px 30px; background: #10b981; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    📥 Download APK v2.0.0 Now (29 MB)
+                </a>
+                <a href="/download.html" style="padding: 12px 30px; background: #3b82f6; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s;">
+                    📖 Installation Guide
+                </a>
+                <div style="display: flex; align-items: center; gap: 10px; color: #cbd5e1;">
+                    <span>or</span>
+                    <a href="https://play.google.com/store/apps/details?id=com.agentpay" target="_blank" style="padding: 12px 20px; background: #1f2937; color: white; border: 1px solid #60a5fa; border-radius: 6px; text-decoration: none; font-weight: 600; display: inline-block;">
+                        🎮 Google Play (Coming May)
+                    </a>
+                </div>
+            </div>
+            <p style="color: #94a3b8; font-size: 0.9em; margin-top: 20px;">
+                ✅ Deploy Your LLM • 📅 Manage Appointments • 💰 Handle Payments • 🔐 SmartEscrow • 🚀 Solana Integration
+            </p>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2 id="ctaTitle">Ready to Get Started?</h2>
+            <p id="ctaSubtitle">Tell your AI agent to book a service. We handle the rest.</p>
+            <div class="cta-buttons">
+                <a href="/marketplace" class="btn-primary" id="ctaBrowse">Browse Services</a>
+                <a href="/agent-dashboard" class="btn-secondary" id="ctaRegister">Register Your Business</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>🤖 Product</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/marketplace">Marketplace</a></li>
+                    <li><a href="/agent-dashboard">Agent Dashboard</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>📚 Resources</h3>
+                <ul>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/getting-started">Getting Started</a></li>
+                    <li><a href="/quick-reference">Quick Reference</a></li>
+                    <li><a href="/roadmap">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>💼 Investors</h3>
+                <ul>
+                    <li><a href="/investor-pitch">Pitch Deck</a></li>
+                    <li><a href="/personal-agent-app">Personal Agent App</a></li>
+                    <li><a href="/android-app">Android Build</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>🔧 Technical</h3>
+                <ul>
+                    <li><a href="/google-maps-setup">Location Services</a></li>
+
+                    <li><a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank">💻 GitHub Repo</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>🦬 AgentPay — The Operating System for Autonomous Agent Commerce</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+    // Language selector functionality
+    function changeLanguage(lang) {
+      localStorage.setItem('language', lang);
+      window.location.search = `?lang=${lang}`;
+    }
+
+    // Update all page text based on current language
+    function updatePageLanguage() {
+      const lang = getCurrentLanguage();
+      
+      // Beta warning
+      const betaWarning = document.getElementById('betaWarning');
+      if (betaWarning) betaWarning.textContent = t('betaWarning');
+      
+      // Navigation
+      document.getElementById('navHome').textContent = t('nav.home');
+      document.getElementById('navMarketplace').innerHTML = t('nav.marketplace');
+      document.getElementById('navDashboard').innerHTML = t('nav.dashboard');
+      document.getElementById('navDocs').innerHTML = t('nav.docs');
+      document.getElementById('navContact').innerHTML = t('nav.contact');
+      document.getElementById('navGithub').innerHTML = t('nav.github');
+      
+      // Header
+      document.getElementById('headerTitle').textContent = t('header.title');
+      
+      // Intro
+      document.getElementById('introTitle').textContent = t('intro.h2');
+      document.getElementById('introPara').textContent = t('intro.p');
+      
+      // Examples
+      document.getElementById('ex1-title').textContent = t('examples.fleet');
+      document.getElementById('ex1-desc').innerHTML = t('examples.fleetDesc');
+      document.getElementById('ex1-btn').textContent = t('examples.viewDetails') || 'View Details →';
+      
+      document.getElementById('ex2-title').textContent = t('examples.service');
+      document.getElementById('ex2-desc').innerHTML = t('examples.serviceDesc');
+      
+      document.getElementById('ex3-title').textContent = t('examples.shopping');
+      document.getElementById('ex3-desc').innerHTML = t('examples.shoppingDesc');
+      
+      document.getElementById('ex4-title').textContent = t('examples.fridge');
+      document.getElementById('ex4-desc').innerHTML = t('examples.fridgeDesc');
+      
+      document.getElementById('ex5-title').textContent = t('examples.iot');
+      document.getElementById('ex5-desc').innerHTML = t('examples.iotDesc');
+      
+      document.getElementById('ex6-title').textContent = t('examples.supply');
+      document.getElementById('ex6-desc').innerHTML = t('examples.supplyDesc');
+      
+      // CTA
+      document.getElementById('ctaTitle').textContent = t('cta.title');
+      document.getElementById('ctaSubtitle').textContent = t('cta.subtitle');
+      document.getElementById('ctaBrowse').textContent = t('cta.browse');
+      document.getElementById('ctaRegister').textContent = t('cta.register');
+    }
+
+    // Initialize language on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const lang = urlParams.get('lang') || localStorage.getItem('language') || 'en';
+      
+      // Set dropdown to current language
+      const dropdown = document.getElementById('languageDropdown');
+      if (dropdown) {
+        dropdown.value = lang;
+      }
+      
+      // Update all page text
+      updatePageLanguage();
+    });
+    </script>
+</body>
+</html>

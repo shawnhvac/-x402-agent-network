@@ -1,0 +1,63 @@
+{
+  "mean_reversion": {
+    "Aggressive": {
+      "num_trades": 4,
+      "win_rate": 75.0,
+      "profit_factor": 0.20837810544503074,
+      "max_dd": -0.9392361555652894,
+      "return": -0.7442852903404505,
+      "sharpe": -99.31104107495739,
+      "avg_hold": 9.0,
+      "losing_streaks": [
+        1
+      ],
+      "gp": 2.5469303933113414,
+      "gl": 12.222639167737375
+    },
+    "Default": {
+      "num_trades": 2,
+      "win_rate": 50.0,
+      "profit_factor": 0.0912335594300461,
+      "max_dd": -0.9392361555652999,
+      "return": -0.8542783278304655,
+      "sharpe": -158.6162031941722,
+      "avg_hold": 11.5,
+      "losing_streaks": [
+        1
+      ],
+      "gp": 1.1149235254104588,
+      "gl": 12.220541787206422
+    },
+    "Conservative": {
+      "num_trades": 1,
+      "win_rate": 0.0,
+      "profit_factor": 0.0,
+      "max_dd": -0.18017865927222723,
+      "return": -0.18017865927222723,
+      "sharpe": 0,
+      "avg_hold": 10.0,
+      "losing_streaks": [
+        1
+      ],
+      "gp": 0.0,
+      "gl": 2.342322570538967
+    }
+  },
+  "grid_trading": {
+    "num_trades": 12,
+    "win_rate": 100.0,
+    "profit_factor": 0,
+    "max_dd": 0.0,
+    "return": 1.555200000000059
+  },
+  "data": {
+    "symbol": "BTC/USD",
+    "timeframe": "5m",
+    "candles": 721,
+    "start": "2026-03-26 10:00:00",
+    "end": "2026-03-28 22:00:00",
+    "start_price": 69489.3,
+    "end_price": 66616.0,
+    "price_change_pct": -4.134881197536891
+  }
+}

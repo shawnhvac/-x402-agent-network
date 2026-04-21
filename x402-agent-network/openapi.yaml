@@ -1,0 +1,539 @@
+openapi: 3.0.0
+info:
+  title: MUSKOX x402 Agent Payment Network
+  description: |
+    The global infrastructure layer for agent-to-agent commerce.
+    
+    Any AI agent or API can accept instant USDC payments via HTTP 402.
+    
+    **Core Vision:**
+    - Universal payment standard for autonomous agents
+    - Machine-first design (agents negotiate payments automatically)
+    - On-chain USDC settlement (<30 seconds)
+    - 2% platform fee (infinite scaling potential)
+    - Zero friction for developers
+    
+    **Agent Types Supported:**
+    - Trading agents (Grid Trader, Sniper Bot)
+    - LLM agents (GPT-4o, Claude, Grok, Llama)
+    - Data agents (price feeds, oracles)
+    - Compute agents (storage, processing)
+    - Custom agents (any API)
+  version: "1.0.0"
+  contact:
+    name: MUSKOX Team
+    url: https://muskox.agent
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001
+    description: Local development
+  - url: https://api.muskox.agent
+    description: Production (coming soon)
+
+tags:
+  - name: Health & Monitoring
+    description: Server status and performance metrics
+  - name: Agent Registry
+    description: Discover and manage registered agents
+  - name: Demo Agents
+    description: Example agents (Grid Trader, Sniper Bot, LLM, Data Feed)
+  - name: Core x402 API
+    description: Universal agent execution with HTTP 402 payment
+
+paths:
+  /health:
+    get:
+      summary: Server health check
+      tags:
+        - Health & Monitoring
+      responses:
+        "200":
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [healthy, initializing]
+                  database:
+                    type: string
+                    enum: [ready, connecting]
+                  timestamp:
+                    type: string
+                    format: date-time
+
+  /metrics:
+    get:
+      summary: Real-time performance metrics
+      tags:
+        - Health & Monitoring
+      responses:
+        "200":
+          description: Performance data and recent requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  performance:
+                    type: object
+                    properties:
+                      totalRequests:
+                        type: integer
+                      successRate:
+                        type: string
+                      avgResponseTime:
+                        type: string
+                      errorCount:
+                        type: integer
+                      p95ResponseTime:
+                        type: string
+                      p99ResponseTime:
+                        type: string
+
+  /status:
+    get:
+      summary: Full system status
+      tags:
+        - Health & Monitoring
+      responses:
+        "200":
+          description: Complete system status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  timestamp:
+                    type: string
+                    format: date-time
+                  system:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                      uptime:
+                        type: number
+                      memoryUsage:
+                        type: object
+
+  /agents:
+    get:
+      summary: List all registered agents
+      tags:
+        - Agent Registry
+      responses:
+        "200":
+          description: Array of registered agents
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agents:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        endpoint:
+                          type: string
+                        cost:
+                          type: number
+                        status:
+                          type: object
+
+    post:
+      summary: Register a new agent
+      tags:
+        - Agent Registry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                name:
+                  type: string
+                description:
+                  type: string
+                endpoint:
+                  type: string
+                baseCost:
+                  type: number
+              required:
+                - agentId
+                - name
+                - endpoint
+                - baseCost
+      responses:
+        "201":
+          description: Agent registered successfully
+        "400":
+          description: Invalid request
+
+  /agents/{agentId}:
+    get:
+      summary: Get agent details
+      tags:
+        - Agent Registry
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent details
+        "404":
+          description: Agent not found
+
+    put:
+      summary: Update agent
+      tags:
+        - Agent Registry
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Agent updated
+        "404":
+          description: Agent not found
+
+    delete:
+      summary: Delete agent
+      tags:
+        - Agent Registry
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Agent deleted
+        "404":
+          description: Agent not found
+
+  /agents-info:
+    get:
+      summary: Get status of all demo agents
+      tags:
+        - Demo Agents
+      responses:
+        "200":
+          description: All demo agents and their status
+
+  /grid-trader:
+    post:
+      summary: Execute grid trading strategy
+      tags:
+        - Demo Agents
+      description: |
+        **Demo Agent:** Simulates grid trading on BTC/USD or ETH/USD
+        
+        **Cost:** 0.10 USDC per execution
+        
+        **Headers Required:**
+        - `X-Requester-Wallet`: Your wallet address
+        - `X-Payment-TxHash` (optional): Payment proof for quota-exceeded scenarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pair:
+                  type: string
+                  example: "BTC/USD"
+                gridSize:
+                  type: integer
+                  example: 5
+                spacing:
+                  type: number
+                  example: 1.0
+      responses:
+        "200":
+          description: Grid trade executed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  executionId:
+                    type: string
+                  output:
+                    type: object
+                  remaining:
+                    type: integer
+                    description: Remaining quota for wallet
+        "402":
+          description: Payment required (quota exceeded)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requiresPayment:
+                    type: boolean
+                  price:
+                    type: string
+                  currency:
+                    type: string
+                  paymentAddress:
+                    type: string
+
+  /sniper-bot:
+    post:
+      summary: Execute token sniping
+      tags:
+        - Demo Agents
+      description: |
+        **Demo Agent:** Simulates token sniping with TP/SL
+        
+        **Cost:** 0.25-1.00 USDC per snipe (dynamic)
+        
+        **Headers Required:**
+        - `X-Requester-Wallet`: Your wallet address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tokenAddress:
+                  type: string
+                buyAmount:
+                  type: number
+                takeProfit:
+                  type: number
+                stopLoss:
+                  type: number
+      responses:
+        "200":
+          description: Snipe executed
+        "402":
+          description: Payment required
+
+  /llm-inference:
+    post:
+      summary: LLM inference service
+      tags:
+        - Demo Agents
+      description: |
+        **Demo Agent:** Language model inference (GPT-4o, Claude, Grok, Llama)
+        
+        **Cost:** 0.05 USDC per 1K tokens
+        
+        **Supported Models:**
+        - gpt-4o
+        - grok-beta
+        - claude-3-opus
+        - llama-3-70b
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                model:
+                  type: string
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                        enum: [system, user, assistant]
+                      content:
+                        type: string
+                max_tokens:
+                  type: integer
+                temperature:
+                  type: number
+      responses:
+        "200":
+          description: Inference complete
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  output:
+                    type: object
+                    properties:
+                      model:
+                        type: string
+                      completion:
+                        type: string
+                      usage:
+                        type: object
+                      cost:
+                        type: number
+        "402":
+          description: Payment required
+
+  /data-feed:
+    post:
+      summary: Real-time price oracle data
+      tags:
+        - Demo Agents
+      description: |
+        **Demo Agent:** Cryptocurrency price feeds with optional history
+        
+        **Cost:** 0.01 USDC per price point
+        
+        **Supported Symbols:**
+        - BTC/USD
+        - ETH/USD
+        - SOL/USD
+        - ARB/USD
+        - AVAX/USD
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbol:
+                  type: string
+                includeHistory:
+                  type: boolean
+                historyLength:
+                  type: integer
+                  maximum: 100
+      responses:
+        "200":
+          description: Price data returned
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  output:
+                    type: object
+                    properties:
+                      symbol:
+                        type: string
+                      currentPrice:
+                        type: object
+                      change24h:
+                        type: number
+                      high24h:
+                        type: number
+                      low24h:
+                        type: number
+                      volume24h:
+                        type: number
+                      history:
+                        type: array
+        "402":
+          description: Payment required
+
+  /api/agent/execute:
+    post:
+      summary: Universal agent execution with x402 payment
+      tags:
+        - Core x402 API
+      description: |
+        **Core x402 Flow:**
+        1. Call agent endpoint
+        2. If quota exceeded → HTTP 402 returned
+        3. Send USDC payment on-chain
+        4. Retry with X-Payment-TxHash header
+        5. Agent executes, 2% fee deducted, proceeds recorded
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agentId:
+                  type: string
+                input:
+                  type: object
+      parameters:
+        - name: X-Requester-Wallet
+          in: header
+          required: true
+          schema:
+            type: string
+          description: Wallet address making the request
+        - name: X-Payment-TxHash
+          in: header
+          schema:
+            type: string
+          description: On-chain payment transaction hash
+      responses:
+        "200":
+          description: Agent executed successfully
+        "402":
+          description: HTTP 402 Payment Required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  requiresPayment:
+                    type: boolean
+                  requestId:
+                    type: string
+                  price:
+                    type: string
+                  currency:
+                    type: string
+                  paymentAddress:
+                    type: string
+
+components:
+  securitySchemes:
+    walletAuth:
+      type: apiKey
+      in: header
+      name: X-Requester-Wallet
+      description: Wallet address for quota and payment tracking
+
+security:
+  - walletAuth: []
+
+x-logo:
+  url: https://muskox.agent/logo.png
+  altText: MUSKOX x402 Agent Payment Network

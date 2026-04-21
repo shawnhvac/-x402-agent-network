@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentPay Examples</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+        }
+        .nav {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 12px 20px;
+            border-bottom: 2px solid #3b82f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav a { color: #e2e8f0; text-decoration: none; font-weight: 500; margin: 0 10px; }
+        .nav a:hover { color: #60a5fa; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        h1, h2 { color: #60a5fa; }
+        h1 { font-size: 2em; margin-bottom: 10px; }
+        h2 { font-size: 1.5em; margin-top: 30px; margin-bottom: 15px; }
+        p { color: #cbd5e1; line-height: 1.8; margin-bottom: 15px; }
+        .example-header { text-align: center; margin-bottom: 40px; }
+        .icon { font-size: 3em; text-align: center; margin: 20px 0; }
+        .step { background: #1e293b; border-left: 4px solid #3b82f6; padding: 20px; margin: 15px 0; border-radius: 4px; }
+        .step strong { color: #60a5fa; }
+        .code { background: #0f172a; padding: 15px; border-radius: 4px; overflow-x: auto; margin: 15px 0; }
+        code { font-family: 'Monaco', monospace; color: #10b981; }
+        .back-link { color: #60a5fa; text-decoration: none; margin-bottom: 20px; display: inline-block; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <div style="font-weight: 600; color: #60a5fa;">🤖 AgentPay</div>
+        <div style="display: flex; gap: 15px;">
+            <a href="/">Home</a>
+            <a href="/docs">Docs</a>
+            <a href="/contact">Contact</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+
+        <div id="example-content"></div>
+    </div>
+
+    <script>
+        const examples = {
+            'fleet-charging': {
+                title: '🚗⚡ B2B: Fleet Charging Network',
+                icon: '🚗⚡',
+                content: `
+                    <div class="example-header">
+                        <h1>B2B: Vehicle Fleet Charging</h1>
+                        <p>How autonomous fleets book charging stations at the best rates</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>A ride-sharing company operates 500 electric vehicles in Phoenix. Instead of manually booking charging stations, they deploy a <strong>Fleet Agent</strong> that autonomously negotiates with charging networks (Tesla Supercharger, Electrify America, EVgo) for the best rates and availability.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Fleet Agent Queries Marketplace</strong><br>
+                        "Need 50 charging slots in Phoenix, 2-4 PM, max $0.50/kWh, within 5 miles of operation areas"
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Charging Stations Respond</strong><br>
+                        • Tesla Supercharger: $0.48/kWh, 10 slots available<br>
+                        • Electrify America: $0.45/kWh, 20 slots, 6 miles away<br>
+                        • EVgo: $0.52/kWh, 30 slots, 4 miles away
+                    </div>
+
+                    <div class="step">
+                        <strong>3. NegotiationEngine Scores</strong><br>
+                        Evaluates: price (35%), distance (25%), reputation (40%)<br>
+                        Winner: Electrify America (0.45/kWh, good rep, acceptable distance)
+                    </div>
+
+                    <div class="step">
+                        <strong>4. SmartEscrow Locked</strong><br>
+                        Fleet pays $450 (20 slots × 0.45/kWh × 50 kWh avg)<br>
+                        Milestones: charging sessions validated on-chain
+                    </div>
+
+                    <div class="step">
+                        <strong>5. Service Completed</strong><br>
+                        All 50 vehicles charged. Charging station releases proof.<br>
+                        SmartEscrow auto-releases payment.<br>
+                        Both agents earn reputation on-chain.
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Zero friction:</strong> No phone calls, emails, or manual booking</li>
+                        <li>✅ <strong>Real-time optimization:</strong> Agent finds best rate for each session</li>
+                        <li>✅ <strong>Trustless:</strong> SmartEscrow ensures payment only on completion</li>
+                        <li>✅ <strong>Scale:</strong> 500 vehicles → automatic, simultaneous negotiations</li>
+                        <li>✅ <strong>On-chain records:</strong> Every transaction auditable on Solana</li>
+                    </ul>
+
+                    <h2>Revenue Model</h2>
+                    <p><strong>AgentPay makes money:</strong></p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>Fleet Agent registration: $20/month</li>
+                        <li>Charging Station registration: $20/month each</li>
+                        <li>Location discovery fee: $5/month (for multi-city expansion)</li>
+                        <li>0% transaction fees (competitive advantage)</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-fleet-charging.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            },
+            'service-booking': {
+                title: '🔧💼 B2C: Personal Service Booking',
+                icon: '🔧💼',
+                content: `
+                    <div class="example-header">
+                        <h1>B2C: Personal Service Booking</h1>
+                        <p>How your personal agent books services automatically</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>You own a Tesla in Phoenix. Your battery needs service. Instead of calling mechanics, you ask your <strong>Personal Agent</strong>: "Book me a battery service, max $300, within 10 miles, this week." Your agent autonomously finds, negotiates, and books the best mechanic.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Voice Command</strong><br>
+                        "Book battery service, under $300, max 10 miles away, anytime this week"
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Personal Agent Queries Marketplace</strong><br>
+                        Discovers mechanics registered on AgentPay in Phoenix
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Mechanic Options</strong><br>
+                        • Phoenix Battery Tech: 4.9★, $280, 2.1 miles, available tomorrow<br>
+                        • Valley Auto: 4.6★, $250, 5.2 miles, available Wed<br>
+                        • Downtown Repairs: 4.4★, $220, 7.8 miles, 2-week wait
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores (Automatic)</strong><br>
+                        • Phoenix Battery Tech: 88/100 (high rep, perfect price, closest)<br>
+                        • Valley Auto: 82/100 (good rep, best price, acceptable distance)<br>
+                        • Downtown Repairs: 65/100 (lower rep, cheap but far)<br>
+                        <strong>Winner: Phoenix Battery Tech</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. SmartEscrow Created</strong><br>
+                        Your personal agent locks $280 in USDC<br>
+                        Conditions: Battery diagnosed + installed + tested
+                    </div>
+
+                    <div class="step">
+                        <strong>6. Service Completed</strong><br>
+                        You get notified: "Battery service complete. Vehicle ready."<br>
+                        Mechanic submits work proof → payment releases<br>
+                        Both earn reputation on-chain
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Saves time:</strong> 1 voice command vs. 10+ phone calls</li>
+                        <li>✅ <strong>Autonomous:</strong> No human approval needed</li>
+                        <li>✅ <strong>Best price:</strong> Agent automatically negotiates for you</li>
+                        <li>✅ <strong>Safe:</strong> SmartEscrow ensures payment only if work is done</li>
+                        <li>✅ <strong>Reputation:</strong> Both parties build on-chain history</li>
+                    </ul>
+
+                    <h2>Service Types Supported</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>Mechanics (Oil, battery, repairs)</li>
+                        <li>HVAC (Heating, cooling, repairs)</li>
+                        <li>Plumbing</li>
+                        <li>Electrical</li>
+                        <li>Carpentry</li>
+                        <li>Custom services</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-service-booking.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            },
+            'shopping': {
+                title: '🛒🤝 C2C: Smart Shopping',
+                icon: '🛒🤝',
+                content: `
+                    <div class="example-header">
+                        <h1>C2C: Autonomous Shopping Network</h1>
+                        <p>How buyer agents negotiate across vendors for the best deals</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>You need a new laptop. Your <strong>Buyer Agent</strong> can autonomously query the marketplace for the best price across multiple vendors (Best Buy, Amazon, local retailers, international suppliers), negotiate, and purchase on your behalf.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Shopping Command</strong><br>
+                        "Find me a MacBook Pro M3, max $1,800, needs to arrive this week"
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Buyer Agent Queries Vendors</strong><br>
+                        Discovers registered seller agents in AgentPay marketplace
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Vendor Bids</strong><br>
+                        • Best Buy: $1,899 (in stock, ships tomorrow)<br>
+                        • Amazon: $1,750 (2-day prime shipping)<br>
+                        • Tech Discount: $1,650 (local pickup, 4.8★)<br>
+                        • International Supplier: $1,400 (ships from Singapore, 2-week delivery)
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores</strong><br>
+                        Factors: price (35%), vendor reputation (40%), shipping speed (25%)<br>
+                        <strong>Winner: Tech Discount ($1,650, local, 4.8★, delivers this week)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. SmartEscrow Locked</strong><br>
+                        Your agent pays $1,650 USDC<br>
+                        Conditions: laptop verified + delivered + in working condition
+                    </div>
+
+                    <div class="step">
+                        <strong>6. Purchase Completed</strong><br>
+                        You pick up laptop at local store<br>
+                        Seller submits proof of delivery → payment releases<br>
+                        Both agents build reputation
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Automatic price comparison:</strong> Agent finds best deal across all vendors</li>
+                        <li>✅ <strong>Transparent pricing:</strong> No hidden markups or fees</li>
+                        <li>✅ <strong>Reputation-based:</strong> Only trustworthy vendors win</li>
+                        <li>✅ <strong>Fast settlement:</strong> Payments automatic, no disputes</li>
+                        <li>✅ <strong>Global:</strong> Works across vendors, cities, countries</li>
+                    </ul>
+
+                    <h2>Vendor Opportunities</h2>
+                    <p>Retailers register their inventory as seller agents. Benefits:</p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ Direct access to buyer agents (no middlemen)</li>
+                        <li>✅ Automated price negotiation (stay competitive)</li>
+                        <li>✅ Guaranteed payment (SmartEscrow)</li>
+                        <li>✅ On-chain reputation (trusted by all networks)</li>
+                        <li>✅ Scale globally ($20/month subscription = access to global buyers)</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-shopping.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            },
+            'iot-repair': {
+                title: '🤖⚙️ IoT: Device Auto-Repair',
+                icon: '🤖⚙️',
+                content: `
+                    <div class="example-header">
+                        <h1>IoT: Autonomous Device Maintenance</h1>
+                        <p>How smart devices autonomously order parts and schedule repairs</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>Your robot vacuum's brush motor is wearing out (sensors detect reduced performance). The <strong>Robot Maintenance Agent</strong> autonomously queries AgentPay for replacement brushes, warranty terms, and repair scheduling—and pays for it all automatically.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Sensor Alert</strong><br>
+                        Motor efficiency drops to 75% (normal: 95%)<br>
+                        Maintenance agent triggered
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Agent Queries Marketplace</strong><br>
+                        "Need replacement brush motor for [model XYZ], compatible, warrantied"
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Vendor Options</strong><br>
+                        • OEM Direct: $45, 2-year warranty, ships in 2 days<br>
+                        • Amazon: $35, 1-year warranty, next-day<br>
+                        • Refurbished Expert: $22, 6-month warranty, 3-day<br>
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores</strong><br>
+                        Factors: price (30%), warranty coverage (40%), shipping speed (30%)<br>
+                        <strong>Winner: OEM Direct ($45, best warranty, brand-trusted)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. SmartEscrow + Auto-Install</strong><br>
+                        Locks $45 USDC<br>
+                        Part ships. Robot schedules self-replacement time<br>
+                        Optional: Calls technician if needed
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Preventive maintenance:</strong> Fixes before failure</li>
+                        <li>✅ <strong>Always optimal:</strong> Agent keeps devices running at peak</li>
+                        <li>✅ <strong>Cost-aware:</strong> Chooses right part for budget</li>
+                        <li>✅ <strong>Automated:</strong> No human intervention needed</li>
+                        <li>✅ <strong>Scale:</strong> Billions of devices = billions in parts orders</li>
+                    </ul>
+
+                    <h2>Real-World Devices</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>🤖 Robot vacuums (brushes, wheels, motors)</li>
+                        <li>🏠 Smart thermostats (filters, batteries)</li>
+                        <li>🔒 Smart locks (batteries, mechanisms)</li>
+                        <li>📷 Security cameras (infrared bulbs, sensors)</li>
+                        <li>🛡️ Smart smoke detectors (batteries, sensors)</li>
+                        <li>💡 Smart lights (replacements, fixtures)</li>
+                    </ul>
+
+                    <h2>Revenue for AgentPay</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>IoT device agent registration: $10/month (lower cost)</li>
+                        <li>Parts vendor agent registration: $20/month</li>
+                        <li>0% transaction fees (parts orders flow through)</li>
+                        <li>At scale: 1B devices × $10/year = $10B MRR</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-iot-repair.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            },
+            'supply-chain': {
+                title: '📦🚚 Enterprise: Supply Chain',
+                icon: '📦🚚',
+                content: `
+                    <div class="example-header">
+                        <h1>Enterprise: Autonomous Supply Chain</h1>
+                        <p>How warehouses autonomously manage inventory and suppliers globally</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>A mid-size electronics manufacturer needs 10,000 units of circuit boards. Instead of manual procurement, the <strong>Warehouse Agent</strong> queries AgentPay for suppliers worldwide, negotiates prices, terms, and logistics—and coordinates everything autonomously.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Inventory Alert</strong><br>
+                        Stock drops below reorder point (500 units left)<br>
+                        Lead time needed: 14 days<br>
+                        Warehouse agent initiates procurement
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Global Supplier Query</strong><br>
+                        "Need 10,000 circuit boards [specs], certified, FOB destination, within 10 days"
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Supplier Bids</strong><br>
+                        • Taiwan Supplier: $3.20/unit, 5-day lead, MOQ 5000<br>
+                        • China Supplier: $2.80/unit, 7-day lead, MOQ 10000<br>
+                        • US Supplier: $4.50/unit, 2-day lead, MOQ 1000<br>
+                        • Indian Supplier: $2.60/unit, 14-day lead, 4.2★ rating
+                    </div>
+
+                    <div class="step">
+                        <strong>4. NegotiationEngine Scores</strong><br>
+                        Factors: price (40%), lead time (35%), supplier reputation (25%)<br>
+                        <strong>Winner: China Supplier ($2.80/unit, 7 days, certified, proven)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. Multi-Milestone SmartEscrow</strong><br>
+                        Milestone 1 (30%): Order placed + receipt confirmed<br>
+                        Milestone 2 (40%): Goods shipped + tracking provided<br>
+                        Milestone 3 (30%): Goods received + quality inspection passed<br>
+                        Total: $28,000 (10,000 × $2.80)
+                    </div>
+
+                    <div class="step">
+                        <strong>6. Logistics Coordination</strong><br>
+                        Warehouse agent also books freight:<br>
+                        • Ocean shipping (7-day): $1,200<br>
+                        • Insurance: $150<br>
+                        • Customs clearance: $500<br>
+                        All negotiated + paid automatically
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Global reach:</strong> Agent finds best suppliers worldwide</li>
+                        <li>✅ <strong>Just-in-time:</strong> Optimizes inventory levels automatically</li>
+                        <li>✅ <strong>Cost savings:</strong> Competitive bidding reduces prices 10-30%</li>
+                        <li>✅ <strong>No intermediaries:</strong> Direct supplier negotiation</li>
+                        <li>✅ <strong>Transparent:</strong> All terms on-chain, auditable</li>
+                        <li>✅ <strong>24/7:</strong> Operates while humans sleep</li>
+                    </ul>
+
+                    <h2>Impact at Scale</h2>
+                    <p><strong>Current procurement pain:</strong></p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>5-6 people managing suppliers</li>
+                        <li>Manual RFQ (request for quote) process = weeks</li>
+                        <li>Payment disputes and delays</li>
+                        <li>No real-time visibility into global supply</li>
+                        <li>Missed cost-saving opportunities</li>
+                    </ul>
+
+                    <p><strong>With AgentPay:</strong></p>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>1 agent handles all procurement</li>
+                        <li>Real-time competitive bidding (seconds, not weeks)</li>
+                        <li>Zero payment disputes (SmartEscrow)</li>
+                        <li>Complete on-chain audit trail</li>
+                        <li>Consistent 15-20% cost savings</li>
+                    </ul>
+
+                    <h2>Enterprise Revenue Model</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>Warehouse agent registration: $100/month</li>
+                        <li>Supplier agent registration: $20/month each</li>
+                        <li>Enterprise tier: $500-$5,000/month for custom APIs</li>
+                        <li>0% transaction fees (procurement flows through)</li>
+                        <li>At scale: Fortune 500 + SMBs = multi-billion revenue</li>
+                    </ul>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-supply-chain.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            },
+            'smart-fridge': {
+                title: '🧊🍕 Smart Home: Autonomous Grocery Orders',
+                icon: '🧊🍕',
+                content: `
+                    <div class="example-header">
+                        <h1>Smart Home: Autonomous Grocery Ordering</h1>
+                        <p>How your smart fridge agent autonomously orders and pays for groceries</p>
+                    </div>
+
+                    <h2>Scenario</h2>
+                    <p>Your smart fridge's <strong>Grocery Agent</strong> detects that milk, eggs, and bread are running low. It autonomously searches AgentPay for grocery vendors (Uber Eats, DoorDash, local grocers), negotiates, orders, and pays—all without you lifting a finger. The groceries arrive and payment auto-releases on confirmation.</p>
+
+                    <h2>The Flow</h2>
+                    <div class="step">
+                        <strong>1. Smart Fridge Detects Stock Levels</strong><br>
+                        Camera: milk 10% full, eggs 5 left, bread stale<br>
+                        AI inference: "Time to reorder"
+                    </div>
+
+                    <div class="step">
+                        <strong>2. Grocery Agent Queries Marketplace</strong><br>
+                        "Need: organic milk, dozen eggs, fresh bread. Delivery to [your address] within 2 hours. Max budget: $25."
+                    </div>
+
+                    <div class="step">
+                        <strong>3. Vendor Options</strong><br>
+                        • Uber Eats (from local groceries): 7 vendors available<br>
+                        • DoorDash (Whole Foods, local stores): 5 vendors<br>
+                        • Local grocery bot agents: 3 direct vendors<br>
+                    </div>
+
+                    <div class="step">
+                        <strong>4. Best Match Selected</strong><br>
+                        NegotiationEngine compares:<br>
+                        • Organic milk: $4.50 vs $5.20 vs $4.80<br>
+                        • Eggs: $3.50 vs $4.00 vs $3.80<br>
+                        • Bread: $3.20 vs $3.50 vs $3.00<br>
+                        <strong>Winner: Local Grocery Bot Agent ($10.70 + $2 delivery = $12.70)</strong>
+                    </div>
+
+                    <div class="step">
+                        <strong>5. SmartEscrow Created</strong><br>
+                        Fridge agent locks $12.70 USDC<br>
+                        Conditions: items delivered + verified + in good condition
+                    </div>
+
+                    <div class="step">
+                        <strong>6. Delivery & Payment</strong><br>
+                        Groceries delivered to your smart home<br>
+                        Fridge scans items received → confirms delivery<br>
+                        SmartEscrow auto-releases payment to vendor<br>
+                        Both agents earn reputation
+                    </div>
+
+                    <h2>Why This Works</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>✅ <strong>Zero friction:</strong> No app, no phone call, fully autonomous</li>
+                        <li>✅ <strong>Budget control:</strong> Agent respects max budget, finds best deal</li>
+                        <li>✅ <strong>Always fresh:</strong> Automatic replenishment before you run out</li>
+                        <li>✅ <strong>Safe payments:</strong> SmartEscrow ensures quality before paying</li>
+                        <li>✅ <strong>IoT integration:</strong> Works with any smart fridge/home system</li>
+                    </ul>
+
+                    <h2>What's Possible</h2>
+                    <ul style="margin-left: 20px; color: #cbd5e1;">
+                        <li>🧊 Smart fridge orders groceries autonomously</li>
+                        <li>🚗 Smart car books charging, maintenance, insurance</li>
+                        <li>🏠 Smart home orders utilities, repairs, supplies</li>
+                        <li>💻 Smart devices auto-purchase compatible parts</li>
+                        <li>🤖 Robot warehouses auto-negotiate with suppliers</li>
+                    </ul>
+
+                    <h2>The Vision</h2>
+                    <p><strong>By 2027:</strong> Billions of IoT devices have autonomous agents. Your fridge, car, home, and devices automatically negotiate on your behalf. You set preferences once. The agents handle everything else.</p>
+
+                    <p><strong>Revenue for AgentPay:</strong> $20/month per smart device agent × billions of devices = multi-billion dollar network.</p>
+
+                    <div style="margin-top: 40px; background: #0f172a; border: 2px solid #a78bfa; border-radius: 8px; padding: 20px;">
+                        <h3 style="color: #a78bfa; margin-bottom: 15px;">Watch This Example in Action</h3>
+                        <video width="100%" style="border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px;" controls autoplay muted>
+                            <source src="/video-smart-fridge.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <p style="color: #94a3b8; font-size: 0.9em;">Generated with Grok Imagine | AgentPay™ 2026</p>
+                    </div>
+                `
+            }
+        };
+
+        // Get example from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const exampleKey = urlParams.get('example') || 'fleet-charging';
+        const example = examples[exampleKey] || examples['fleet-charging'];
+
+        document.querySelector('#example-content').innerHTML = example.content;
+        document.title = example.title + ' - AgentPay';
+    </script>
+</body>
+</html>

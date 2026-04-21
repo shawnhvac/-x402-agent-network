@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Marketplace - AgentPay</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
+        }
+        .header {
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .search-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        select {
+            padding: 8px 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            cursor: pointer;
+        }
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .agent-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 20px;
+            transition: border-color 0.3s;
+        }
+        .agent-card:hover { border-color: #2563eb; }
+        .agent-name { font-size: 1.2em; font-weight: bold; margin: 10px 0; }
+        .agent-rating { color: #fbbf24; margin: 10px 0; }
+        .agent-price { color: #10b981; font-size: 1.1em; margin: 10px 0; }
+        .agent-location { color: #94a3b8; font-size: 0.9em; }
+        .btn-view {
+            width: 100%;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        .btn-view:hover { background: #1d4ed8; }
+        .loading { text-align: center; color: #94a3b8; padding: 40px; }
+        .no-results { text-align: center; color: #94a3b8; padding: 40px; }
+    </style>
+</head>
+<body>
+    <nav style="background: rgba(15, 23, 42, 0.95); padding: 15px 20px; border-bottom: 2px solid #2563eb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div style="font-weight: 600; color: #60a5fa; font-size: 1.2em;">
+            🤖 AgentPay
+        </div>
+        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+            <a href="/" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Home</a>
+            <a href="/marketplace" style="color: #60a5fa; text-decoration: none; font-weight: 500; border-bottom: 2px solid #60a5fa; padding-bottom: 3px;">📍 Marketplace</a>
+            <a href="/agent-dashboard" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">🤖 Dashboard</a>
+            <a href="/contact" style="color: #60a5fa; text-decoration: none; font-weight: 500;">💬 Support</a>
+        </div>
+    </nav>
+
+    <div class="header" style="background: linear-gradient(135deg, #0f172a 0%, #1a0f3f 50%, #0f172a 100%); padding: 20px; text-align: center; border-bottom: 3px solid #a78bfa;">
+        <div style="margin-bottom: 10px;">
+            <img src="/logo-icon.jpg" alt="AgentPay™" style="max-width: 60px; height: auto;">
+        </div>
+        <h1 style="color: #a78bfa; font-size: 1.8em; margin: 0; text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);">Agent Marketplace™</h1>
+        <p style="color: #c4b5fd; font-size: 1.05em; margin: 10px 0 0 0;">Discover autonomous agents for your needs</p>
+        <p style="color: #94a3b8; font-size: 0.85em; margin: 8px 0 0 0;">Part of AgentPay™ Network</p>
+    </div>
+
+    <div class="container">
+        <div class="search-section">
+            <input type="text" class="search-input" placeholder="Search agents by name or location..." id="searchInput">
+            <div class="filters">
+                <select id="serviceType">
+                    <option value="">All Services</option>
+                    <option value="mechanic">Mechanic</option>
+                    <option value="battery_service">Battery Service</option>
+                    <option value="plumber">Plumber</option>
+                    <option value="electrician">Electrician</option>
+                    <option value="hvac">HVAC/R</option>
+                    <option value="carpenter">Carpenter</option>
+                    <option value="delivery">Delivery</option>
+                    <option value="taxi">Taxi</option>
+                    <option value="charging_station">Charging Station</option>
+                </select>
+                <select id="sortBy">
+                    <option value="rating">Highest Rated</option>
+                    <option value="price">Lowest Price</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="agentsContainer" class="agents-grid">
+            <div class="loading">Loading agents...</div>
+        </div>
+    </div>
+
+    <script>
+        // Fetch agents from API
+        async function loadAgents() {
+            try {
+                const response = await fetch('/api/agents');
+                const agents = await response.json();
+                displayAgents(agents);
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                document.getElementById('agentsContainer').innerHTML = '<div class="no-results">Unable to load agents. Please try again later.</div>';
+            }
+        }
+
+        function displayAgents(agents) {
+            const container = document.getElementById('agentsContainer');
+            
+            if (!agents || agents.length === 0) {
+                container.innerHTML = '<div class="no-results">No agents found yet. Check back soon!</div>';
+                return;
+            }
+
+            container.innerHTML = agents.map(agent => `
+                <div class="agent-card">
+                    <div style="font-size: 2em;">🤖</div>
+                    <div class="agent-name">${agent.name || 'Unknown Agent'}</div>
+                    <div class="agent-location">📍 ${agent.location?.city || 'Unknown'}, ${agent.location?.state || 'Unknown'}</div>
+                    <div class="agent-rating">⭐ ${(agent.rating || 5).toFixed(1)} (${agent.reviews || 0} reviews)</div>
+                    <div class="agent-price">💰 $${agent.pricePerHour || '50'}/hr</div>
+                    <div style="color: #94a3b8; font-size: 0.85em; margin-top: 10px;">
+                        ${agent.totalTransactions || 0} transactions • ${((agent.successRate || 1) * 100).toFixed(0)}% success
+                    </div>
+                    <button class="btn-view">View Profile</button>
+                </div>
+            `).join('');
+        }
+
+        // Load agents on page load
+        loadAgents();
+
+        // Refresh every 30 seconds
+        setInterval(loadAgents, 30000);
+    </script>
+
+    <footer>
+        <div class="footer-container">
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>🤖 Product</h3>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/marketplace">Marketplace</a></li>
+                    <li><a href="/agent-dashboard">Agent Dashboard</a></li>
+                    <li><a href="/pricing">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>📚 Resources</h3>
+                <ul>
+                    <li><a href="/docs">Documentation</a></li>
+                    <li><a href="/getting-started">Getting Started</a></li>
+                    <li><a href="/quick-reference">Quick Reference</a></li>
+                    <li><a href="/roadmap">Roadmap</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>💼 Investors</h3>
+                <ul>
+                    <li><a href="/investor-pitch">Pitch Deck</a></li>
+                    <li><a href="/personal-agent-app">Personal Agent App</a></li>
+                    <li><a href="/android-app">Android Build</a></li>
+                    <li><a href="/contact">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>🔧 Technical</h3>
+                <ul>
+                    <li><a href="/google-maps-setup">Location Services</a></li>
+                    <li><a href="/admin">🔐 Admin</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>🦬 AgentPay — The Operating System for Autonomous Agent Commerce</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <style>
+        footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 2px solid #334155;
+            margin-top: 60px;
+            padding: 40px 20px;
+        }
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+        }
+        .footer-section h3 {
+            color: #60a5fa;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section li {
+            margin-bottom: 12px;
+        }
+        .footer-section a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section a:hover {
+            color: #60a5fa;
+        }
+        .footer-bottom {
+            border-top: 1px solid #334155;
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.9em;
+        }
+    </style>
+</body>
+</html>

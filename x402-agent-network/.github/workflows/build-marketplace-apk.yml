@@ -1,0 +1,46 @@
+name: Build Marketplace APK
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Make gradle executable
+        run: chmod +x ./android/gradlew
+
+      - name: Build APK
+        working-directory: ./android
+        run: ./gradlew clean assembleRelease
+
+      - name: Find APK output
+        run: find android -name "*.apk" -type f
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentpay-marketplace-apk
+          path: android/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      - name: Check success
+        run: |
+          if [ -f android/build/outputs/apk/release/app-release.apk ]; then
+            echo "✅ Build successful! APK created: app-release.apk"
+            ls -lh android/build/outputs/apk/release/app-release.apk
+          else
+            echo "❌ Build failed - APK not found"
+            echo "Searching for APK files:"
+            find android -name "*.apk" -type f
+            exit 1
+          fi

@@ -1,0 +1,113 @@
+{
+  "data_info": {
+    "btc_candles": 105050,
+    "btc_days": 364.7569444444444,
+    "btc_date_range": "2025-03-28 22:15:00 to 2026-03-28 22:15:00",
+    "btc_price_range": "$60151 - $126099",
+    "eth_candles": 105044,
+    "eth_days": 364.7361111111111
+  },
+  "results": {
+    "btc": {
+      "1.5": {
+        "symbol": "BTC/USD",
+        "spacing": 0.015,
+        "num_trades": 28,
+        "win_rate": 64.28571428571429,
+        "profit_factor": 1.1248785607530198,
+        "max_dd": -8.79532678561263,
+        "return": 1.2189463333270538,
+        "sharpe": 14.921327717650714,
+        "avg_trade": 0.17413519047529968,
+        "total_fees": 1.591967753086395,
+        "gross_profit": 43.919999999999966,
+        "net_profit": 4.875785333308215,
+        "max_loss_streak": 10,
+        "final_capital": 404.8757853333082
+      },
+      "2.0": {
+        "symbol": "BTC/USD",
+        "spacing": 0.02,
+        "num_trades": 21,
+        "win_rate": 52.38095238095239,
+        "profit_factor": 1.0699680960668077,
+        "max_dd": -7.1109079010235945,
+        "return": 0.5385088333270858,
+        "sharpe": 9.019947484964353,
+        "avg_trade": 0.10257311110992487,
+        "total_fees": 1.1637177530863947,
+        "gross_profit": 32.940000000000005,
+        "net_profit": 2.154035333308343,
+        "max_loss_streak": 10,
+        "final_capital": 402.15403533330834
+      },
+      "2.5": {
+        "symbol": "BTC/USD",
+        "spacing": 0.025,
+        "num_trades": 16,
+        "win_rate": 50.0,
+        "profit_factor": 0.7965839964466792,
+        "max_dd": -5.7533214570810385,
+        "return": -1.2219286666728948,
+        "sharpe": -24.4356820609373,
+        "avg_trade": -0.30548216666822436,
+        "total_fees": 0.8554677530863948,
+        "gross_profit": 19.14045706666167,
+        "net_profit": -4.887714666691579,
+        "max_loss_streak": 8,
+        "final_capital": 395.1122853333084
+      }
+    },
+    "eth": {
+      "1.5": {
+        "symbol": "ETH/USD",
+        "spacing": 0.015,
+        "num_trades": 24,
+        "win_rate": 100.0,
+        "profit_factor": 1.0,
+        "max_dd": 0.0,
+        "return": 18.314999999999955,
+        "sharpe": 327.53712587697686,
+        "avg_trade": 3.0525000000000007,
+        "total_fees": 1.44,
+        "gross_profit": 73.26000000000002,
+        "net_profit": 73.25999999999982,
+        "max_loss_streak": 0,
+        "final_capital": 473.2599999999998
+      },
+      "2.0": {
+        "symbol": "ETH/USD",
+        "spacing": 0.02,
+        "num_trades": 19,
+        "win_rate": 100.0,
+        "profit_factor": 1.0,
+        "max_dd": 0.0,
+        "return": 20.11499999999998,
+        "sharpe": 315.94691253593,
+        "avg_trade": 4.2347368421052645,
+        "total_fees": 1.1400000000000001,
+        "gross_profit": 80.46000000000002,
+        "net_profit": 80.45999999999992,
+        "max_loss_streak": 0,
+        "final_capital": 480.4599999999999
+      },
+      "2.5": {
+        "symbol": "ETH/USD",
+        "spacing": 0.025,
+        "num_trades": 17,
+        "win_rate": 100.0,
+        "profit_factor": 1.0,
+        "max_dd": 0.0,
+        "return": 24.49499999999999,
+        "sharpe": 342.5341800204705,
+        "avg_trade": 5.763529411764706,
+        "total_fees": 1.0200000000000002,
+        "gross_profit": 97.98,
+        "net_profit": 97.97999999999996,
+        "max_loss_streak": 0,
+        "final_capital": 497.97999999999996
+      }
+    }
+  },
+  "timestamp": "2026-03-28T22:21:59.018367"
+}

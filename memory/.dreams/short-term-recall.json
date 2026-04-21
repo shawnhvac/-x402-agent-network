@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-17T23:07:45.855Z",
+  "entries": {
+    "memory:memory/2026-04-12.md:58:96": {
+      "key": "memory:memory/2026-04-12.md:58:96",
+      "path": "memory/2026-04-12.md",
+      "startLine": 58,
+      "endLine": 96,
+      "source": "memory",
+      "snippet": "- INVESTOR_PITCH_AGENT_CLONING_MODEL.md (16K document) - DEVELOPER_ROADMAP.md (4 phases, $17-38K total) - VC contact list + pitch templates - Founder background featured (Crypto OG 2014, 1.5yr+ community coin) - Direct email: shawnlippert383@gmail.com - **Status**: Ready for Series A meetings ## Technical Details ### Wallet Detection Flow 1. App loads → MultiWalletManager.discoverInstalledWallets() 2. Queries PackageManager for: app.phantom, com.solflare.mobile, com.jupiter.app 3. Returns list of installed wallets 4. UI shows only installed wallets in modal 5. User selects wallet → connectWallet(WalletType) 6. State saved to SharedPreferences ### Deep Link Signing - App builds t",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T15:18:38.120Z",
+      "lastRecalledAt": "2026-04-17T15:18:38.120Z",
+      "queryHashes": [
+        "be09e91fff1f"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "developer-roadmap.md",
+        "17-38k",
+        "1.5yr",
+        "gmail.com",
+        "app.phantom",
+        "com.solflare.mobile",
+        "com.jupiter.app",
+        "16k"
+      ]
+    },
+    "memory:memory/2026-04-12.md:1:34": {
+      "key": "memory:memory/2026-04-12.md:1:34",
+      "path": "memory/2026-04-12.md",
+      "startLine": 1,
+      "endLine": 34,
+      "source": "memory",
+      "snippet": "# Daily Memory Log - April 12, 2026 ## Session Summary **Major Accomplishments:** 1. ✅ **Phase 1 Android Wallet Integration Started** - Built MultiWalletManager.kt (11.3 KB) - detects Phantom, Solflare, Jupiter wallets - Updated MainActivity.kt (14.2 KB) - wallet selection UI + connection modal - Updated AndroidManifest.xml - deep link support (agentpay://) - Created PHASE1_WALLET_INTEGRATION.md - comprehensive implementation guide - Framework ready for real address retrieval, balance display, transaction signing 2. ✅ **OX Skillset Expanded to 62 Specialized Developer Profiles** - Added 3 Telegram specialists: - Senior Telegram AI Bot Developer - Telegram AI Ag",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T15:18:38.120Z",
+      "lastRecalledAt": "2026-04-17T15:18:38.120Z",
+      "queryHashes": [
+        "be09e91fff1f"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "multiwalletmanager.kt",
+        "11.3",
+        "mainactivity.kt",
+        "14.2",
+        "androidmanifest.xml",
+        "phase1-wallet-integration.md",
+        "log",
+        "april"
+      ]
+    },
+    "memory:memory/2026-04-12.md:87:133": {
+      "key": "memory:memory/2026-04-12.md:87:133",
+      "path": "memory/2026-04-12.md",
+      "startLine": 87,
+      "endLine": 133,
+      "source": "memory",
+      "snippet": "- [ ] Payment release transaction (not yet wired) ## Next Actions (Priority Order) 1. **Immediate (This Week)** - Test APK on Android phone with Phantom/Solflare/Jupiter installed - Verify wallet detection works - Add real wallet address retrieval from wallet app response - Connect to SolanaWalletManager for real balance display 2. **Short-term (Next 5-7 Days)** - Complete real transaction signing - Build SmartEscrow transaction creation - Implement payment release flow - End-to-end testing on physical device - Update APK on website 3. **Series A (This Week)** - Post X thread (5-part thread ready) - Apply to Solana Foundation grants ($250K-500K non-diluti",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T15:18:38.120Z",
+      "lastRecalledAt": "2026-04-17T15:18:38.120Z",
+      "queryHashes": [
+        "be09e91fff1f"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "phantom/solflare/jupiter",
+        "short-term",
+        "5-7",
+        "end-to-end",
+        "5-part",
+        "250k-500k",
+        "non-diluti",
+        "payment"
+      ]
+    },
+    "memory:memory/2026-04-05.md:51:88": {
+      "key": "memory:memory/2026-04-05.md:51:88",
+      "path": "memory/2026-04-05.md",
+      "startLine": 51,
+      "endLine": 88,
+      "source": "memory",
+      "snippet": "- Need code reviews before pushing to avoid keyboard/import bugs - Dual flows better serve diverse user states (have tokens vs need to buy) - Token pricing should be USD-denominated for user clarity --- ## Session 2: Payment Verification Improvements + Wallet Persistence (03:00-03:11 UTC) ### Payment Detection Issue Diagnosed - User sent 500 $MUSKOX to treasury wallet: `6aCEuwH3PYx99cEmRz45otfxk39uF7ewGhqmvxfXisSG` - Bot's automatic `/premium` command not detecting the payment - Improved verification system with multiple approaches: ### Improvements Applied 1. **Increased Transaction Lookback** - Changed from 50 → 100 transactions - Uses `getSignaturesForAddress` with `limit=100`",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T15:18:38.120Z",
+      "lastRecalledAt": "2026-04-17T15:18:38.120Z",
+      "queryHashes": [
+        "be09e91fff1f"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "keyboard/import",
+        "usd-denominated",
+        "00-03",
+        "need",
+        "code",
+        "reviews",
+        "pushing",
+        "avoid"
+      ]
+    },
+    "memory:memory/2026-04-05.md:80:118": {
+      "key": "memory:memory/2026-04-05.md:80:118",
+      "path": "memory/2026-04-05.md",
+      "startLine": 80,
+      "endLine": 118,
+      "source": "memory",
+      "snippet": "- Checks for $MUSKOX transfer to treasury - Verifies amount ≥ $25 USD - Activates premium immediately if valid 4. **Wallet Persistence Implemented** - User settings now saved to `user-data/user-settings.json` - Auto-loads on bot startup - `/connect <pubkey>` → Wallet saved to disk - After bot restart → Wallet still connected ✅ - Auto-save triggers: connect, premium activation, snipes 5. **Testing Command Added (Temporary)** - `/activatepremiumnow` for development testing - Immediately activates premium for 30 days - Shows clear \"TESTING ONLY\" message - Logs as `[PREMIUM_TEST]` for tracking - Will be removed before production launch - Used to test p",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T15:18:38.120Z",
+      "lastRecalledAt": "2026-04-17T15:18:38.120Z",
+      "queryHashes": [
+        "be09e91fff1f"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "user-data/user-settings.json",
+        "auto-loads",
+        "auto-save",
+        "premium-test",
+        "checks",
+        "muskox",
+        "transfer",
+        "treasury"
+      ]
+    },
+    "memory:memory/2026-04-06.md:1:65": {
+      "key": "memory:memory/2026-04-06.md:1:65",
+      "path": "memory/2026-04-06.md",
+      "startLine": 1,
+      "endLine": 65,
+      "source": "memory",
+      "snippet": "# Session Log - 2026-04-06 (FINAL) ## COMPLETE SESSION SUMMARY - WEEK 1 → WEEK 3 LOCKED IN **Date:** April 6, 2026 **Time:** 00:30 UTC → 05:37 UTC (5 hours 7 minutes) **Status:** ✅ WEEK 3 EXECUTION STARTED --- ## WEEK 1 COMPLETE (PAST) **Days 1-2: Foundation** - Express server + x402 middleware ✅ - SQLite database + agent registry ✅ - Quota system (10 free calls) ✅ - 100% TypeScript compilation ✅ **Days 3-4: Demo Agents** - Grid Trader Agent ✅ ($2,600 profit in test) - Sniper Bot Agent ✅ (dynamic pricing verified) - Full x402 flow tested ✅ - Database payments logging ✅ **Days 5-7: Scaling** - Public IP deployment (66.42.98.231:3001) ✅ - UFW firewall configured ✅ - Windows client t",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T23:07:45.855Z",
+      "lastRecalledAt": "2026-04-17T23:07:45.855Z",
+      "queryHashes": [
+        "027777378dff"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "1-2",
+        "3-4",
+        "5-7",
+        "66.42.98.231",
+        "log",
+        "final",
+        "complete",
+        "summary"
+      ]
+    },
+    "memory:memory/2026-04-06.md:189:234": {
+      "key": "memory:memory/2026-04-06.md:189:234",
+      "path": "memory/2026-04-06.md",
+      "startLine": 189,
+      "endLine": 234,
+      "source": "memory",
+      "snippet": "- Apr 14-17: Tier 1 email outreach (20 builders) - Apr 19-20: First momentum metrics - Apr 20-27: Tier 2 outreach (50 builders) - May 4: Official launch event --- ## SHAWN'S APPROVAL & DIRECTION (Final) **Approved on:** April 6, 2026, 05:36 UTC **Guidance Given:** 1. \"Emphasize universal x402 agent infrastructure (NOT just trading)\" 2. \"Trading bots are DEMOS only\" 3. \"Network is the real product\" 4. \"Position for ANY agent type (LLM, data, compute, etc.)\" 5. \"Launch materials ready, execute Week 3 immediately\" **Decision:** WEEK 3 EXECUTION APPROVED & STARTED --- ## SESSION ACHIEVEMENT **Delivered:** - ✅ Week 1: Foundation + 2 demo agents - ✅ Week 2: Production hardening + 2 new age",
+      "recallCount": 1,
+      "dailyCount": 0,
+      "groundedCount": 0,
+      "totalScore": 1,
+      "maxScore": 1,
+      "firstRecalledAt": "2026-04-17T23:07:45.855Z",
+      "lastRecalledAt": "2026-04-17T23:07:45.855Z",
+      "queryHashes": [
+        "027777378dff"
+      ],
+      "recallDays": [
+        "2026-04-17"
+      ],
+      "conceptTags": [
+        "network",
+        "14-17",
+        "19-20",
+        "20-27",
+        "apr",
+        "tier",
+        "email",
+        "outreach"
+      ]
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "btc": {
+    "symbol": "BTC/USD",
+    "num_trades": 5,
+    "win_rate": 100.0,
+    "profit_factor": 0,
+    "max_dd": 0.0,
+    "return": 1.8031962784318807,
+    "final_capital": 509.0159813921594,
+    "avg_trade": 1.80319627843188,
+    "avg_win": 1.80319627843188,
+    "avg_loss": 0,
+    "total_trades_df": "  grid_level  entry_price   exit_price  ...  hold_candles   win  reason\n0          0  65867.23031  68555.68869  ...           906  True     NaN\n1          1  64523.00112  69899.91788  ...           692  True     NaN\n2          2  63178.77193  71244.14707  ...          1178  True     NaN\n3          0  65867.23031  68555.68869  ...           182  True     NaN\n4       open  65867.23031  66558.00000  ...           383  True     eob\n\n[5 rows x 10 columns]"
+  },
+  "eth": {
+    "symbol": "ETH/USD",
+    "num_trades": 4,
+    "win_rate": 100.0,
+    "profit_factor": 0,
+    "max_dd": 0.0,
+    "return": 1.95,
+    "final_capital": 509.75,
+    "avg_trade": 2.437499999999999,
+    "avg_win": 2.437499999999999,
+    "avg_loss": 0,
+    "total_trades_df": "   grid_level  entry_price   exit_price  ...  net_pnl  hold_candles   win\n0           0  1956.179115  2077.179885  ...    1.875           917  True\n1           0  1956.179115  2077.179885  ...    1.875           296  True\n2           1  1895.678730  2137.680270  ...    4.125          1355  True\n3           0  1956.179115  2077.179885  ...    1.875          1053  True\n\n[4 rows x 9 columns]"
+  },
+  "timestamp": "2026-03-28T22:11:34.202857"
+}
