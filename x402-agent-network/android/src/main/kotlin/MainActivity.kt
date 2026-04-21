@@ -472,7 +472,6 @@ fun DashboardScreen(onHome: () -> Unit) {
 fun StatCard(value: String, label: String) {
     Card(
         modifier = Modifier
-            .weight(1f)
             .padding(5.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
         shape = RoundedCornerShape(8.dp)
