@@ -39,23 +39,13 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
 
-    - name: Build Agent APK
+    - name: Build Provider APK Only
       run: |
         cd ${{ github.workspace }}/x402-agent-network
         chmod +x gradlew
-        ./gradlew assembleRelease -PagentType=agent --stacktrace
-
-    - name: Build Marketplace APK
-      run: |
-        cd ${{ github.workspace }}/x402-agent-network
-        ./gradlew assembleRelease -PagentType=marketplace --stacktrace
-
-    - name: Build Provider APK
-      run: |
-        cd ${{ github.workspace }}/x402-agent-network
         ./gradlew assembleRelease -PagentType=provider --stacktrace
 
-    - name: Sign APKs
+    - name: Sign Provider APK
       env:
         KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -68,28 +58,12 @@ jobs:
           -keystore release.keystore \
           -storepass "$KEYSTORE_PASSWORD" \
           -keypass "$KEY_PASSWORD" \
-          build/outputs/apk/release/agentpay-agent-release.apk \
-          "$KEY_ALIAS"
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-          -keystore release.keystore \
-          -storepass "$KEYSTORE_PASSWORD" \
-          -keypass "$KEY_PASSWORD" \
-          build/outputs/apk/release/agentpay-marketplace-release.apk \
-          "$KEY_ALIAS"
-        jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-          -keystore release.keystore \
-          -storepass "$KEYSTORE_PASSWORD" \
-          -keypass "$KEY_PASSWORD" \
           build/outputs/apk/release/agentpay-provider-release.apk \
           "$KEY_ALIAS"
 
-    - name: Zipalign APKs
+    - name: Zipalign Provider APK
       run: |
         cd ${{ github.workspace }}/x402-agent-network
-        zipalign -v 4 build/outputs/apk/release/agentpay-agent-release.apk \
-          build/outputs/apk/release/agentpay-agent-aligned.apk
-        zipalign -v 4 build/outputs/apk/release/agentpay-marketplace-release.apk \
-          build/outputs/apk/release/agentpay-marketplace-aligned.apk
         zipalign -v 4 build/outputs/apk/release/agentpay-provider-release.apk \
           build/outputs/apk/release/agentpay-provider-aligned.apk
 
@@ -101,23 +75,15 @@ jobs:
         echo "  \"commit\": \"${{ github.sha }}\"," >> build-metadata/build-info.json
         echo "  \"branch\": \"${{ github.ref }}\"," >> build-metadata/build-info.json
         echo "  \"build_number\": \"${{ github.run_number }}\"," >> build-metadata/build-info.json
-        echo "  \"builds\": {" >> build-metadata/build-info.json
-        echo "    \"agent\": {" >> build-metadata/build-info.json
-        echo "      \"file\": \"agentpay-agent-aligned.apk\"," >> build-metadata/build-info.json
-        echo "      \"size\": \"$(stat -f%z x402-agent-network/build/outputs/apk/release/agentpay-agent-aligned.apk 2>/dev/null || stat -c%s x402-agent-network/build/outputs/apk/release/agentpay-agent-aligned.apk)\"" >> build-metadata/build-info.json
-        echo "    }," >> build-metadata/build-info.json
-        echo "    \"marketplace\": {" >> build-metadata/build-info.json
-        echo "      \"file\": \"agentpay-marketplace-aligned.apk\"," >> build-metadata/build-info.json
-        echo "      \"size\": \"$(stat -f%z x402-agent-network/build/outputs/apk/release/agentpay-marketplace-aligned.apk 2>/dev/null || stat -c%s x402-agent-network/build/outputs/apk/release/agentpay-marketplace-aligned.apk)\"" >> build-metadata/build-info.json
-        echo "    }," >> build-metadata/build-info.json
+        echo "  \"build\": {" >> build-metadata/build-info.json
         echo "    \"provider\": {" >> build-metadata/build-info.json
         echo "      \"file\": \"agentpay-provider-aligned.apk\"," >> build-metadata/build-info.json
-        echo "      \"size\": \"$(stat -f%z x402-agent-network/build/outputs/apk/release/agentpay-provider-aligned.apk 2>/dev/null || stat -c%s x402-agent-network/build/outputs/apk/release/agentpay-provider-aligned.apk)\"" >> build-metadata/build-info.json
+        echo "      \"size\": \"$(stat -c%s x402-agent-network/build/outputs/apk/release/agentpay-provider-aligned.apk 2>/dev/null || echo '0')\"" >> build-metadata/build-info.json
         echo "    }" >> build-metadata/build-info.json
         echo "  }" >> build-metadata/build-info.json
         echo "}" >> build-metadata/build-info.json
 
-    - name: Upload to Web Server via SCP
+    - name: Upload Provider APK to Web Server via SCP
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -129,15 +95,7 @@ jobs:
         chmod 600 ~/.ssh/deploy_key
         ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
         
-        # Copy APKs
-        scp -i ~/.ssh/deploy_key \
-          x402-agent-network/build/outputs/apk/release/agentpay-agent-aligned.apk \
-          "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/agentpay-latest.apk"
-        
-        scp -i ~/.ssh/deploy_key \
-          x402-agent-network/build/outputs/apk/release/agentpay-marketplace-aligned.apk \
-          "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/agentpay-marketplace-latest.apk"
-        
+        # Copy Provider APK
         scp -i ~/.ssh/deploy_key \
           x402-agent-network/build/outputs/apk/release/agentpay-provider-aligned.apk \
           "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/agentpay-provider-latest.apk"
@@ -170,8 +128,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          x402-agent-network/build/outputs/apk/release/agentpay-agent-aligned.apk
-          x402-agent-network/build/outputs/apk/release/agentpay-marketplace-aligned.apk
           x402-agent-network/build/outputs/apk/release/agentpay-provider-aligned.apk
           build-metadata/build-info.json
       env:
@@ -184,13 +140,13 @@ jobs:
         webhook-url: ${{ secrets.SLACK_WEBHOOK }}
         payload: |
           {
-            "text": "AgentPay APK Build #${{ github.run_number }}",
+            "text": "AgentPay Provider APK Build #${{ github.run_number }}",
             "blocks": [
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "Build Status: ${{ job.status }}\n\nAgent APK: ✅\nMarketplace APK: ✅\nProvider APK: ✅\n\nCommit: ${{ github.sha }}"
+                  "text": "Build Status: ${{ job.status }}\n\nProvider APK: ✅\n\nCommit: ${{ github.sha }}"
                 }
               }
             ]
