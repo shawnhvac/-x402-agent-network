@@ -161,6 +161,15 @@ app.get("/marketplace", (req: Request, res: Response) => {
   res.sendFile("public/marketplace.html", { root: process.cwd() });
 });
 
+// Provider Download Page
+app.get("/provider-download", (req: Request, res: Response) => {
+  res.sendFile("public/provider-download.html", { root: process.cwd() });
+});
+
+app.get("/provider-download.html", (req: Request, res: Response) => {
+  res.sendFile("public/provider-download.html", { root: process.cwd() });
+});
+
 app.get("/agent-dashboard", (req: Request, res: Response) => {
   res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
 });
