@@ -20,25 +20,25 @@ jobs:
           distribution: temurin
           cache: gradle
 
-      - name: Download Gradle wrapper jar
+      - name: Install Gradle 8.2
         run: |
-          mkdir -p x402-agent-network/android/gradle/wrapper
-          curl -Lo x402-agent-network/android/gradle/wrapper/gradle-wrapper.jar \
-            https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
-
-      - name: Make gradlew executable
-        run: chmod +x x402-agent-network/android/gradlew
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/gradle-dist
+          echo "/tmp/gradle-dist/gradle-8.2/bin" >> $GITHUB_PATH
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
       - name: Build Provider APK
         working-directory: x402-agent-network/android
-        run: ./gradlew assembleDebug -x lint --stacktrace
+        run: gradle assembleDebug -x lint --stacktrace
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
 
-      - name: Find and upload APK
+      - name: Find and copy APK
         run: |
           APK=$(find x402-agent-network/android -name "*.apk" | head -1)
           echo "Found APK: $APK"
