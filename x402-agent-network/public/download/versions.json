@@ -1,0 +1,38 @@
+{
+  "provider": {
+    "latest": {
+      "version": "1.0.0",
+      "build": 1,
+      "filename": "agentpay-provider-v1.0.0.apk",
+      "url": "https://x402-agent-pay.com/download/agentpay-provider-v1.0.0.apk",
+      "downloadUrl": "/download/agentpay-provider-v1.0.0.apk",
+      "releaseDate": "2026-04-21T02:32:00Z",
+      "fileSize": "32000000",
+      "fileSizeReadable": "32 MB",
+      "sha256": "",
+      "changelog": "Initial release - Business provider portal with service management, booking system, and analytics",
+      "features": [
+        "Business registration and login",
+        "Create and manage unlimited services",
+        "Real-time booking notifications",
+        "Accept, confirm, and complete bookings",
+        "Revenue tracking and analytics",
+        "Business profile management",
+        "Operating hours configuration"
+      ]
+    },
+    "versions": [
+      {
+        "version": "1.0.0",
+        "build": 1,
+        "filename": "agentpay-provider-v1.0.0.apk",
+        "releaseDate": "2026-04-21T02:32:00Z",
+        "fileSize": "32000000",
+        "fileSizeReadable": "32 MB",
+        "changelog": "Initial release - Business provider portal",
+        "status": "current",
+        "downloadUrl": "/download/agentpay-provider-v1.0.0.apk"
+      }
+    ]
+  }
+}
