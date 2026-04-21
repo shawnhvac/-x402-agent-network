@@ -20,6 +20,7 @@ import { errorHandler, handleUnhandledRejection, handleUncaughtException, timeou
 import agentRoutes from "./routes/agents.js";
 import demoAgentRoutes from "./routes/demo-agents.js";
 import apkRoutes from "./routes/apk.js";
+import servicesRoutes from "./routes/services.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -386,6 +387,11 @@ app.post("/api/agent/execute", async (req: Request, res: Response) => {
  * DAYS 3-4: Agent Registry Routes
  */
 app.use("/agents", agentRoutes);
+
+/**
+ * Services Marketplace Routes
+ */
+app.use("/api/v1", servicesRoutes);
 
 /**
  * APK Download & Status Routes
