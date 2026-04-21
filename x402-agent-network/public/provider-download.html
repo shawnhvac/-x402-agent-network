@@ -52,17 +52,13 @@
         
         .version-badge {
             display: inline-block;
-            background: #3b82f6;
+            background: #10b981;
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: bold;
             margin-bottom: 15px;
-        }
-        
-        .version-badge.latest {
-            background: #10b981;
         }
         
         .download-card h2 {
@@ -163,60 +159,6 @@
             margin-top: 10px;
         }
         
-        .version-history {
-            margin-top: 40px;
-        }
-        
-        .version-history h3 {
-            color: #fff;
-            margin-bottom: 20px;
-        }
-        
-        .version-item {
-            background: #1e293b;
-            border-left: 3px solid #3b82f6;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .version-item-left {
-            flex: 1;
-        }
-        
-        .version-item-version {
-            color: #fff;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .version-item-date {
-            color: #94a3b8;
-            font-size: 0.85em;
-        }
-        
-        .version-item-size {
-            color: #64748b;
-            font-size: 0.9em;
-        }
-        
-        .version-item-actions {
-            text-align: right;
-        }
-        
-        .version-item-actions a {
-            color: #3b82f6;
-            text-decoration: none;
-            font-size: 0.9em;
-        }
-        
-        .version-item-actions a:hover {
-            text-decoration: underline;
-        }
-        
         .info-box {
             background: #0f172a;
             border: 1px solid #334155;
@@ -270,11 +212,11 @@
         
         <!-- Latest Version -->
         <div class="download-card">
-            <div class="version-badge latest">Latest Version</div>
+            <div class="version-badge">Latest Version</div>
             <h2>Provider v1.0.0</h2>
             <div class="build-info">
                 <span>Build: 1</span>
-                <span>Size: 32 MB</span>
+                <span>Size: 29 MB</span>
             </div>
             <div class="release-date">Released: April 21, 2026</div>
             
@@ -300,12 +242,11 @@
             
             <div>
                 <a href="/download/agentpay-provider-v1.0.0.apk" class="download-btn">⬇️ Download APK</a>
-                <a href="javascript:void(0)" class="download-btn secondary" onclick="copyLink()">📋 Copy Link</a>
             </div>
             <div class="file-info">
                 📦 Filename: agentpay-provider-v1.0.0.apk<br>
-                💾 Size: 32 MB<br>
-                📋 SHA256: <code style="color: #94a3b8;">pending</code>
+                💾 Size: 29 MB<br>
+                ✅ Status: Ready to Install
             </div>
         </div>
         
@@ -343,33 +284,6 @@
                 5. Start managing your services!
             </p>
         </div>
-        
-        <!-- Version History -->
-        <div class="version-history">
-            <h3>📅 Version History</h3>
-            
-            <div class="version-item">
-                <div class="version-item-left">
-                    <div class="version-item-version">v1.0.0 (Build 1)</div>
-                    <div class="version-item-date">April 21, 2026</div>
-                    <div class="version-item-size">32 MB</div>
-                </div>
-                <div class="version-item-actions">
-                    <a href="/download/agentpay-provider-v1.0.0.apk">Download</a>
-                </div>
-            </div>
-        </div>
     </div>
-    
-    <script>
-        function copyLink() {
-            const link = window.location.origin + '/download/agentpay-provider-v1.0.0.apk';
-            navigator.clipboard.writeText(link).then(() => {
-                alert('Download link copied to clipboard!');
-            }).catch(() => {
-                alert('Failed to copy link');
-            });
-        }
-    </script>
 </body>
 </html>
