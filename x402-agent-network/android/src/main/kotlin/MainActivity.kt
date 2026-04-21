@@ -1,4 +1,4 @@
-package com.agentpay
+package com.agentpay.provider
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,67 +27,185 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import android.util.Log
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.io.IOException
 
-data class Provider(
-    val id: String,
-    val name: String,
-    val service: String,
-    val price: Double,
-    val rating: Float,
-    val reviews: Int,
-    val distance: Double,
-    val address: String,
-    val phone: String
+data class BusinessService(
+    val id: String = "",
+    val name: String = "",
+    val category: String = "",
+    val description: String = "",
+    val price: Double = 0.0,
+    val duration: Int = 60,
+    val available: Boolean = true,
+    val image: String = ""
+)
+
+data class BusinessProfile(
+    val id: String = "",
+    val businessName: String = "",
+    val category: String = "",
+    val location: String = "",
+    val address: String = "",
+    val phone: String = "",
+    val email: String = "",
+    val description: String = "",
+    val rating: Float = 0f,
+    val reviews: Int = 0
 )
 
 data class Booking(
-    val id: String,
-    val provider: String,
-    val date: String,
-    val time: String,
-    val amount: Double,
-    val status: String
+    val id: String = "",
+    val customerName: String = "",
+    val date: String = "",
+    val time: String = "",
+    val service: String = "",
+    val amount: Double = 0.0,
+    val status: String = "pending" // pending, confirmed, completed, cancelled
 )
 
-class MainActivityMarketplace : ComponentActivity() {
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AgentPayApp()
+            AgentPayProviderApp()
         }
     }
 }
 
 @Composable
-fun AgentPayApp() {
-    var currentScreen by remember { mutableStateOf("home") }
-    var selectedProvider by remember { mutableStateOf<Provider?>(null) }
+fun AgentPayProviderApp() {
+    var currentScreen by remember { mutableStateOf("login") }
+    var businessProfile by remember { mutableStateOf<BusinessProfile?>(null) }
+    var authToken by remember { mutableStateOf("") }
     
     when (currentScreen) {
-        "home" -> HomeScreen { selectedScreen -> currentScreen = selectedScreen }
-        "marketplace" -> MarketplaceScreen(
-            onBooking = { currentScreen = "booking"; selectedProvider = it },
-            onHome = { currentScreen = "home" }
+        "login" -> LoginScreen(
+            onLogin = { email, password ->
+                // TODO: Authenticate business
+                currentScreen = "dashboard"
+            }
         )
-        "booking" -> if (selectedProvider != null) {
-            BookingScreen(
-                provider = selectedProvider!!,
-                onBook = { currentScreen = "dashboard" },
-                onBack = { currentScreen = "marketplace" }
-            )
-        }
-        "dashboard" -> DashboardScreen { currentScreen = "home" }
+        "dashboard" -> DashboardScreen(
+            profile = businessProfile,
+            onLogout = { currentScreen = "login" },
+            onNavigate = { screen -> currentScreen = screen }
+        )
+        "services" -> ServicesManagementScreen(
+            onBack = { currentScreen = "dashboard" },
+            businessId = businessProfile?.id ?: ""
+        )
+        "bookings" -> BookingsScreen(
+            onBack = { currentScreen = "dashboard" },
+            businessId = businessProfile?.id ?: ""
+        )
+        "analytics" -> AnalyticsScreen(
+            onBack = { currentScreen = "dashboard" }
+        )
+        "settings" -> SettingsScreen(
+            profile = businessProfile,
+            onBack = { currentScreen = "dashboard" }
+        )
     }
 }
 
 @Composable
-fun HomeScreen(onNavigate: (String) -> Unit) {
+fun LoginScreen(onLogin: (String, String) -> Unit) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0f172a))
+            .padding(20.dp)
             .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Logo/Title
+        Text(
+            "AgentPay Provider",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            modifier = Modifier.padding(bottom = 40.dp)
+        )
+        
+        // Email Field
+        TextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF1e293b),
+                unfocusedContainerColor = Color(0xFF1e293b),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            )
+        )
+        
+        // Password Field
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFF1e293b),
+                unfocusedContainerColor = Color(0xFF1e293b),
+                focusedTextColor = Color.White,
+                unfocusedTextColor = Color.White
+            )
+        )
+        
+        // Login Button
+        Button(
+            onClick = { onLogin(email, password) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF3b82f6)
+            )
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Sign In", fontSize = 16.sp)
+            }
+        }
+        
+        // Register Link
+        Row(modifier = Modifier.padding(top = 20.dp)) {
+            Text("Don't have an account? ", color = Color.Gray)
+            Text("Register", color = Color(0xFF3b82f6), modifier = Modifier.clickable { })
+        }
+    }
+}
+
+@Composable
+fun DashboardScreen(
+    profile: BusinessProfile?,
+    onLogout: () -> Unit,
+    onNavigate: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0f172a))
     ) {
         // Header
         Box(
@@ -98,392 +217,388 @@ fun HomeScreen(onNavigate: (String) -> Unit) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    "🤖 AgentPay",
-                    fontSize = 28.sp,
+                    "AgentPay Provider Dashboard",
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF60a5fa)
+                    color = Color.White
                 )
-                Text(
-                    "AI-Powered Booking Platform",
-                    fontSize = 12.sp,
-                    color = Color(0xFFcbd5e1)
-                )
+                if (profile != null) {
+                    Text(
+                        profile.businessName,
+                        fontSize = 14.sp,
+                        color = Color.Gray
+                    )
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Hero Section
-        Column(
+        
+        // Content
+        LazyColumn(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                "Find Services Instantly",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            item {
+                // Quick Stats
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard("Revenue", "$0", Modifier.weight(1f))
+                    StatCard("Bookings", "0", Modifier.weight(1f))
+                }
+            }
             
-            Text(
-                "Book professionals near you with real-time payments",
-                fontSize = 14.sp,
-                color = Color(0xFFcbd5e1),
-                modifier = Modifier.padding(top = 10.dp)
-            )
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    StatCard("Rating", "0.0★", Modifier.weight(1f))
+                    StatCard("Reviews", "0", Modifier.weight(1f))
+                }
+            }
+            
+            // Menu Items
+            item { Spacer(modifier = Modifier.height(20.dp)) }
+            
+            item {
+                MenuButton(
+                    icon = Icons.Default.ShoppingCart,
+                    title = "Services",
+                    subtitle = "Manage your services",
+                    onClick = { onNavigate("services") }
+                )
+            }
+            
+            item {
+                MenuButton(
+                    icon = Icons.Default.DateRange,
+                    title = "Bookings",
+                    subtitle = "View pending & confirmed bookings",
+                    onClick = { onNavigate("bookings") }
+                )
+            }
+            
+            item {
+                MenuButton(
+                    icon = Icons.Default.BarChart,
+                    title = "Analytics",
+                    subtitle = "Revenue & performance metrics",
+                    onClick = { onNavigate("analytics") }
+                )
+            }
+            
+            item {
+                MenuButton(
+                    icon = Icons.Default.Settings,
+                    title = "Settings",
+                    subtitle = "Business profile & preferences",
+                    onClick = { onNavigate("settings") }
+                )
+            }
+            
+            item {
+                Button(
+                    onClick = onLogout,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7f1d1d))
+                ) {
+                    Text("Logout")
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // CTA Buttons
-        Button(
-            onClick = { onNavigate("marketplace") },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF10b981)
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text("Browse Services", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(15.dp))
-
-        Button(
-            onClick = { onNavigate("dashboard") },
-            modifier = Modifier
-                .fillMaxWidth(0.8f)
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF3b82f6)
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text("My Bookings", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Features
-        FeatureCard("💳", "Secure Payments", "Stripe + Solana")
-        FeatureCard("⭐", "Verified Pros", "4.8+ ratings")
-        FeatureCard("🚀", "Instant Booking", "Confirm in seconds")
     }
 }
 
 @Composable
-fun FeatureCard(icon: String, title: String, subtitle: String) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(0.85f)
-            .background(Color(0xFF1e293b), RoundedCornerShape(8.dp))
-            .padding(15.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(icon, fontSize = 24.sp, modifier = Modifier.padding(end = 15.dp))
-        Column {
-            Text(title, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(subtitle, fontSize = 12.sp, color = Color(0xFFcbd5e1))
-        }
-    }
-    Spacer(modifier = Modifier.height(15.dp))
-}
-
-@Composable
-fun MarketplaceScreen(onBooking: (Provider) -> Unit, onHome: () -> Unit) {
-    var searchQuery by remember { mutableStateOf("") }
-    val providers = listOf(
-        Provider("p1", "Pro Salon", "Haircut", 25.0, 4.8f, 42, 0.3, "123 Main St", "555-0001"),
-        Provider("p2", "Quick Mechanic", "Oil Change", 45.0, 4.9f, 156, 0.5, "456 Oak Ave", "555-0002"),
-        Provider("p3", "Dental Clinic", "Cleaning", 80.0, 4.7f, 89, 0.2, "789 Pine Rd", "555-0003"),
-    )
-
+fun ServicesManagementScreen(
+    onBack: () -> Unit,
+    businessId: String
+) {
+    var services by remember { mutableStateOf(listOf<BusinessService>()) }
+    var showAddService by remember { mutableStateOf(false) }
+    
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0f172a))
     ) {
         // Header
-        Row(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFF1e293b))
-                .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(20.dp)
         ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color(0xFF60a5fa),
-                modifier = Modifier.clickable { onHome() }
-            )
-            Text("Services", color = Color.White, fontWeight = FontWeight.Bold)
-            Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color(0xFF60a5fa))
-        }
-
-        // Search
-        TextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Search services...", color = Color(0xFF94a3b8)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(15.dp),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFF1e293b),
-                unfocusedContainerColor = Color(0xFF1e293b),
-                focusedTextColor = Color.White
-            ),
-            shape = RoundedCornerShape(8.dp)
-        )
-
-        // Provider List
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp)
-        ) {
-            items(providers.filter { it.name.contains(searchQuery, ignoreCase = true) }) { provider ->
-                ProviderCard(provider) { onBooking(provider) }
-            }
-        }
-    }
-}
-
-@Composable
-fun ProviderCard(provider: Provider, onBook: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp)
-            .clickable { onBook() },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(15.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(provider.name, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text(provider.service, fontSize = 12.sp, color = Color(0xFFcbd5e1))
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
-                Text("$${provider.price}", fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+                Text(
+                    "Manage Services",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                IconButton(onClick = { showAddService = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Add", tint = Color.White)
+                }
+            }
+        }
+        
+        if (showAddService) {
+            AddServiceDialog(
+                onAdd = { service ->
+                    services = services + service
+                    showAddService = false
+                },
+                onDismiss = { showAddService = false }
+            )
+        }
+        
+        // Services List
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            if (services.isEmpty()) {
+                item {
+                    Text(
+                        "No services yet. Tap + to add one.",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
+            } else {
+                items(services) { service ->
+                    ServiceCard(
+                        service = service,
+                        onEdit = { /* TODO */ },
+                        onDelete = { services = services.filter { it.id != service.id } }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ServiceCard(
+    service: BusinessService,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onEdit() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        service.name,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        service.category,
+                        fontSize = 12.sp,
+                        color = Color.Gray
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFef4444))
+                }
             }
             
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("⭐", fontSize = 14.sp)
-                    Text("${provider.rating} (${provider.reviews})", fontSize = 12.sp, color = Color(0xFFcbd5e1))
+                Text(
+                    "\$${service.price}",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF10b981)
+                )
+                Text(
+                    "${service.duration} min",
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                if (service.available) {
+                    Text("Available", fontSize = 12.sp, color = Color(0xFF10b981))
+                } else {
+                    Text("Unavailable", fontSize = 12.sp, color = Color(0xFFef4444))
                 }
-                Text("${provider.distance} mi away", fontSize = 12.sp, color = Color(0xFFcbd5e1))
             }
         }
     }
 }
 
 @Composable
-fun BookingScreen(provider: Provider, onBook: () -> Unit, onBack: () -> Unit) {
-    var selectedDate by remember { mutableStateOf("") }
-    var selectedTime by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0f172a))
-            .verticalScroll(rememberScrollState())
-    ) {
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1e293b))
-                .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color(0xFF60a5fa),
-                modifier = Modifier.clickable { onBack() }
-            )
-            Text("Book Service", color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 10.dp))
-        }
-
-        Column(modifier = Modifier.padding(20.dp)) {
-            // Provider Info
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(modifier = Modifier.padding(15.dp)) {
-                    Text(provider.name, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 18.sp)
-                    Text(provider.service, color = Color(0xFFcbd5e1), fontSize = 14.sp)
-                    Text("${provider.address} • ${provider.phone}", color = Color(0xFF94a3b8), fontSize = 12.sp, modifier = Modifier.padding(top = 10.dp))
-                }
+fun AddServiceDialog(
+    onAdd: (BusinessService) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var name by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var price by remember { mutableStateOf("") }
+    var duration by remember { mutableStateOf("60") }
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Service", color = Color.White) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Service Name") },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF1e293b),
+                        unfocusedContainerColor = Color(0xFF1e293b),
+                        focusedTextColor = Color.White
+                    )
+                )
+                TextField(
+                    value = category,
+                    onValueChange = { category = it },
+                    label = { Text("Category") },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF1e293b),
+                        unfocusedContainerColor = Color(0xFF1e293b),
+                        focusedTextColor = Color.White
+                    )
+                )
+                TextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { Text("Price (\$)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF1e293b),
+                        unfocusedContainerColor = Color(0xFF1e293b),
+                        focusedTextColor = Color.White
+                    )
+                )
+                TextField(
+                    value = duration,
+                    onValueChange = { duration = it },
+                    label = { Text("Duration (minutes)") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color(0xFF1e293b),
+                        unfocusedContainerColor = Color(0xFF1e293b),
+                        focusedTextColor = Color.White
+                    )
+                )
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Date Selection
-            Text("Select Date", fontWeight = FontWeight.Bold, color = Color.White)
-            TextField(
-                value = selectedDate,
-                onValueChange = { selectedDate = it },
-                placeholder = { Text("YYYY-MM-DD", color = Color(0xFF94a3b8)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFF1e293b),
-                    unfocusedContainerColor = Color(0xFF1e293b)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-
-            Spacer(modifier = Modifier.height(15.dp))
-
-            // Time Selection
-            Text("Select Time", fontWeight = FontWeight.Bold, color = Color.White)
-            TextField(
-                value = selectedTime,
-                onValueChange = { selectedTime = it },
-                placeholder = { Text("HH:MM", color = Color(0xFF94a3b8)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFF1e293b),
-                    unfocusedContainerColor = Color(0xFF1e293b)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Price Summary
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF1e2e3b)),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(modifier = Modifier.padding(15.dp)) {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Service", color = Color(0xFFcbd5e1))
-                        Text("$${provider.price}", color = Color(0xFFcbd5e1))
-                    }
-                    Row(modifier = Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Fee", color = Color(0xFFcbd5e1))
-                        Text("$${(provider.price * 0.025).toInt()}", color = Color(0xFFcbd5e1))
-                    }
-                    Divider(modifier = Modifier.padding(vertical = 10.dp), color = Color(0xFF334155))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Total", fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("$${(provider.price * 1.025).toInt()}", fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Book Button
+        },
+        confirmButton = {
             Button(
-                onClick = { onBook() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10b981)),
-                shape = RoundedCornerShape(8.dp),
-                enabled = selectedDate.isNotEmpty() && selectedTime.isNotEmpty()
+                onClick = {
+                    onAdd(
+                        BusinessService(
+                            id = System.currentTimeMillis().toString(),
+                            name = name,
+                            category = category,
+                            price = price.toDoubleOrNull() ?: 0.0,
+                            duration = duration.toIntOrNull() ?: 60
+                        )
+                    )
+                }
             ) {
-                Text("Confirm Booking", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Add")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
             }
         }
-    }
+    )
 }
 
 @Composable
-fun DashboardScreen(onHome: () -> Unit) {
-    val bookings = listOf(
-        Booking("b1", "Pro Salon", "2026-04-15", "14:30", 25.0, "Confirmed"),
-        Booking("b2", "Quick Mechanic", "2026-04-18", "10:00", 45.0, "Pending")
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF0f172a))
-    ) {
+fun BookingsScreen(onBack: () -> Unit, businessId: String) {
+    var bookings by remember { mutableStateOf(listOf<Booking>()) }
+    var selectedTab by remember { mutableStateOf("pending") }
+    
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0f172a))) {
         // Header
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF1e293b))
+                .padding(20.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                Text(
+                    "Bookings",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+        
+        // Tabs
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFF1e293b))
-                .padding(15.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(
-                Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                tint = Color(0xFF60a5fa),
-                modifier = Modifier.clickable { onHome() }
-            )
-            Text("My Bookings", color = Color.White, fontWeight = FontWeight.Bold)
-            Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color(0xFF60a5fa))
-        }
-
-        // Stats
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(15.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatCard("${bookings.size}", "Total Bookings")
-            StatCard("$${bookings.sumOf { it.amount }}", "Spent")
-            StatCard("${bookings.count { it.status == "Confirmed" }}", "Completed")
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Booking List
-        LazyColumn(modifier = Modifier.padding(horizontal = 15.dp)) {
-            items(bookings) { booking ->
-                BookingCard(booking)
+            listOf("Pending", "Confirmed", "Completed", "Cancelled").forEach { tab ->
+                Button(
+                    onClick = { selectedTab = tab.lowercase() },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (selectedTab == tab.lowercase()) Color(0xFF3b82f6) else Color(0xFF334155)
+                    ),
+                    modifier = Modifier.padding(vertical = 12.dp)
+                ) {
+                    Text(tab, fontSize = 12.sp)
+                }
             }
         }
-    }
-}
-
-@Composable
-fun StatCard(value: String, label: String) {
-    Card(
-        modifier = Modifier
-            .padding(5.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(value, fontWeight = FontWeight.Bold, color = Color(0xFF60a5fa), fontSize = 16.sp)
-            Text(label, fontSize = 11.sp, color = Color(0xFFcbd5e1))
+        
+        // Bookings List
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+            if (bookings.isEmpty()) {
+                item {
+                    Text("No ${selectedTab} bookings", color = Color.Gray)
+                }
+            } else {
+                items(bookings.filter { it.status == selectedTab }) { booking ->
+                    BookingCard(booking)
+                }
+            }
         }
     }
 }
@@ -491,38 +606,112 @@ fun StatCard(value: String, label: String) {
 @Composable
 fun BookingCard(booking: Booking) {
     Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(booking.customerName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(booking.status.uppercase(), fontSize = 12.sp, color = Color(0xFF3b82f6))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("${booking.date} at ${booking.time}", fontSize = 12.sp, color = Color.Gray)
+            Text("${booking.service} - \$${booking.amount}", fontSize = 12.sp, color = Color(0xFF10b981))
+        }
+    }
+}
+
+@Composable
+fun AnalyticsScreen(onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0f172a))) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF1e293b))
+                .padding(20.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                Text("Analytics", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        }
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+            item { Text("Revenue analytics coming soon", color = Color.Gray) }
+        }
+    }
+}
+
+@Composable
+fun SettingsScreen(profile: BusinessProfile?, onBack: () -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0f172a))) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF1e293b))
+                .padding(20.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                }
+                Text("Settings", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            }
+        }
+        LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+            item { Text("Profile settings coming soon", color = Color.Gray) }
+        }
+    }
+}
+
+@Composable
+fun StatCard(title: String, value: String, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier.height(100.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(title, fontSize = 12.sp, color = Color.Gray)
+            Text(value, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+    }
+}
+
+@Composable
+fun MenuButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b)),
-        shape = RoundedCornerShape(8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))
     ) {
-        Column(modifier = Modifier.padding(15.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(booking.provider, fontWeight = FontWeight.Bold, color = Color.White)
-                    Text("${booking.date} at ${booking.time}", fontSize = 12.sp, color = Color(0xFFcbd5e1))
-                }
-                Text("$${booking.amount}", fontWeight = FontWeight.Bold, color = Color(0xFF10b981))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(icon, contentDescription = title, tint = Color(0xFF3b82f6), modifier = Modifier.size(32.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(subtitle, fontSize = 12.sp, color = Color.Gray)
             }
-            
-            Spacer(modifier = Modifier.height(10.dp))
-            
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text("Status: ${booking.status}", fontSize = 12.sp, color = Color(0xFFcbd5e1))
-                Button(
-                    onClick = { },
-                    modifier = Modifier.height(30.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3b82f6)),
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Text("View", fontSize = 11.sp)
-                }
-            }
+            Icon(Icons.Default.ChevronRight, contentDescription = "Go", tint = Color.Gray)
         }
     }
 }
