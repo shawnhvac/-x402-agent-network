@@ -47,18 +47,18 @@ Include:
   "auth": { "type": "none" },
   "api": {
     "type": "openapi",
-    "url": "https://agentpay.com/openapi.json",
+    "url": "https://x402-agent-pay.com/openapi.json",
     "is_user_action_confirmed": false
   },
-  "logo_url": "https://agentpay.com/logo.png",
+  "logo_url": "https://x402-agent-pay.com/logo.png",
   "contact_email": "x402agentpay@gmail.com"
 }
 ```
 
-**Location:** https://agentpay.com/.well-known/openai-gpt-plugin.json
+**Location:** https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
 
 ### OpenAPI Spec
-**Location:** https://agentpay.com/openapi.json  
+**Location:** https://x402-agent-pay.com/openapi.json  
 **Status:** ✅ Accessible and valid
 
 ### HTTPS
@@ -81,8 +81,8 @@ We would like to submit AgentPay Service Booking plugin for review and inclusion
 
 Plugin Details:
 - Name: AgentPay Service Booking
-- Manifest: https://agentpay.com/.well-known/openai-gpt-plugin.json
-- OpenAPI: https://agentpay.com/openapi.json
+- Manifest: https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
+- OpenAPI: https://x402-agent-pay.com/openapi.json
 - Auth Type: None (x402 payment protocol)
 
 Description:
@@ -95,7 +95,7 @@ Key Features:
 - Zero API key requirement
 
 Company: AgentPay
-Website: https://agentpay.com
+Website: https://x402-agent-pay.com
 Contact: x402agentpay@gmail.com
 
 Please let us know if you need any additional information.
@@ -116,7 +116,7 @@ AgentPay Team
    ```json
    {
      "type": "openapi",
-     "url": "https://agentpay.com/openapi.json"
+     "url": "https://x402-agent-pay.com/openapi.json"
    }
    ```
 5. Test the integration
@@ -211,14 +211,14 @@ If you need support during submission:
 
 **AgentPay Support:**
 - Email: x402agentpay@gmail.com
-- Website: https://agentpay.com
+- Website: https://x402-agent-pay.com
 
 ---
 
 ## ✨ Summary
 
 ✅ Plugin ready: AgentPay Service Booking  
-✅ HTTPS configured: https://agentpay.com  
+✅ HTTPS configured: https://x402-agent-pay.com  
 ✅ Manifest accessible: /.well-known/openai-gpt-plugin.json  
 ✅ OpenAPI spec: /openapi.json  
 ✅ Endpoints verified: All responding  

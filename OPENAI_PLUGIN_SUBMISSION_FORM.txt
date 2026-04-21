@@ -20,7 +20,7 @@ Description for Model:
 Search for services, book appointments, and make autonomous payments via AgentPay x402 marketplace. Agents can search for salons, restaurants, mechanics, and other services, then book them autonomously with integrated payment handling via x402 protocol.
 
 Logo URL:
-https://agentpay.com/logo.png
+https://x402-agent-pay.com/logo.png
 
 Contact Email:
 x402agentpay@gmail.com
@@ -29,19 +29,19 @@ Authentication Type:
 None
 
 Manifest URL:
-https://agentpay.com/.well-known/openai-gpt-plugin.json
+https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
 
 OpenAPI Spec URL:
-https://agentpay.com/openapi.json
+https://x402-agent-pay.com/openapi.json
 
 Website URL:
-https://agentpay.com
+https://x402-agent-pay.com
 
 Legal Info URL:
-https://agentpay.com/legal
+https://x402-agent-pay.com/legal
 
 Privacy Policy URL:
-https://agentpay.com/privacy
+https://x402-agent-pay.com/privacy
 
 Category:
 Service Tools / Productivity
@@ -74,21 +74,21 @@ API ENDPOINTS
 
 1. Search Services
    Method: POST
-   URL: https://agentpay.com/api/v1/search
+   URL: https://x402-agent-pay.com/api/v1/search
    Price: $0.001 USDC
    Input: { category, location, date?, filters? }
    Output: [ { id, name, description, price, rating } ]
 
 2. Book Service
    Method: POST
-   URL: https://agentpay.com/api/v1/book
+   URL: https://x402-agent-pay.com/api/v1/book
    Price: $0.002 USDC
    Input: { service_id, date, time, notes? }
    Output: { booking_id, status, confirmation_url }
 
 3. Complete Payment
    Method: POST
-   URL: https://agentpay.com/api/v1/pay
+   URL: https://x402-agent-pay.com/api/v1/pay
    Price: $0.001 USDC
    Input: { booking_id, amount, payment_method }
    Output: { transaction_id, status, receipt_url }
@@ -98,7 +98,7 @@ VERIFICATION CHECKLIST
 ───────────────────────────────────────────────────────────────────────────────
 
 Domain Verification:
- ✓ Domain: agentpay.com
+ ✓ Domain: x402-agent-pay.com
  ✓ Server: Contabo (85.239.236.56)
  ✓ Status: Live and accessible
  ✓ DNS: Configured and propagated
@@ -144,7 +144,7 @@ STEP 3: Fill in the form using the fields above
   - Select Authentication: None
 
 STEP 4: Verify Domain
-  OpenAI will ask to verify agentpay.com
+  OpenAI will ask to verify x402-agent-pay.com
   - Add DNS record OR
   - Add verification file to domain
   - Verification typically takes 1-24 hours

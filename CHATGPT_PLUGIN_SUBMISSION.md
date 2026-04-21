@@ -23,7 +23,7 @@
   - x402 payment requirements documented
 
 - [x] **Domain Verification**
-  - Domain: `agentpay.com`
+  - Domain: `x402-agent-pay.com`
   - DNS: Live on Contabo (85.239.236.56)
   - HTTPS: Recommended (configure SSL)
   - Status: ✅ Accessible
@@ -36,12 +36,12 @@
 
 - [x] **Legal & Privacy**
   - Contact email: `x402agentpay@gmail.com`
-  - Legal info URL: `https://agentpay.com/legal`
-  - Privacy policy URL: `https://agentpay.com/privacy`
+  - Legal info URL: `https://x402-agent-pay.com/legal`
+  - Privacy policy URL: `https://x402-agent-pay.com/privacy`
   - Terms of service: Ready
 
 - [x] **Logo & Branding**
-  - Logo URL: `https://agentpay.com/logo.png`
+  - Logo URL: `https://x402-agent-pay.com/logo.png`
   - Format: PNG or SVG recommended
   - Size: 512x512px minimum
 
@@ -61,19 +61,19 @@
   },
   "api": {
     "type": "openapi",
-    "url": "https://agentpay.com/openapi.json",
+    "url": "https://x402-agent-pay.com/openapi.json",
     "is_user_action_confirmed": false
   },
-  "logo_url": "https://agentpay.com/logo.png",
+  "logo_url": "https://x402-agent-pay.com/logo.png",
   "contact_email": "x402agentpay@gmail.com",
-  "legal_info_url": "https://agentpay.com/legal",
-  "privacy_policy_url": "https://agentpay.com/privacy",
-  "HttpUrl": "https://agentpay.com",
+  "legal_info_url": "https://x402-agent-pay.com/legal",
+  "privacy_policy_url": "https://x402-agent-pay.com/privacy",
+  "HttpUrl": "https://x402-agent-pay.com",
   "RemoveUserConversationData": true
 }
 ```
 
-**Manifest Location:** `https://agentpay.com/.well-known/openai-gpt-plugin.json`
+**Manifest Location:** `https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json`
 
 ---
 
@@ -120,12 +120,12 @@ POST /api/v1/pay
 - **Plugin Name:** AgentPay Service Booking
 - **Description:** Book services with autonomous AI payment
 - **Auth Type:** No auth (None)
-- **Manifest URL:** https://agentpay.com/.well-known/openai-gpt-plugin.json
-- **OpenAPI URL:** https://agentpay.com/openapi.json
-- **Logo URL:** https://agentpay.com/logo.png
-- **Website:** https://agentpay.com
-- **Legal:** https://agentpay.com/legal
-- **Privacy:** https://agentpay.com/privacy
+- **Manifest URL:** https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
+- **OpenAPI URL:** https://x402-agent-pay.com/openapi.json
+- **Logo URL:** https://x402-agent-pay.com/logo.png
+- **Website:** https://x402-agent-pay.com
+- **Legal:** https://x402-agent-pay.com/legal
+- **Privacy:** https://x402-agent-pay.com/privacy
 - **Support Email:** x402agentpay@gmail.com
 
 ### Step 3: Verify Domain
@@ -135,7 +135,7 @@ OpenAI will verify domain ownership:
 - Verification typically takes 1-24 hours
 
 **Our Setup:**
-- Domain: agentpay.com
+- Domain: x402-agent-pay.com
 - Server: Contabo (85.239.236.56)
 - Status: Live and accessible
 
@@ -171,7 +171,7 @@ OpenAI will test:
 **Action Needed:** 
 ```bash
 # Get SSL certificate
-sudo certbot certonly --standalone -d agentpay.com
+sudo certbot certonly --standalone -d x402-agent-pay.com
 
 # Configure nginx/Apache to use cert
 # Or use Contabo's built-in SSL
@@ -225,7 +225,7 @@ const limiter = rateLimit({
 ## 🔧 CONFIGURATION CHECKLIST
 
 ### Domain Setup
-- [ ] DNS configured (agentpay.com → 85.239.236.56)
+- [ ] DNS configured (x402-agent-pay.com → 85.239.236.56)
 - [ ] SSL certificate installed (HTTPS required)
 - [ ] Manifest accessible at /.well-known/openai-gpt-plugin.json
 - [ ] OpenAPI spec accessible at /openapi.json
@@ -254,13 +254,13 @@ const limiter = rateLimit({
 
 ### Immediate (Today)
 1. **Configure SSL/HTTPS**
-   - Get certificate for agentpay.com
+   - Get certificate for x402-agent-pay.com
    - Update nginx/Apache config
-   - Test: `curl https://agentpay.com/health`
+   - Test: `curl https://x402-agent-pay.com/health`
 
 2. **Verify Manifest & OpenAPI**
-   - Check: `https://agentpay.com/.well-known/openai-gpt-plugin.json`
-   - Check: `https://agentpay.com/openapi.json`
+   - Check: `https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json`
+   - Check: `https://x402-agent-pay.com/openapi.json`
    - Should return valid JSON
 
 3. **Test Endpoints**
@@ -302,12 +302,12 @@ const limiter = rateLimit({
 Plugin Name: AgentPay Service Booking
 Description: Book services with autonomous AI payment and x402 integration
 Auth Type: None
-Manifest URL: https://agentpay.com/.well-known/openai-gpt-plugin.json
-OpenAPI URL: https://agentpay.com/openapi.json
-Logo URL: https://agentpay.com/logo.png
-Website: https://agentpay.com
-Legal URL: https://agentpay.com/legal
-Privacy URL: https://agentpay.com/privacy
+Manifest URL: https://x402-agent-pay.com/.well-known/openai-gpt-plugin.json
+OpenAPI URL: https://x402-agent-pay.com/openapi.json
+Logo URL: https://x402-agent-pay.com/logo.png
+Website: https://x402-agent-pay.com
+Legal URL: https://x402-agent-pay.com/legal
+Privacy URL: https://x402-agent-pay.com/privacy
 Support Email: x402agentpay@gmail.com
 
 Features:

@@ -2,20 +2,20 @@
   "schema_version": "v1",
   "name_for_model": "AgentPay",
   "name_for_human": "AgentPay Service Booking",
-  "description_for_model": "Search for services, book appointments, and make autonomous payments via AgentPay x402 marketplace. Agents can search for salons, restaurants, mechanics, and other services, then book them autonomously with integrated payment handling via x402 protocol.",
-  "description_for_human": "Book services with autonomous payment - haircuts, restaurants, repairs, and more with AI agents making payments automatically.",
+  "description_for_model": "Search for services, book appointments, and make autonomous payments via AgentPay x402 marketplace. Discover services via x402 Bazaar, book them autonomously, and process payments without manual intervention. Agents can access salons, restaurants, mechanics, and other services.",
+  "description_for_human": "Book services with autonomous payment - haircuts, restaurants, repairs, and more with AI agents making payments automatically. Powered by x402 protocol.",
   "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://agentpay.com/openapi.json",
+    "url": "https://x402-agent-pay.com/openapi.json",
     "is_user_action_confirmed": false
   },
-  "logo_url": "https://agentpay.com/logo.png",
-  "contact_email": "x402agentpay@gmail.com",
-  "legal_info_url": "https://agentpay.com/legal",
-  "privacy_policy_url": "https://agentpay.com/privacy",
-  "HttpUrl": "https://agentpay.com",
+  "logo_url": "https://x402-agent-pay.com/logo.png",
+  "contact_email": "shawnhvac@x402-agent-pay.com",
+  "legal_info_url": "https://x402-agent-pay.com/legal",
+  "privacy_policy_url": "https://x402-agent-pay.com/privacy",
+  "HttpUrl": "https://x402-agent-pay.com",
   "RemoveUserConversationData": true
 }
