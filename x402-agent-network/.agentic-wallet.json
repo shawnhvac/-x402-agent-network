@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "wallet": {
+    "network": "base",
+    "currency": "USDC",
+    "payment_protocol": "x402"
+  },
+  "features": {
+    "autonomous_payments": true,
+    "auto_funding": false,
+    "payment_confirmation": true
+  },
+  "agentpay": {
+    "api_endpoint": "https://x402-agent-pay.com",
+    "pricing": {
+      "search": "$0.001",
+      "book": "$0.002",
+      "pay": "$0.001"
+    },
+    "supported_services": [
+      "salon_booking",
+      "restaurant_reservation",
+      "auto_service",
+      "home_cleaning",
+      "fitness_class",
+      "professional_service",
+      "event_booking"
+    ]
+  }
+}
