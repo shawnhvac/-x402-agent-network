@@ -1,0 +1,42 @@
+name: Build AgentPay Provider APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: temurin
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x x402-agent-network/android/gradlew
+
+      - name: Build Provider APK
+        working-directory: x402-agent-network/android
+        run: ./gradlew clean assembleDebug -x lint --stacktrace
+
+      - name: Rename APK
+        run: |
+          find x402-agent-network/android -name "*.apk" -type f
+          cp x402-agent-network/android/build/outputs/apk/debug/android-debug.apk agentpay-provider.apk
+          ls -lh agentpay-provider.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentpay-provider-apk
+          path: agentpay-provider.apk
+          retention-days: 30
+
+      - name: Done
+        run: echo "SUCCESS agentpay-provider.apk built"
