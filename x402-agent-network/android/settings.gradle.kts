@@ -4,6 +4,10 @@ pluginManagement {
         google()
         mavenCentral()
     }
+    plugins {
+        id("com.android.application") version "8.1.0"
+        id("org.jetbrains.kotlin.android") version "1.9.0"
+    }
 }
 
 dependencyResolutionManagement {
@@ -15,3 +19,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "AgentPay"
+include(":app")
