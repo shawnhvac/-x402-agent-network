@@ -24,6 +24,7 @@ import servicesRoutes from "./routes/services.js";
 import solanaPaymentRoutes from "./routes/solana-payments.js";
 import ethereumPaymentRoutes from "./routes/ethereum-payments.js";
 import stripePaymentRoutes from "./routes/stripe-payments.js";
+import businessPortalRoutes from "./routes/business-portal.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -410,6 +411,11 @@ app.use("/api/v1", ethereumPaymentRoutes);
  * Stripe Payment Routes
  */
 app.use("/api/v1", stripePaymentRoutes);
+
+/**
+ * Business Portal Routes
+ */
+app.use("/api/v1", businessPortalRoutes);
 
 /**
  * APK Download & Status Routes
