@@ -8,8 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -18,17 +20,29 @@ jobs:
           distribution: temurin
           cache: gradle
 
+      - name: Download Gradle wrapper jar
+        run: |
+          mkdir -p x402-agent-network/android/gradle/wrapper
+          curl -Lo x402-agent-network/android/gradle/wrapper/gradle-wrapper.jar \
+            https://github.com/gradle/gradle/raw/v8.2.0/gradle/wrapper/gradle-wrapper.jar
+
       - name: Make gradlew executable
         run: chmod +x x402-agent-network/android/gradlew
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Build Provider APK
         working-directory: x402-agent-network/android
-        run: ./gradlew clean assembleDebug -x lint --stacktrace
+        run: ./gradlew assembleDebug -x lint --stacktrace
+        env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
 
-      - name: Rename APK
+      - name: Find and upload APK
         run: |
-          find x402-agent-network/android -name "*.apk" -type f
-          cp x402-agent-network/android/build/outputs/apk/debug/android-debug.apk agentpay-provider.apk
+          APK=$(find x402-agent-network/android -name "*.apk" | head -1)
+          echo "Found APK: $APK"
+          cp "$APK" agentpay-provider.apk
           ls -lh agentpay-provider.apk
 
       - name: Upload APK artifact
@@ -38,5 +52,5 @@ jobs:
           path: agentpay-provider.apk
           retention-days: 30
 
-      - name: Done
-        run: echo "SUCCESS agentpay-provider.apk built"
+      - name: Build complete
+        run: echo "SUCCESS — agentpay-provider.apk is ready"
