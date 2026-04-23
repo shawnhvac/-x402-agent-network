@@ -16,5 +16,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "AgentPay"
 include(":app")
-project(":app").projectDir = file(".")
-
