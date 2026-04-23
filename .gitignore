@@ -10,3 +10,14 @@ prediction*
 muskox*
 MUSKOX*
 .credentials/
+node_modules/
+frontend/node_modules/
+.env
+frontend/.env
+frontend/dist/
+node_modules/
+frontend/node_modules/
+frontend/dist/
+.env
+frontend/.env
+*.env
