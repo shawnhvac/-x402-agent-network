@@ -64,6 +64,6 @@ export declare class ZoAgentBridge {
     private storeConversationMessage;
     getRouter(): import("express-serve-static-core").Router;
     getConversations(): AgentConversation[];
-    getConversation(id: string): AgentConversation | undefined;
+    getConversation(id: string): AgentConversation;
 }
 export default ZoAgentBridge;

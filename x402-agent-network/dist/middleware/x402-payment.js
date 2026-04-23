@@ -1,252 +1,153 @@
 /**
- * x402 Payment Middleware
- * Enables AgentPay endpoints to accept x402 payments via Bazaar
- *
- * Each endpoint requires agent to make x402 payment before accessing
- * Automatically registers with Bazaar after first successful payment
+ * x402 Payment Middleware — AgentPay
+ * Updated: Added Bazaar discovery extension for CDP indexing
  */
-import { paymentMiddleware } from "@x402/express";
-import { x402ResourceServer, HTTPFacilitatorClient } from "@x402/core/server";
-import { registerExactEvmScheme } from "@x402/evm/exact/server";
-import { bazaarResourceServerExtension, declareDiscoveryExtension, } from "@x402/extensions/bazaar";
-/**
- * Initialize x402 payment infrastructure
- *
- * Uses CDP facilitator for production (handles Bazaar auto-registration)
- * Falls back to x402.org for testing/staging
- */
-export const initializeX402 = () => {
-    const facilitatorUrl = process.env.X402_FACILITATOR_URL ||
-        "https://api.cdp.coinbase.com/platform/v2/x402/facilitator";
-    const facilitatorClient = new HTTPFacilitatorClient({
-        url: facilitatorUrl,
-    });
-    const x402Server = new x402ResourceServer(facilitatorClient);
-    registerExactEvmScheme(x402Server);
-    x402Server.registerExtension(bazaarResourceServerExtension);
-    return { x402Server, facilitatorClient };
-};
-/**
- * Setup x402 payment middleware on Express app
- *
- * Protects three core endpoints:
- * 1. /api/v1/search - Find services ($0.001)
- * 2. /api/v1/book - Reserve service ($0.002)
- * 3. /api/v1/pay - Execute payment ($0.001)
- */
-export const setupX402Middleware = (app) => {
-    const { x402Server } = initializeX402();
-    const agentPayWallet = process.env.AGENTPAY_WALLET ||
-        "0x1234567890123456789012345678901234567890"; // Placeholder
-    app.use(paymentMiddleware({
-        // ===== ENDPOINT 1: SERVICE DISCOVERY =====
-        "POST /api/v1/search": {
-            accepts: {
-                scheme: "exact",
-                price: "$0.001",
-                network: "eip155:1", // Ethereum mainnet
-                payTo: agentPayWallet,
-            },
-            extensions: {
-                ...declareDiscoveryExtension({
-                    input: {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                category: {
-                                    type: "string",
-                                    description: "Service category (salon, restaurant, mechanic, etc)"
-                                },
-                                location: {
-                                    type: "string",
-                                    description: "Location (address or coordinates)"
-                                },
-                                date: {
-                                    type: "string",
-                                    description: "Desired service date (ISO 8601)"
-                                },
-                                duration: {
-                                    type: "integer",
-                                    description: "Service duration in minutes (optional)"
-                                },
-                            },
-                            required: ["category", "location"],
-                        },
-                    },
-                    output: {
-                        example: {
-                            services: [
-                                {
-                                    id: "salon-123",
-                                    name: "Local Salon",
-                                    rating: 4.8,
-                                    price_min: 45,
-                                    price_max: 75,
-                                    distance_miles: 1.2,
-                                    availability: ["2026-04-18 2pm", "2026-04-19 10am"],
-                                },
-                                {
-                                    id: "salon-456",
-                                    name: "Premium Salon",
-                                    rating: 4.9,
-                                    price_min: 60,
-                                    price_max: 120,
-                                    distance_miles: 2.5,
-                                    availability: ["2026-04-18 3pm", "2026-04-19 11am"],
-                                },
-                            ],
-                        },
-                        schema: {
-                            type: "object",
-                            properties: {
-                                services: {
-                                    type: "array",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            id: { type: "string" },
-                                            name: { type: "string" },
-                                            rating: { type: "number" },
-                                            price_min: { type: "number" },
-                                            price_max: { type: "number" },
-                                            distance_miles: { type: "number" },
-                                            availability: { type: "array", items: { type: "string" } },
-                                        },
-                                        required: ["id", "name", "price_min", "availability"],
-                                    },
-                                },
-                            },
-                        },
-                    },
-                }),
-            },
-        },
-        // ===== ENDPOINT 2: SERVICE BOOKING =====
-        "POST /api/v1/book": {
-            accepts: {
-                scheme: "exact",
-                price: "$0.002",
-                network: "eip155:1",
-                payTo: agentPayWallet,
-            },
-            extensions: {
-                ...declareDiscoveryExtension({
-                    input: {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                service_id: {
-                                    type: "string",
-                                    description: "Service ID from search results"
-                                },
-                                booking_time: {
-                                    type: "string",
-                                    description: "Desired booking time (ISO 8601)"
-                                },
-                                customer_wallet: {
-                                    type: "string",
-                                    description: "Customer's Ethereum wallet address"
-                                },
-                                customer_name: {
-                                    type: "string",
-                                    description: "Customer name for booking"
-                                },
-                            },
-                            required: ["service_id", "booking_time", "customer_wallet"],
-                        },
-                    },
-                    output: {
-                        example: {
-                            booking_id: "booking-456",
-                            status: "confirmed",
-                            service_date: "2026-04-18 2pm",
-                            service_name: "Hair Cut",
-                            provider: "Local Salon",
-                            price: 55.00,
-                            confirmation_code: "AGPAY-ABC123",
-                        },
-                        schema: {
-                            type: "object",
-                            properties: {
-                                booking_id: { type: "string" },
-                                status: { type: "string" },
-                                service_date: { type: "string" },
-                                service_name: { type: "string" },
-                                provider: { type: "string" },
-                                price: { type: "number" },
-                                confirmation_code: { type: "string" },
-                            },
-                            required: ["booking_id", "status", "service_date"],
-                        },
-                    },
-                }),
-            },
-        },
-        // ===== ENDPOINT 3: PAYMENT SETTLEMENT =====
-        "POST /api/v1/pay": {
-            accepts: {
-                scheme: "exact",
-                price: "$0.001", // Meta fee only
-                network: "eip155:1",
-                payTo: agentPayWallet,
-            },
-            extensions: {
-                ...declareDiscoveryExtension({
-                    input: {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                booking_id: {
-                                    type: "string",
-                                    description: "Booking ID from /book endpoint"
-                                },
-                                service_price: {
-                                    type: "number",
-                                    description: "Service price in USD"
-                                },
-                                customer_wallet: {
-                                    type: "string",
-                                    description: "Customer wallet for escrow"
-                                },
-                            },
-                            required: ["booking_id", "service_price", "customer_wallet"],
-                        },
-                    },
-                    output: {
-                        example: {
-                            transaction_hash: "0xabcdef1234567890...",
-                            status: "settled",
-                            escrow_address: "0xescrow1234567890...",
-                            booking_id: "booking-456",
-                            amount: 55.00,
-                        },
-                        schema: {
-                            type: "object",
-                            properties: {
-                                transaction_hash: { type: "string" },
-                                status: { type: "string" },
-                                escrow_address: { type: "string" },
-                                booking_id: { type: "string" },
-                                amount: { type: "number" },
-                            },
-                            required: ["transaction_hash", "status", "escrow_address"],
-                        },
-                    },
-                }),
-            },
-        },
-    }, x402Server));
-};
-/**
- * Extract x402 payment info from request
- * Called after payment middleware validates the payment
- */
-export const getX402PaymentInfo = (req) => {
+import { paymentMiddleware, x402ResourceServer } from "@x402/express";
+import { HTTPFacilitatorClient } from "@x402/core/server";
+import { ExactEvmScheme } from "@x402/evm/exact/server";
+import { createPrivateKey } from "crypto";
+import { SignJWT, importPKCS8 } from "jose";
+import { readFileSync } from "fs";
+const WALLET = (process.env.AGENTPAY_WALLET ||
+    "0x52893C94B03B5c5732c5AE71728cD69E360645Ce");
+const BASE_MAINNET = "eip155:8453";
+const CDP_FACILITATOR_URL = "https://api.cdp.coinbase.com/platform/v2/x402";
+const CDP_KEY_PATH = process.env.CDP_KEY_PATH || "/root/.openclaw/workspace/cdp_key.json";
+async function buildCDPToken(action) {
+    const cdpKey = JSON.parse(readFileSync(CDP_KEY_PATH, "utf8"));
+    const keyObj = createPrivateKey({ key: cdpKey.privateKey, format: "pem" });
+    const pkcs8 = keyObj.export({ type: "pkcs8", format: "pem" }).toString();
+    const privateKey = await importPKCS8(pkcs8, "ES256");
+    const now = Math.floor(Date.now() / 1000);
+    const nonce = Math.random().toString().slice(2, 18);
+    const method = action === "supported" ? "GET" : "POST";
+    return new SignJWT({
+        sub: cdpKey.name, iss: "cdp", aud: ["cdp_service"],
+        uris: [`${method} api.cdp.coinbase.com/platform/v2/x402/${action}`],
+        nbf: now,
+    })
+        .setProtectedHeader({ alg: "ES256", kid: cdpKey.name, nonce })
+        .setIssuedAt(now)
+        .setExpirationTime(now + 120)
+        .sign(privateKey);
+}
+async function createAuthHeaders() {
+    const [verifyToken, settleToken, supportedToken] = await Promise.all([
+        buildCDPToken("verify"),
+        buildCDPToken("settle"),
+        buildCDPToken("supported"),
+    ]);
     return {
-        verified: req.x402?.verified || false,
-        payer: req.x402?.payer || null,
-        amount: req.x402?.amount || null,
-        network: req.x402?.network || null,
+        verify: { Authorization: `Bearer ${verifyToken}` },
+        settle: { Authorization: `Bearer ${settleToken}` },
+        supported: { Authorization: `Bearer ${supportedToken}` },
     };
+}
+const PAID_ROUTES = {
+    "POST /api/v1/search": {
+        accepts: [{ scheme: "exact", price: "$0.001", network: BASE_MAINNET, payTo: WALLET }],
+        description: "Search for local service providers (HVAC, plumbing, hair salons, restaurants, etc.) by query, category, and location. Returns a ranked list of providers with pricing and availability.",
+        extensions: {
+            bazaar: {
+                input: { query: "hvac repair", location: "Phoenix, AZ", category: "hvac" },
+                inputSchema: {
+                    properties: {
+                        query: { type: "string", description: "Search term e.g. 'hvac repair' or 'hair salon'" },
+                        location: { type: "string", description: "City and state e.g. 'Phoenix, AZ'" },
+                        category: { type: "string", description: "Service category: hvac, plumbing, hair-beauty, food-dining, etc." },
+                    },
+                    required: ["query"],
+                },
+                bodyType: "json",
+                output: {
+                    example: { success: true, count: 5, results: [{ id: "hvac-phx-001", name: "Desert Air HVAC", price: 99, rating: 4.8 }] },
+                },
+            },
+        },
+    },
+    "POST /api/v1/book": {
+        accepts: [{ scheme: "exact", price: "$0.002", network: BASE_MAINNET, payTo: WALLET }],
+        description: "Book a service appointment with a provider. Supply the service ID (from /search), service type, date, time, and customer details. Returns a booking confirmation with ID.",
+        extensions: {
+            bazaar: {
+                input: { service_id: "salon-ny-001", service_type: "haircut", date: "2026-04-25", time: "10:00", customer_name: "Alice", customer_email: "alice@example.com" },
+                inputSchema: {
+                    properties: {
+                        service_id: { type: "string", description: "Provider ID from /search results" },
+                        service_type: { type: "string", description: "Type of service to book e.g. haircut, hvac-repair" },
+                        date: { type: "string", description: "Appointment date in YYYY-MM-DD format" },
+                        time: { type: "string", description: "Appointment time in HH:MM format" },
+                        customer_name: { type: "string", description: "Customer full name" },
+                        customer_email: { type: "string", description: "Customer email address" },
+                    },
+                    required: ["service_id", "service_type", "date", "time"],
+                },
+                bodyType: "json",
+                output: {
+                    example: { success: true, booking: { id: "BK-1234567890", service_name: "Manhattan Hair Studio", status: "pending_confirmation", price: 65 } },
+                },
+            },
+        },
+    },
+    "POST /api/v1/pay": {
+        accepts: [{ scheme: "exact", price: "$0.001", network: BASE_MAINNET, payTo: WALLET }],
+        description: "Confirm payment for a completed service booking. Supply the booking ID and on-chain payment transaction hash to finalise the service transaction.",
+        extensions: {
+            bazaar: {
+                input: { booking_id: "BK-1234567890", payment_tx: "0xabc123..." },
+                inputSchema: {
+                    properties: {
+                        booking_id: { type: "string", description: "Booking ID returned from /book" },
+                        payment_tx: { type: "string", description: "On-chain transaction hash for the service payment" },
+                    },
+                    required: ["booking_id", "payment_tx"],
+                },
+                bodyType: "json",
+                output: {
+                    example: { success: true, payment: { booking_id: "BK-1234567890", status: "confirmed" } },
+                },
+            },
+        },
+    },
 };
+function seedResourceServerSync(server, facilitatorClient) {
+    const supportedResponse = {
+        kinds: [{ x402Version: 2, scheme: "exact", network: BASE_MAINNET }],
+    };
+    if (!server.supportedResponsesMap.has(2))
+        server.supportedResponsesMap.set(2, new Map());
+    const respVersionMap = server.supportedResponsesMap.get(2);
+    if (!respVersionMap.has(BASE_MAINNET))
+        respVersionMap.set(BASE_MAINNET, new Map());
+    respVersionMap.get(BASE_MAINNET).set("exact", supportedResponse);
+    if (!server.facilitatorClientsMap.has(2))
+        server.facilitatorClientsMap.set(2, new Map());
+    const clientVersionMap = server.facilitatorClientsMap.get(2);
+    if (!clientVersionMap.has(BASE_MAINNET))
+        clientVersionMap.set(BASE_MAINNET, new Map());
+    clientVersionMap.get(BASE_MAINNET).set("exact", facilitatorClient);
+}
+export function setupX402Middleware(app) {
+    const facilitatorClient = new HTTPFacilitatorClient({
+        url: CDP_FACILITATOR_URL,
+        createAuthHeaders,
+    });
+    const evmScheme = new ExactEvmScheme();
+    const server = new x402ResourceServer(facilitatorClient)
+        .register(BASE_MAINNET, evmScheme);
+    seedResourceServerSync(server, facilitatorClient);
+    app.use(paymentMiddleware(PAID_ROUTES, server, undefined, undefined, false));
+    console.log("\u2705 x402 middleware live — Base mainnet seeded, CDP facilitator per-request");
+    console.log(`\u{1F4B3} Wallet: ${WALLET} | ${BASE_MAINNET}`);
+    console.log("\u{1F310} POST /api/v1/search ($0.001) | /api/v1/book ($0.002) | /api/v1/pay ($0.001)");
+    console.log("\u{1F50D} Bazaar extensions declared on all 3 routes");
+}
+export function getX402PaymentInfo() {
+    return {
+        wallet: WALLET,
+        network: BASE_MAINNET,
+        facilitator: CDP_FACILITATOR_URL,
+        endpoints: Object.keys(PAID_ROUTES),
+    };
+}
 //# sourceMappingURL=x402-payment.js.map

@@ -1,539 +1,711 @@
-openapi: 3.0.0
+openapi: "3.0.0"
 info:
-  title: MUSKOX x402 Agent Payment Network
+  title: AgentPay — AI Agent Commerce Network
   description: |
-    The global infrastructure layer for agent-to-agent commerce.
-    
-    Any AI agent or API can accept instant USDC payments via HTTP 402.
-    
-    **Core Vision:**
-    - Universal payment standard for autonomous agents
-    - Machine-first design (agents negotiate payments automatically)
-    - On-chain USDC settlement (<30 seconds)
-    - 2% platform fee (infinite scaling potential)
-    - Zero friction for developers
-    
-    **Agent Types Supported:**
-    - Trading agents (Grid Trader, Sniper Bot)
-    - LLM agents (GPT-4o, Claude, Grok, Llama)
-    - Data agents (price feeds, oracles)
-    - Compute agents (storage, processing)
-    - Custom agents (any API)
-  version: "1.0.0"
+    AgentPay is the global payment and service discovery layer for AI agents.
+
+    Agents can autonomously search for services, book them, and pay — either
+    with USDC on-chain (x402 protocol) or by charging a human's saved card
+    (Stripe off-session). No human interaction required after initial card setup.
+
+    ## Payment Methods
+    - **x402 / USDC on Base** — instant on-chain settlement, machine-native
+    - **Stripe card (off-session)** — agent charges human's saved card autonomously
+    - **Multi-chain crypto** — ETH, USDC, USDT on 7 EVM chains + Solana
+
+    ## Agent Flow (Stripe card payments)
+    1. `POST /api/v1/stripe/setup-customer` — human saves card once
+    2. `GET  /api/v1/osm-search` — agent finds nearby business
+    3. `POST /api/v1/stripe/agent-charge` — agent charges card, books service
+
+    ## Agent Flow (x402 crypto payments)
+    1. `GET  /api/v1/search` — discover services (x402 gated, $0.001 USDC)
+    2. Send x402 payment header with USDC
+    3. Service executes, payment settles on-chain
+
+    ## Product Search
+    - `POST /api/v1/products` — 3 online options + local stores near user
+
+    Base URL: https://www.x402-agent-pay.com
+  version: "2.0.0"
   contact:
-    name: MUSKOX Team
-    url: https://muskox.agent
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+    name: AgentPay Support
+    url: https://www.x402-agent-pay.com/contact
+    email: X402agentpay@gmail.com
 
 servers:
+  - url: https://www.x402-agent-pay.com
+    description: Production
   - url: http://localhost:3001
     description: Local development
-  - url: https://api.muskox.agent
-    description: Production (coming soon)
 
 tags:
-  - name: Health & Monitoring
-    description: Server status and performance metrics
-  - name: Agent Registry
-    description: Discover and manage registered agents
-  - name: Demo Agents
-    description: Example agents (Grid Trader, Sniper Bot, LLM, Data Feed)
-  - name: Core x402 API
-    description: Universal agent execution with HTTP 402 payment
+  - name: Health
+    description: Server status
+  - name: Service Discovery
+    description: Find services and businesses worldwide via OpenStreetMap
+  - name: Product Search
+    description: Search physical products — online + local stores
+  - name: Stripe Card Payments
+    description: Agent charges human card off-session (no human needed per transaction)
+  - name: Crypto Payments
+    description: x402 on-chain payments — USDC, ETH, SOL across 8 networks
+  - name: Business Registration
+    description: Onboard a business to the AgentPay marketplace
+  - name: Agents & Registry
+    description: Register and discover AI agents
 
 paths:
+
+  # ── HEALTH ────────────────────────────────────────────────────────────────
   /health:
     get:
       summary: Server health check
-      tags:
-        - Health & Monitoring
+      tags: [Health]
       responses:
         "200":
-          description: Server is healthy
+          description: Healthy
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  status:
-                    type: string
-                    enum: [healthy, initializing]
-                  database:
-                    type: string
-                    enum: [ready, connecting]
-                  timestamp:
-                    type: string
-                    format: date-time
+                  status: { type: string, example: healthy }
+                  database: { type: string, example: ready }
+                  timestamp: { type: string, format: date-time }
 
-  /metrics:
+  # ── SERVICE DISCOVERY (OSM) ────────────────────────────────────────────────
+  /api/v1/osm-search:
     get:
-      summary: Real-time performance metrics
-      tags:
-        - Health & Monitoring
+      summary: Find real businesses near a location (OpenStreetMap)
+      description: |
+        Live search of real-world businesses via OpenStreetMap Overpass API.
+        Returns businesses sorted by distance. No payment required.
+        Use this to find a business before booking and charging the human's card.
+      tags: [Service Discovery]
+      parameters:
+        - name: category
+          in: query
+          required: true
+          description: Service category
+          schema:
+            type: string
+            enum: [hair-beauty, food-dining, auto-service, home-services, health-fitness,
+                   medical, pets, tech-repair, travel-transport, financial, real-estate,
+                   fashion-retail, events, education, professional]
+          example: hair-beauty
+        - name: lat
+          in: query
+          description: Latitude (preferred over location string)
+          schema: { type: number, example: 51.5074 }
+        - name: lon
+          in: query
+          description: Longitude
+          schema: { type: number, example: -0.1278 }
+        - name: location
+          in: query
+          description: City/address string if lat/lon not available
+          schema: { type: string, example: "London, UK" }
+        - name: radius_km
+          in: query
+          description: Search radius in km (max 20)
+          schema: { type: number, default: 3, example: 5 }
+        - name: limit
+          in: query
+          description: Max results (max 20)
+          schema: { type: integer, default: 10, example: 10 }
       responses:
         "200":
-          description: Performance data and recent requests
+          description: Businesses found
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  timestamp:
-                    type: string
-                    format: date-time
-                  performance:
+                  success: { type: boolean }
+                  category: { type: string }
+                  count: { type: integer }
+                  center:
                     type: object
                     properties:
-                      totalRequests:
-                        type: integer
-                      successRate:
-                        type: string
-                      avgResponseTime:
-                        type: string
-                      errorCount:
-                        type: integer
-                      p95ResponseTime:
-                        type: string
-                      p99ResponseTime:
-                        type: string
-
-  /status:
-    get:
-      summary: Full system status
-      tags:
-        - Health & Monitoring
-      responses:
-        "200":
-          description: Complete system status
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  timestamp:
-                    type: string
-                    format: date-time
-                  system:
-                    type: object
-                    properties:
-                      database:
-                        type: string
-                      uptime:
-                        type: number
-                      memoryUsage:
-                        type: object
-
-  /agents:
-    get:
-      summary: List all registered agents
-      tags:
-        - Agent Registry
-      responses:
-        "200":
-          description: Array of registered agents
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  agents:
+                      lat: { type: number }
+                      lon: { type: number }
+                  results:
                     type: array
                     items:
                       type: object
                       properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                        endpoint:
-                          type: string
-                        cost:
-                          type: number
-                        status:
-                          type: object
+                        id: { type: string, example: "osm_123456" }
+                        name: { type: string, example: "Central Hair Studio" }
+                        address: { type: string }
+                        city: { type: string }
+                        phone: { type: string }
+                        website: { type: string }
+                        opening_hours: { type: string }
+                        distance_km: { type: number }
+                        lat: { type: number }
+                        lon: { type: number }
+                        bookable: { type: boolean }
+                        payment_x402: { type: boolean }
+              example:
+                success: true
+                category: hair-beauty
+                count: 3
+                results:
+                  - id: osm_987654
+                    name: "Mayfair Barbers"
+                    address: "12 Bond St"
+                    city: "London"
+                    distance_km: 0.3
+                    bookable: true
 
+  /api/v1/categories:
+    get:
+      summary: List all supported service categories
+      tags: [Service Discovery]
+      responses:
+        "200":
+          description: All categories with sub-services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        icon: { type: string }
+                        description: { type: string }
+                        services:
+                          type: array
+                          items: { type: string }
+
+  /api/v1/search:
+    get:
+      summary: Search registered AgentPay services (x402 gated — $0.001 USDC)
+      description: Returns registered services/agents. Requires x402 payment header.
+      tags: [Service Discovery]
+      parameters:
+        - name: q
+          in: query
+          description: Search query
+          schema: { type: string, example: "haircut London" }
+        - name: category
+          in: query
+          schema: { type: string }
+        - name: location
+          in: query
+          schema: { type: string }
+      responses:
+        "402":
+          description: Payment required — send x402 USDC payment to proceed
+        "200":
+          description: Search results
+
+  # ── PRODUCT SEARCH ─────────────────────────────────────────────────────────
+  /api/v1/products:
     post:
-      summary: Register a new agent
-      tags:
-        - Agent Registry
+      summary: Search for a physical product — online + local stores
+      description: |
+        Returns 3 online purchase options (Amazon, Walmart, Target) and up to 3
+        local stores near the user that likely stock the product. Requires x402 payment.
+      tags: [Product Search]
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required: [query]
               properties:
-                agentId:
+                query:
                   type: string
+                  description: Product to search for
+                  example: "hair dye"
+                lat:
+                  type: number
+                  description: User latitude for local store results
+                  example: 51.5074
+                lon:
+                  type: number
+                  description: User longitude for local store results
+                  example: -0.1278
+                location:
+                  type: string
+                  description: City/address if lat/lon not provided
+                  example: "Phoenix, AZ"
+      responses:
+        "200":
+          description: Online and local product results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  query: { type: string }
+                  online_count: { type: integer }
+                  local_count: { type: integer }
+                  results:
+                    type: object
+                    properties:
+                      online:
+                        type: array
+                        description: 3 online purchase options
+                        items:
+                          type: object
+                          properties:
+                            name: { type: string }
+                            price: { type: number }
+                            store: { type: string }
+                            url: { type: string }
+                            delivery: { type: string }
+                      local:
+                        type: array
+                        description: Nearby stores that stock this product
+                        items:
+                          type: object
+                          properties:
+                            store: { type: string }
+                            address: { type: string }
+                            distance_km: { type: number }
+        "402":
+          description: x402 payment required
+
+  # ── STRIPE CARD PAYMENTS ───────────────────────────────────────────────────
+  /api/v1/stripe/config:
+    get:
+      summary: Get Stripe publishable key and supported payment methods
+      tags: [Stripe Card Payments]
+      responses:
+        "200":
+          description: Stripe configuration
+          content:
+            application/json:
+              example:
+                publishable_key: "pk_live_..."
+                supported_methods: [card, apple_pay, google_pay, link]
+                currencies: [usd, eur, gbp, cad, aud, sgd, jpy, mxn, brl, inr]
+                flow:
+                  step1_register_human_card: "POST /api/v1/stripe/setup-customer"
+                  step2_agent_charges: "POST /api/v1/stripe/agent-charge"
+
+  /api/v1/stripe/setup-customer:
+    post:
+      summary: Register a human's card for future agent charges (Step 1)
+      description: |
+        Creates a Stripe Customer and returns a hosted setup URL.
+        Send `setup_url` to the human — they enter their card once (30 seconds).
+        Store the returned `customer_id` — use it for all future autonomous charges.
+        The card is saved as `off_session` so agents can charge it without human present.
+      tags: [Stripe Card Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "jane@example.com"
                 name:
                   type: string
-                description:
+                  example: "Jane Smith"
+                agent_id:
                   type: string
-                endpoint:
+                  description: ID of the agent acting on this human's behalf
+                  example: "agent_gpt4o_001"
+                user_id:
                   type: string
-                baseCost:
-                  type: number
-              required:
-                - agentId
-                - name
-                - endpoint
-                - baseCost
+                  description: Your internal user ID
+                  example: "user_123"
+      responses:
+        "200":
+          description: Customer created — send setup_url to human
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  customer_id:
+                    type: string
+                    description: Store this — use for all agent-charge calls
+                    example: "cus_ABC123"
+                  setup_url:
+                    type: string
+                    description: Send this URL to the human to save their card
+                    example: "https://checkout.stripe.com/c/pay/cs_live_..."
+                  setup_intent_client_secret:
+                    type: string
+                    description: For custom Stripe Elements UI instead of hosted page
+                  publishable_key:
+                    type: string
+                  instructions:
+                    type: string
+                    example: "Send setup_url to the human. Once they save their card, use customer_id for all agent charges."
+
+  /api/v1/stripe/agent-charge:
+    post:
+      summary: Agent charges a human's saved card autonomously (Step 2)
+      description: |
+        Charges the human's saved card instantly — no human interaction, no redirect.
+        Call this every time the agent makes a booking on the human's behalf.
+        Returns receipt details including card brand and last 4 digits.
+
+        **Error handling:**
+        - `requires_action: true` → card needs 3DS auth, send `checkout_url` to human
+        - `card_declined` → notify human, ask them to update card
+        - `insufficient_funds` → notify human
+      tags: [Stripe Card Payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [customer_id, amount]
+              properties:
+                customer_id:
+                  type: string
+                  description: From setup-customer step
+                  example: "cus_ABC123"
+                amount:
+                  type: integer
+                  description: Amount in cents (e.g. 5000 = $50.00)
+                  example: 5000
+                currency:
+                  type: string
+                  default: usd
+                  example: usd
+                service_name:
+                  type: string
+                  example: "Haircut at Mayfair Barbers"
+                booking_id:
+                  type: string
+                  example: "book_789"
+                agent_id:
+                  type: string
+                  example: "agent_gpt4o_001"
+                business_name:
+                  type: string
+                  example: "Mayfair Barbers"
+      responses:
+        "200":
+          description: Card charged successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  charge_id: { type: string }
+                  payment_intent_id: { type: string }
+                  amount: { type: integer }
+                  currency: { type: string }
+                  status: { type: string, example: succeeded }
+                  card_last4: { type: string, example: "4242" }
+                  card_brand: { type: string, example: "visa" }
+                  customer_email: { type: string }
+                  message: { type: string, example: "Card ending in 4242 charged $50.00 for Haircut" }
+        "402":
+          description: Card declined, insufficient funds, or 3DS required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean, example: false }
+                  requires_action: { type: boolean }
+                  error: { type: string }
+                  code: { type: string, example: "card_declined" }
+                  checkout_url: { type: string, description: "If 3DS needed — send to human" }
+
+  /api/v1/stripe/customer/{customer_id}:
+    get:
+      summary: Check if a human has a card saved before booking
+      tags: [Stripe Card Payments]
+      parameters:
+        - name: customer_id
+          in: path
+          required: true
+          schema: { type: string }
+          example: "cus_ABC123"
+      responses:
+        "200":
+          description: Customer card info
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  customer_id: { type: string }
+                  email: { type: string }
+                  has_saved_card: { type: boolean }
+                  agent_can_charge: { type: boolean }
+                  cards:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        brand: { type: string }
+                        last4: { type: string }
+                        exp_month: { type: integer }
+                        exp_year: { type: integer }
+
+  /api/v1/stripe/verify:
+    post:
+      summary: Verify a Stripe payment succeeded
+      tags: [Stripe Card Payments]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                payment_intent_id: { type: string }
+                session_id: { type: string }
+      responses:
+        "200":
+          description: Payment status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  verified: { type: boolean }
+                  status: { type: string }
+                  amount: { type: integer }
+                  currency: { type: string }
+
+  /api/v1/stripe/checkout:
+    post:
+      summary: Create hosted Stripe checkout (redirect — for one-off or new users)
+      tags: [Stripe Card Payments]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount: { type: integer, example: 5000 }
+                currency: { type: string, default: usd }
+                service_name: { type: string, example: "Haircut" }
+                business_name: { type: string }
+                booking_id: { type: string }
+                success_url: { type: string }
+                cancel_url: { type: string }
+      responses:
+        "200":
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  checkout_url: { type: string }
+                  session_id: { type: string }
+
+  # ── CRYPTO PAYMENTS ────────────────────────────────────────────────────────
+  /api/v1/payment/chains:
+    get:
+      summary: All supported payment chains and tokens
+      description: Returns all EVM chains + Solana with contract addresses and receiver wallets.
+      tags: [Crypto Payments]
+      responses:
+        "200":
+          description: Supported chains
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  receiver_wallet:
+                    type: string
+                    description: EVM wallet — same address works on all EVM chains
+                    example: "0x52893C94B03B5c5732c5AE71728cD69E360645Ce"
+                  evm_chains:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string, example: "base" }
+                        name: { type: string, example: "Base" }
+                        chainId: { type: integer, example: 8453 }
+                        nativeToken: { type: string, example: "ETH" }
+                        tokens:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              symbol: { type: string }
+                              contract: { type: string }
+                  solana:
+                    type: object
+                    properties:
+                      network: { type: string, example: "mainnet-beta" }
+                      receiver: { type: string }
+                      tokens:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            symbol: { type: string }
+                            mint: { type: string }
+                  x402_primary:
+                    type: object
+                    description: Primary x402 network for autonomous agent payments
+                    properties:
+                      network: { type: string, example: "Base (eip155:8453)" }
+                      payTo: { type: string }
+
+  /api/v1/payment/verify-evm:
+    post:
+      summary: Verify an EVM transaction on any supported chain
+      tags: [Crypto Payments]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tx_hash]
+              properties:
+                tx_hash: { type: string, example: "0xabc123..." }
+                chain:
+                  type: string
+                  default: base
+                  enum: [ethereum, base, polygon, arbitrum, optimism, avalanche, bsc]
+      responses:
+        "200":
+          description: Transaction verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  verified: { type: boolean }
+                  chain: { type: string }
+                  block: { type: integer }
+                  explorer_url: { type: string }
+
+  /api/v1/solana/verify-payment:
+    post:
+      summary: Verify a Solana transaction (SOL or USDC)
+      tags: [Crypto Payments]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tx_hash]
+              properties:
+                tx_hash: { type: string }
+                amount: { type: number }
+                service_id: { type: string }
+      responses:
+        "200":
+          description: Verified
+        "402":
+          description: Verification failed
+
+  # ── BUSINESS REGISTRATION ──────────────────────────────────────────────────
+  /api/v1/business/register:
+    post:
+      summary: Register a business on the AgentPay marketplace
+      description: |
+        Lists a business so AI agents worldwide can discover and book it.
+        Free to register — business receives USDC or card payments per booking.
+        Also available as a web form at https://www.x402-agent-pay.com/register
+      tags: [Business Registration]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, businessName, category]
+              properties:
+                businessName: { type: string, example: "Downtown Hair Studio" }
+                email: { type: string, format: email }
+                password: { type: string }
+                category:
+                  type: string
+                  enum: [hair-beauty, food-dining, auto-service, home-services,
+                         health-fitness, medical, pets, tech-repair, travel-transport,
+                         financial, real-estate, fashion-retail, events, education, professional]
+                phone: { type: string, example: "+1 555 000 0000" }
+                address: { type: string }
+                city: { type: string }
+                country: { type: string }
+                description: { type: string }
+                website: { type: string }
+                wallet: { type: string, description: "Crypto wallet for USDC payouts" }
+                services:
+                  type: array
+                  items: { type: string }
+                  example: ["Haircut", "Color", "Styling"]
       responses:
         "201":
-          description: Agent registered successfully
-        "400":
-          description: Invalid request
+          description: Business registered and live on marketplace
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                  business:
+                    type: object
+                    properties:
+                      id: { type: string, example: "biz_1714000000000" }
+                      businessName: { type: string }
+                      category: { type: string }
+                      location: { type: string }
+                  message: { type: string, example: "Business registered successfully" }
 
-  /agents/{agentId}:
+  # ── AGENTS REGISTRY ────────────────────────────────────────────────────────
+  /api/v1/agents:
     get:
-      summary: Get agent details
-      tags:
-        - Agent Registry
-      parameters:
-        - name: agentId
-          in: path
-          required: true
-          schema:
-            type: string
+      summary: List registered AI agents
+      tags: [Agents & Registry]
       responses:
         "200":
-          description: Agent details
-        "404":
-          description: Agent not found
+          description: Agent list
 
-    put:
-      summary: Update agent
-      tags:
-        - Agent Registry
-      parameters:
-        - name: agentId
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-      responses:
-        "200":
-          description: Agent updated
-        "404":
-          description: Agent not found
-
-    delete:
-      summary: Delete agent
-      tags:
-        - Agent Registry
-      parameters:
-        - name: agentId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Agent deleted
-        "404":
-          description: Agent not found
-
-  /agents-info:
-    get:
-      summary: Get status of all demo agents
-      tags:
-        - Demo Agents
-      responses:
-        "200":
-          description: All demo agents and their status
-
-  /grid-trader:
+  /api/v1/agents/register:
     post:
-      summary: Execute grid trading strategy
-      tags:
-        - Demo Agents
-      description: |
-        **Demo Agent:** Simulates grid trading on BTC/USD or ETH/USD
-        
-        **Cost:** 0.10 USDC per execution
-        
-        **Headers Required:**
-        - `X-Requester-Wallet`: Your wallet address
-        - `X-Payment-TxHash` (optional): Payment proof for quota-exceeded scenarios
+      summary: Register a new AI agent
+      tags: [Agents & Registry]
       requestBody:
-        required: true
         content:
           application/json:
             schema:
               type: object
+              required: [name, endpoint]
               properties:
-                pair:
-                  type: string
-                  example: "BTC/USD"
-                gridSize:
-                  type: integer
-                  example: 5
-                spacing:
-                  type: number
-                  example: 1.0
+                name: { type: string }
+                endpoint: { type: string, format: uri }
+                description: { type: string }
+                pricing: { type: string }
+                category: { type: string }
       responses:
-        "200":
-          description: Grid trade executed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  executionId:
-                    type: string
-                  output:
-                    type: object
-                  remaining:
-                    type: integer
-                    description: Remaining quota for wallet
-        "402":
-          description: Payment required (quota exceeded)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  requiresPayment:
-                    type: boolean
-                  price:
-                    type: string
-                  currency:
-                    type: string
-                  paymentAddress:
-                    type: string
-
-  /sniper-bot:
-    post:
-      summary: Execute token sniping
-      tags:
-        - Demo Agents
-      description: |
-        **Demo Agent:** Simulates token sniping with TP/SL
-        
-        **Cost:** 0.25-1.00 USDC per snipe (dynamic)
-        
-        **Headers Required:**
-        - `X-Requester-Wallet`: Your wallet address
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                tokenAddress:
-                  type: string
-                buyAmount:
-                  type: number
-                takeProfit:
-                  type: number
-                stopLoss:
-                  type: number
-      responses:
-        "200":
-          description: Snipe executed
-        "402":
-          description: Payment required
-
-  /llm-inference:
-    post:
-      summary: LLM inference service
-      tags:
-        - Demo Agents
-      description: |
-        **Demo Agent:** Language model inference (GPT-4o, Claude, Grok, Llama)
-        
-        **Cost:** 0.05 USDC per 1K tokens
-        
-        **Supported Models:**
-        - gpt-4o
-        - grok-beta
-        - claude-3-opus
-        - llama-3-70b
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                model:
-                  type: string
-                messages:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      role:
-                        type: string
-                        enum: [system, user, assistant]
-                      content:
-                        type: string
-                max_tokens:
-                  type: integer
-                temperature:
-                  type: number
-      responses:
-        "200":
-          description: Inference complete
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  output:
-                    type: object
-                    properties:
-                      model:
-                        type: string
-                      completion:
-                        type: string
-                      usage:
-                        type: object
-                      cost:
-                        type: number
-        "402":
-          description: Payment required
-
-  /data-feed:
-    post:
-      summary: Real-time price oracle data
-      tags:
-        - Demo Agents
-      description: |
-        **Demo Agent:** Cryptocurrency price feeds with optional history
-        
-        **Cost:** 0.01 USDC per price point
-        
-        **Supported Symbols:**
-        - BTC/USD
-        - ETH/USD
-        - SOL/USD
-        - ARB/USD
-        - AVAX/USD
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                symbol:
-                  type: string
-                includeHistory:
-                  type: boolean
-                historyLength:
-                  type: integer
-                  maximum: 100
-      responses:
-        "200":
-          description: Price data returned
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  output:
-                    type: object
-                    properties:
-                      symbol:
-                        type: string
-                      currentPrice:
-                        type: object
-                      change24h:
-                        type: number
-                      high24h:
-                        type: number
-                      low24h:
-                        type: number
-                      volume24h:
-                        type: number
-                      history:
-                        type: array
-        "402":
-          description: Payment required
-
-  /api/agent/execute:
-    post:
-      summary: Universal agent execution with x402 payment
-      tags:
-        - Core x402 API
-      description: |
-        **Core x402 Flow:**
-        1. Call agent endpoint
-        2. If quota exceeded → HTTP 402 returned
-        3. Send USDC payment on-chain
-        4. Retry with X-Payment-TxHash header
-        5. Agent executes, 2% fee deducted, proceeds recorded
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                agentId:
-                  type: string
-                input:
-                  type: object
-      parameters:
-        - name: X-Requester-Wallet
-          in: header
-          required: true
-          schema:
-            type: string
-          description: Wallet address making the request
-        - name: X-Payment-TxHash
-          in: header
-          schema:
-            type: string
-          description: On-chain payment transaction hash
-      responses:
-        "200":
-          description: Agent executed successfully
-        "402":
-          description: HTTP 402 Payment Required
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  requiresPayment:
-                    type: boolean
-                  requestId:
-                    type: string
-                  price:
-                    type: string
-                  currency:
-                    type: string
-                  paymentAddress:
-                    type: string
+        "201":
+          description: Agent registered
 
 components:
   securitySchemes:
-    walletAuth:
+    x402Payment:
       type: apiKey
       in: header
-      name: X-Requester-Wallet
-      description: Wallet address for quota and payment tracking
-
-security:
-  - walletAuth: []
-
-x-logo:
-  url: https://muskox.agent/logo.png
-  altText: MUSKOX x402 Agent Payment Network
+      name: X-Payment
+      description: x402 payment token for gated endpoints

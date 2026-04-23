@@ -1,0 +1,71 @@
+{
+  "agents": {
+    "testagent-alpha-7701bcd6": {
+      "agent_id": "testagent-alpha-7701bcd6",
+      "agent_name": "TestAgent-Alpha",
+      "agent_url": "https://testagent.example.com",
+      "capabilities": [
+        "service-booking",
+        "payment-processing"
+      ],
+      "wallet_address": "0x52893C94B03B5c5732c5AE71728cD69E360645Ce",
+      "contact_email": "agent@testagent.example.com",
+      "description": "Test AI agent for home services",
+      "pricing_model": "per-booking",
+      "supported_chains": [
+        "base",
+        "ethereum"
+      ],
+      "webhook_url": null,
+      "mcp_endpoint": null,
+      "openapi_url": null,
+      "tags": [
+        "hvac",
+        "plumbing"
+      ],
+      "status": "active",
+      "registered_at": "2026-04-22T04:20:02.743Z",
+      "updated_at": "2026-04-22T04:20:02.743Z",
+      "call_count": 0,
+      "tx_count": 0,
+      "verified": false
+    },
+    "externaltestbot-072e8167": {
+      "agent_id": "externaltestbot-072e8167",
+      "agent_name": "ExternalTestBot",
+      "agent_url": "https://external-test.io",
+      "capabilities": [
+        "search"
+      ],
+      "wallet_address": "0x52893C94B03B5c5732c5AE71728cD69E360645Ce",
+      "contact_email": "bot@external-test.io",
+      "description": "",
+      "pricing_model": "per-call",
+      "supported_chains": [
+        "base"
+      ],
+      "webhook_url": null,
+      "mcp_endpoint": null,
+      "openapi_url": null,
+      "tags": [],
+      "status": "active",
+      "registered_at": "2026-04-22T04:23:44.315Z",
+      "updated_at": "2026-04-22T04:23:44.315Z",
+      "call_count": 0,
+      "tx_count": 0,
+      "verified": false
+    }
+  },
+  "apiKeys": {
+    "ap_79fdcb4146fe3b5f33a9490abf82912db56caa01dfd46f07": {
+      "agent_id": "testagent-alpha-7701bcd6",
+      "created_at": "2026-04-22T04:20:02.743Z",
+      "active": true
+    },
+    "ap_a7c5842979e3e7e8c44cf585a73e8d2b6e365ad8f8d2b67b": {
+      "agent_id": "externaltestbot-072e8167",
+      "created_at": "2026-04-22T04:23:44.315Z",
+      "active": true
+    }
+  }
+}

@@ -2,7 +2,6 @@
  * app.ts - Main Express application
  * WEEK 1: Basic x402 flow + agent registry
  */
-import { type PaymentRequiredOptions } from "./middleware/x402.js";
 declare global {
     namespace Express {
         interface Response {
