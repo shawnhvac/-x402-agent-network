@@ -32,18 +32,38 @@ jobs:
       - name: Accept Android licenses
         run: yes | sdkmanager --licenses || true
 
+      - name: Install build tools
+        run: |
+          sdkmanager "build-tools;34.0.0" || true
+
+      - name: Generate debug keystore
+        run: |
+          mkdir -p ~/.android
+          keytool -genkeypair -v             -keystore ~/.android/debug.keystore             -storepass android             -alias androiddebugkey             -keypass android             -keyalg RSA             -keysize 2048             -validity 10000             -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null || true
+          echo "Debug keystore ready"
+
       - name: Build Provider APK
         working-directory: x402-agent-network/android
         run: gradle assembleDebug -x lint --stacktrace
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
 
-      - name: Find and copy APK
+      - name: Find APK
         run: |
           APK=$(find x402-agent-network/android -name "*.apk" | head -1)
           echo "Found APK: $APK"
-          cp "$APK" agentpay-provider.apk
+          echo "APK_PATH=$APK" >> $GITHUB_ENV
+          ls -lh "$APK"
+
+      - name: Sign APK with apksigner
+        run: |
+          BUILD_TOOLS=$(ls /usr/local/lib/android/sdk/build-tools/ | sort -V | tail -1)
+          APKSIGNER="/usr/local/lib/android/sdk/build-tools/${BUILD_TOOLS}/apksigner"
+          echo "Using apksigner: $APKSIGNER"
+          $APKSIGNER sign             --ks ~/.android/debug.keystore             --ks-pass pass:android             --key-pass pass:android             --ks-key-alias androiddebugkey             --out agentpay-provider.apk             "$APK_PATH"
+          echo "Signed APK:"
           ls -lh agentpay-provider.apk
+          $APKSIGNER verify --verbose agentpay-provider.apk | head -5
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -53,4 +73,4 @@ jobs:
           retention-days: 30
 
       - name: Build complete
-        run: echo "SUCCESS — agentpay-provider.apk is ready"
+        run: echo "SUCCESS — agentpay-provider.apk is signed and ready"
