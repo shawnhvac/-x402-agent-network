@@ -33,6 +33,8 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.IOException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 data class BusinessService(
     val id: String = "",
@@ -196,16 +198,18 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onRegister: () -> Unit) {
                 isLoading = true
                 coroutineScope.launch {
                     try {
-                        val client = OkHttpClient()
-                        val json = JSONObject()
-                        json.put("email", email.trim())
-                        json.put("password", password)
-                        val body = json.toString().toRequestBody("application/json".toMediaType())
-                        val request = Request.Builder()
-                            .url("https://www.x402-agent-pay.com/api/v1/provider/login")
-                            .post(body)
-                            .build()
-                        val response = client.newCall(request).execute()
+                        val response = withContext(Dispatchers.IO) {
+                            val client = OkHttpClient()
+                            val json = JSONObject()
+                            json.put("email", email.trim())
+                            json.put("password", password)
+                            val body = json.toString().toRequestBody("application/json".toMediaType())
+                            val request = Request.Builder()
+                                .url("https://www.x402-agent-pay.com/api/v1/provider/login")
+                                .post(body)
+                                .build()
+                            client.newCall(request).execute()
+                        }
                         val responseBody = response.body?.string() ?: ""
                         if (response.isSuccessful) {
                             onLogin(email.trim(), password)
@@ -215,7 +219,7 @@ fun LoginScreen(onLogin: (String, String) -> Unit, onRegister: () -> Unit) {
                         }
                     } catch (e: Exception) {
                         errorMsg = "Connection error. Please check your internet."
-                        Log.e("AgentPay", "Login error", e)
+                        Log.e("AgentPay", "Login error: ${'$'}{e.javaClass.simpleName}: ${'$'}{e.message}")
                     } finally {
                         isLoading = false
                     }
@@ -348,19 +352,21 @@ fun RegisterScreen(onRegistered: () -> Unit, onBack: () -> Unit) {
                         isLoading = true
                         coroutineScope.launch {
                             try {
-                                val client = OkHttpClient()
-                                val json = JSONObject()
-                                json.put("businessName", businessName.trim())
-                                json.put("email", email.trim())
-                                json.put("phone", phone.trim())
-                                json.put("password", password)
-                                json.put("category", category)
-                                val body = json.toString().toRequestBody("application/json".toMediaType())
-                                val request = Request.Builder()
-                                    .url("https://www.x402-agent-pay.com/api/v1/provider/register")
-                                    .post(body)
-                                    .build()
-                                val response = client.newCall(request).execute()
+                                val response = withContext(Dispatchers.IO) {
+                                    val client = OkHttpClient()
+                                    val json = JSONObject()
+                                    json.put("businessName", businessName.trim())
+                                    json.put("email", email.trim())
+                                    json.put("phone", phone.trim())
+                                    json.put("password", password)
+                                    json.put("serviceCategory", category)
+                                    val body = json.toString().toRequestBody("application/json".toMediaType())
+                                    val request = Request.Builder()
+                                        .url("https://www.x402-agent-pay.com/api/v1/provider/register")
+                                        .post(body)
+                                        .build()
+                                    client.newCall(request).execute()
+                                }
                                 val responseBody = response.body?.string() ?: ""
                                 if (response.isSuccessful) {
                                     successMsg = "Account created! Please sign in."
@@ -372,7 +378,7 @@ fun RegisterScreen(onRegistered: () -> Unit, onBack: () -> Unit) {
                                 }
                             } catch (e: Exception) {
                                 errorMsg = "Connection error. Please check your internet."
-                                Log.e("AgentPay", "Register error", e)
+                                Log.e("AgentPay", "Register error: ${e.javaClass.simpleName}: ${e.message}")
                             } finally {
                                 isLoading = false
                             }
