@@ -1,4 +1,5 @@
 import { Router, Request, Response } from 'express';
+import Database from 'better-sqlite3';
 
 const router = Router();
 
@@ -118,35 +119,78 @@ router.get('/osm-search', async (req: Request, res: Response) => {
     };
   }).filter(Boolean).sort((a: any, b: any) => (a.distance_km ?? 99) - (b.distance_km ?? 99)).slice(0, maxN);
 
-  // Also pull self-registered AgentPay providers matching this category
+  // Blend self-registered AgentPay providers into results (ESM-safe)
   try {
-    const Database = require('better-sqlite3');
-    const pdb = new Database('/var/lib/agentpay/providers.db');
     const catMap: Record<string, string[]> = {
       'hair-beauty':    ['hair', 'beauty', 'barber', 'salon', 'nail'],
       'auto-service':   ['auto', 'car', 'vehicle', 'tyre', 'mechanic'],
-      'home-services':  ['hvac', 'plumb', 'electric', 'handyman', 'roof', 'paint', 'home'],
-      'health-fitness': ['fitness', 'gym', 'health', 'sport'],
-      'medical':        ['medical', 'doctor', 'dentist', 'clinic', 'pharmacy'],
-      'food-dining':    ['food', 'restaurant', 'cafe', 'catering'],
-      'tech-repair':    ['tech', 'repair', 'computer', 'phone', 'electronic'],
-      'pets':           ['pet', 'vet', 'grooming'],
-      'professional':   ['lawyer', 'accountant', 'consult', 'legal'],
-      'events':         ['event', 'entertainment', 'party'],
+      'home-services':  ['hvac', 'plumb', 'electric', 'handyman', 'roof', 'paint', 'home', 'clean'],
+      'health-fitness': ['fitness', 'gym', 'health', 'sport', 'yoga', 'pilates'],
+      'medical':        ['medical', 'doctor', 'dentist', 'clinic', 'pharmacy', 'chiro', 'therapy'],
+      'food-dining':    ['food', 'restaurant', 'cafe', 'catering', 'bakery'],
+      'tech-repair':    ['tech', 'repair', 'computer', 'phone', 'electronic', 'it'],
+      'pets':           ['pet', 'vet', 'grooming', 'dog', 'cat', 'animal'],
+      'professional':   ['lawyer', 'accountant', 'consult', 'legal', 'financial'],
+      'events':         ['event', 'entertainment', 'party', 'wedding', 'photo'],
+      'landscaping':    ['lawn', 'landscape', 'garden', 'tree', 'sprinkler'],
+      'cleaning':       ['clean', 'maid', 'janitor', 'housekeep'],
     };
-    const keywords = catMap[category] || [category.replace('-', ' ')];
+    const keywords = catMap[category] || [category.replace(/-/g, ' ')];
+    // Use the already-imported Database (ESM)
+    const pdb = new Database('/var/lib/agentpay/providers.db');
     const allProviders: any[] = pdb.prepare('SELECT * FROM providers WHERE status = ?').all('active');
-    const matched = allProviders.filter((p: any) =>
+    const apProviders = allProviders.filter((p: any) =>
       keywords.some(k => (p.category || p.business_name || '').toLowerCase().includes(k))
-    ).map((p: any) => ({
-      id: 'ap_' + p.id, name: p.business_name, category,
-      address: null, city: null, postcode: null,
-      phone: p.phone || null, website: null, opening_hours: null,
-      distance_km: null, lat: null, lon: null, osm_id: null,
-      source: 'agentpay', bookable: true, payment_x402: true, verified: true, email: p.email,
-    }));
-    results.unshift(...matched);
-  } catch (_) {}
+    ).map((p: any) => {
+      // Pull their services
+      let services: any[] = [];
+      try {
+        services = pdb.prepare('SELECT name, price, duration FROM provider_services WHERE provider_id = ? AND available = 1').all(p.id) as any[];
+      } catch (_) {}
+      // Compute distance if provider has lat/lon
+      const dist = (p.lat && p.lon && sLat && sLon) ? distKm(sLat, sLon, p.lat, p.lon) : null;
+      return {
+        id: 'ap_' + p.id,
+        name: p.business_name,
+        category,
+        address: p.address || null,
+        city: p.city || null,
+        postcode: null,
+        phone: p.phone || null,
+        website: null,
+        opening_hours: null,
+        distance_km: dist,
+        lat: p.lat || null,
+        lon: p.lon || null,
+        osm_id: p.osm_id || null,
+        source: 'agentpay',
+        bookable: true,
+        payment_x402: true,
+        verified: p.verified === 1,
+        osm_claimed: !!p.osm_id,
+        email: p.email,
+        services: services.map((s: any) => ({ name: s.name, price: s.price, duration: s.duration })),
+      };
+    });
+    // Sort AgentPay providers: verified+claimed first, then by distance
+    apProviders.sort((a: any, b: any) => {
+      if (a.osm_claimed && !b.osm_claimed) return -1;
+      if (!a.osm_claimed && b.osm_claimed) return 1;
+      return (a.distance_km ?? 999) - (b.distance_km ?? 999);
+    });
+    // Interleave: AgentPay providers first, then OSM results
+    results.unshift(...apProviders);
+    // Deduplicate by osm_id — if both OSM and AgentPay have same business, keep AgentPay version
+    const seen = new Set<string>();
+    results = results.filter((r: any) => {
+      const key = r.osm_id ? String(r.osm_id) : r.id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  } catch (blendErr: any) {
+    console.error('[OSM] Provider blend error:', blendErr.message);
+  }
 
   res.json({
     success: true, category,

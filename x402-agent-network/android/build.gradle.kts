@@ -11,7 +11,7 @@ android {
         applicationId = "com.agentpay.provider"
         minSdk = 24
         targetSdk = 34
-        versionCode = 34
+        versionCode = 35
         versionName = "1.3.0"
     }
 

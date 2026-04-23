@@ -650,12 +650,53 @@ fun ServicesManagementScreen(
             )
         }
 
+        // Claim OSM business banner
+        val isVerified = prefs.getBoolean("provider_osm_verified", false)
+        if (!isVerified) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
+                    .clickable { /* TODO: navigate to OSM claim screen */ },
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1e3a5f)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("🗺️", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Claim your business on OpenStreetMap", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("Get verified ✓ and appear first in agent searches", color = Color(0xFF94a3b8), fontSize = 12.sp)
+                    }
+                    Icon(Icons.Default.ArrowForward, contentDescription = null, tint = Color(0xFF3b82f6))
+                }
+            }
+        } else {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF052e16)),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("✅", fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text("Verified Business — Agents can find and book you", color = Color(0xFF10b981), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                }
+            }
+        }
+
         // Services List
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 12.dp)
         ) {
             if (services.isEmpty()) {
                 item {
