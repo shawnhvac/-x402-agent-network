@@ -530,9 +530,47 @@ fun ServicesManagementScreen(
     onBack: () -> Unit,
     businessId: String
 ) {
-    var services by remember { mutableStateOf(listOf<BusinessService>()) }
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+
+    // Load services from SharedPreferences on first composition
+    fun loadServices(): List<BusinessService> {
+        val json = prefs.getString("services_list", null) ?: return emptyList()
+        return try {
+            val arr = org.json.JSONArray(json)
+            (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                BusinessService(
+                    id       = o.optString("id", java.util.UUID.randomUUID().toString()),
+                    name     = o.optString("name", ""),
+                    category = o.optString("category", ""),
+                    price    = o.optDouble("price", 0.0),
+                    duration = o.optInt("duration", 60),
+                    available = o.optBoolean("available", true)
+                )
+            }
+        } catch (e: Exception) { emptyList() }
+    }
+
+    // Persist services to SharedPreferences
+    fun saveServices(list: List<BusinessService>) {
+        val arr = org.json.JSONArray()
+        list.forEach { s ->
+            arr.put(org.json.JSONObject().apply {
+                put("id",       s.id)
+                put("name",     s.name)
+                put("category", s.category)
+                put("price",    s.price)
+                put("duration", s.duration)
+                put("available", s.available)
+            })
+        }
+        prefs.edit().putString("services_list", arr.toString()).apply()
+    }
+
+    var services by remember { mutableStateOf(loadServices()) }
     var showAddService by remember { mutableStateOf(false) }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -564,17 +602,19 @@ fun ServicesManagementScreen(
                 }
             }
         }
-        
+
         if (showAddService) {
             AddServiceDialog(
                 onAdd = { service ->
-                    services = services + service
+                    val updated = services + service
+                    services = updated
+                    saveServices(updated)
                     showAddService = false
                 },
                 onDismiss = { showAddService = false }
             )
         }
-        
+
         // Services List
         LazyColumn(
             modifier = Modifier
@@ -595,7 +635,11 @@ fun ServicesManagementScreen(
                     ServiceCard(
                         service = service,
                         onEdit = { /* TODO */ },
-                        onDelete = { services = services.filter { it.id != service.id } }
+                        onDelete = {
+                            val updated = services.filter { it.id != service.id }
+                            services = updated
+                            saveServices(updated)
+                        }
                     )
                 }
             }

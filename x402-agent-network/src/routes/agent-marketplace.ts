@@ -46,7 +46,7 @@ router.get('/marketplace/info', (_req: Request, res: Response) => {
     registration_fee:      'free',
     listing_fee:           'free',
     transaction_fee:       '2% on Stripe bookings, $0.001 USDC flat on x402 calls',
-    receiver_wallet:       '0x52893C94B03B5c5732c5AE71728cD69E360645Ce',
+    receiver_wallet:       '0x2a07182afDB346C84dFc5D116D84f34E1db4617d',
     openapi_spec:          'https://www.x402-agent-pay.com/openapi.json',
     llms_txt:              'https://www.x402-agent-pay.com/llms.txt',
     bazaar_resource:       'https://www.x402-agent-pay.com/api/v1/search',
@@ -159,7 +159,7 @@ router.post('/marketplace/agent/register', async (req: Request, res: Response) =
       marketplace_info: {
         total_registered_agents: Object.keys(db.agents).length,
         your_position:           Object.keys(db.agents).length,
-        receiver_wallet:         '0x52893C94B03B5c5732c5AE71728cD69E360645Ce'
+        receiver_wallet:         '0x2a07182afDB346C84dFc5D116D84f34E1db4617d'
       }
     });
   } catch (err: any) {

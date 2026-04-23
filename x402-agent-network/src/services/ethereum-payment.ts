@@ -8,7 +8,7 @@ import * as path from 'path';
 
 // Ethereum Configuration
 const ETHEREUM_RPC = process.env.ETHEREUM_RPC_ENDPOINT || 'https://eth.llamarpc.com';
-const RECEIVER_WALLET = process.env.ETHEREUM_RECEIVER_WALLET || '0x52893C94B03B5c5732c5AE71728cD69E360645Ce';
+const RECEIVER_WALLET = process.env.ETHEREUM_RECEIVER_WALLET || '0x2a07182afDB346C84dFc5D116D84f34E1db4617d';
 const USDC_CONTRACT = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'; // Mainnet USDC
 const ETHERSCAN_API = process.env.ETHERSCAN_API_KEY || '';
 
