@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 import crypto from "crypto";
 import { readFileSync, appendFileSync, existsSync, createReadStream } from 'fs';
 import { join as pathJoin } from 'path';
-import { x402Middleware, paymentRequired, type PaymentRequiredOptions } from "./middleware/x402.js";
+// x402Middleware removed — replaced by @x402/express paymentMiddleware in x402-payment.ts
 import { setupX402Middleware, getX402PaymentInfo } from "./middleware/x402-payment.js";
 import { initializeDatabase, getQuota, decrementQuota, recordPayment } from "./db-sqlite.js";
 import { loggingMiddleware, getRequestLogs, getMetrics } from "./middleware/logging.js";
@@ -25,6 +25,10 @@ import solanaPaymentRoutes from "./routes/solana-payments.js";
 import ethereumPaymentRoutes from "./routes/ethereum-payments.js";
 import stripePaymentRoutes from "./routes/stripe-payments.js";
 import businessPortalRoutes from "./routes/business-portal.js";
+import walletRoutes from "./routes/wallet.js";
+import productsOsmRoutes from "./routes/products-osm.js";
+import agentMarketplaceRoutes from "./routes/agent-marketplace.js";
+import notifyRoutes from "./routes/notify.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -42,22 +46,33 @@ dotenv.config();
 
 const app = express();
 
+// ✅ Trust nginx reverse proxy — required for correct protocol/host detection
+// This ensures req.protocol returns 'https' and Bazaar indexes the correct public URL
+app.set('trust proxy', 1);
+app.use((req, _res, next) => {
+  // Force https protocol for x402 resource URL registration
+  if (req.headers['x-forwarded-proto']) {
+    Object.defineProperty(req, 'protocol', { get() { return req.headers['x-forwarded-proto']; } });
+  }
+  next();
+});
+
 // ✅ SECURITY: CORS Protection
 app.use(cors({
   origin: (process.env.ALLOWED_ORIGINS || 'https://x402-agent-pay.com').split(','),
   credentials: true,
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-PAYMENT', 'X-Payment-Response',
+                   'X-Requester-Wallet', 'X-Payment-TxHash'],
+  exposedHeaders: ['X-Payment-Response', 'X-PAYMENT']
 }));
 
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
 
 // ✅ x402 PAYMENT MIDDLEWARE - Register Bazaar endpoints
-// Enables autonomous payment for: /api/v1/search, /api/v1/book, /api/v1/pay
-console.log('🔗 Initializing x402 Bazaar payment middleware...');
+// setupX402Middleware is SYNCHRONOUS — Maps seeded before routes register
 setupX402Middleware(app);
-console.log('✅ x402 Bazaar middleware active (agents can now make x402 payments)');
 
 // ✅ Initialize Telegram Agent Bridge
 const telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || '';
@@ -101,25 +116,17 @@ try {
 }
 
 // APK Download endpoint - BEFORE middleware to avoid being blocked
-app.get("/download/agentpay-latest.apk", (req: Request, res: Response) => {
-  const apkPath = pathJoin(process.cwd(), "public", "apk", "agentpay-latest.apk");
-  
-  if (!existsSync(apkPath)) {
-    return res.status(404).json({ 
-      status: "coming-soon",
-      message: "Android APK coming soon!"
-    });
-  }
-  
-  res.setHeader('Content-Type', 'application/vnd.android.package-archive');
-  res.setHeader('Content-Disposition', 'attachment; filename="agentpay.apk"');
-  createReadStream(apkPath).pipe(res);
+// APK routes — redirect all variants to the nginx-served file
+["/download/agentpay-latest.apk", "/download/agentpay-2.0.0.apk", "/download.html"].forEach(path => {
+  app.get(path, (_req: Request, res: Response) => {
+    res.redirect(302, "/downloads/agentpay-provider.apk");
+  });
 });
 
 app.use(express.json());
 app.use(timeoutMiddleware(30000)); // 30 second timeout
 app.use(loggingMiddleware); // Log all requests
-app.use(x402Middleware);
+// app.use(x402Middleware) — removed, old custom middleware replaced by @x402/express
 
 // ✅ SECURITY: Rate limiting for login attempts
 const loginLimiter = rateLimit({
@@ -153,7 +160,9 @@ function validateSessionToken(token: string): boolean {
 }
 
 // Serve static files (landing page)
-app.use(express.static("public"));
+app.use(express.static("public", { dotfiles: "allow" }));
+// Explicit well-known routes for agent discovery
+app.get("/.well-known/:file", (req: Request, res: Response) => { res.sendFile(req.params.file, { root: "public/.well-known", dotfiles: "allow" }); });
 
 // Marketplace and Dashboard routes
 // Serve specific HTML pages without .html extension
@@ -194,6 +203,26 @@ app.get("/admin", (req: Request, res: Response) => {
   res.sendFile("public/admin.html", { root: process.cwd() });
 });
 
+app.get("/register", (req: Request, res: Response) => {
+  res.sendFile("public/register.html", { root: process.cwd() });
+});
+
+app.get("/register-business", (req: Request, res: Response) => {
+  res.sendFile("public/register.html", { root: process.cwd() });
+});
+
+app.get("/checkout", (req: Request, res: Response) => {
+  res.sendFile("public/checkout.html", { root: process.cwd() });
+});
+
+app.get("/payment-success", (req: Request, res: Response) => {
+  res.sendFile("public/payment-success.html", { root: process.cwd() });
+});
+
+app.get("/payment-cancel", (req: Request, res: Response) => {
+  res.redirect("/?payment=cancelled");
+});
+
 /**
  * ✅ SECURITY: Admin Login Endpoint
  * Validates password, creates secure HttpOnly session cookie
@@ -221,7 +250,7 @@ app.post("/api/admin/login", loginLimiter, (req: Request, res: Response) => {
     // ✅ SECURITY: Set HttpOnly cookie (cannot be accessed by JavaScript)
     res.cookie('adminSession', token, {
       httpOnly: true,              // Prevents JavaScript access
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      secure: process.env.NODE_ENV !== 'development', // HTTPS only in production
       sameSite: 'strict',          // CSRF protection
       maxAge: 3600000,             // 1 hour
       path: '/api/admin'           // Scope to admin endpoints
@@ -277,6 +306,41 @@ app.get("/api/admin/contacts", (req: Request, res: Response) => {
   } catch (error) {
     console.error("Admin contacts error:", error);
     res.status(500).json({ error: "Failed to load contacts" });
+  }
+});
+
+/**
+ * ✅ SECURITY: Admin API - Get all bookings from SQLite
+ */
+app.get("/api/admin/bookings", (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.adminSession;
+    if (!token || !validateSessionToken(token)) {
+      return res.status(401).json({ error: "Unauthorized - please login" });
+    }
+    const limit  = parseInt(req.query.limit  as string || '100');
+    const offset = parseInt(req.query.offset as string || '0');
+    const bookings = listBookings(limit, offset);
+    return res.json(bookings);
+  } catch (error) {
+    console.error("Admin bookings error:", error);
+    return res.status(500).json({ error: "Failed to load bookings" });
+  }
+});
+
+/**
+ * ✅ SECURITY: Admin API - Get booking stats
+ */
+app.get("/api/admin/stats", (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.adminSession;
+    if (!token || !validateSessionToken(token)) {
+      return res.status(401).json({ error: "Unauthorized - please login" });
+    }
+    return res.json(getStats());
+  } catch (error) {
+    console.error("Admin stats error:", error);
+    return res.status(500).json({ error: "Failed to load stats" });
   }
 });
 
@@ -425,6 +489,10 @@ app.use("/api/v1", stripePaymentRoutes);
  * Business Portal Routes
  */
 app.use("/api/v1", businessPortalRoutes);
+app.use("/api/v1", productsOsmRoutes);
+app.use("/api/v1", agentMarketplaceRoutes);
+app.use("/api/v1/notify", notifyRoutes);
+app.use("/api/v1/wallet", walletRoutes);
 
 /**
  * APK Download & Status Routes
