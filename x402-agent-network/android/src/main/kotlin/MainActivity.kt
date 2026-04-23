@@ -86,9 +86,14 @@ fun AgentPayProviderApp() {
     when (currentScreen) {
         "login" -> LoginScreen(
             onLogin = { email, password ->
-                // TODO: Authenticate business
+                // Basic validation — real auth call handled inside LoginScreen
                 currentScreen = "dashboard"
-            }
+            },
+            onRegister = { currentScreen = "register" }
+        )
+        "register" -> RegisterScreen(
+            onRegistered = { currentScreen = "login" },
+            onBack = { currentScreen = "login" }
         )
         "dashboard" -> DashboardScreen(
             profile = businessProfile,
@@ -114,11 +119,14 @@ fun AgentPayProviderApp() {
 }
 
 @Composable
-fun LoginScreen(onLogin: (String, String) -> Unit) {
+fun LoginScreen(onLogin: (String, String) -> Unit, onRegister: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    
+    var errorMsg by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -128,7 +136,6 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Logo/Title
         Text(
             "AgentPay Provider",
             fontSize = 28.sp,
@@ -136,15 +143,17 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
             color = Color.White,
             modifier = Modifier.padding(bottom = 40.dp)
         )
-        
-        // Email Field
+
+        if (errorMsg.isNotEmpty()) {
+            Text(errorMsg, color = Color(0xFFf87171), fontSize = 13.sp,
+                modifier = Modifier.padding(bottom = 12.dp))
+        }
+
         TextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email = it; errorMsg = "" },
             label = { Text("Email") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFF1e293b),
@@ -153,15 +162,12 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
                 unfocusedTextColor = Color.White
             )
         )
-        
-        // Password Field
+
         TextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = { password = it; errorMsg = "" },
             label = { Text("Password") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 24.dp),
+            modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color(0xFF1e293b),
@@ -170,16 +176,54 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
                 unfocusedTextColor = Color.White
             )
         )
-        
-        // Login Button
+
         Button(
-            onClick = { onLogin(email, password) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF3b82f6)
-            )
+            onClick = {
+                // ── Validation ──────────────────────────────────────
+                if (email.isBlank() || password.isBlank()) {
+                    errorMsg = "Please enter your email and password."
+                    return@Button
+                }
+                if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    errorMsg = "Please enter a valid email address."
+                    return@Button
+                }
+                if (password.length < 6) {
+                    errorMsg = "Password must be at least 6 characters."
+                    return@Button
+                }
+                // ── Call backend ────────────────────────────────────
+                isLoading = true
+                coroutineScope.launch {
+                    try {
+                        val client = OkHttpClient()
+                        val json = JSONObject()
+                        json.put("email", email.trim())
+                        json.put("password", password)
+                        val body = json.toString().toRequestBody("application/json".toMediaType())
+                        val request = Request.Builder()
+                            .url("https://www.x402-agent-pay.com/api/v1/provider/login")
+                            .post(body)
+                            .build()
+                        val response = client.newCall(request).execute()
+                        val responseBody = response.body?.string() ?: ""
+                        if (response.isSuccessful) {
+                            onLogin(email.trim(), password)
+                        } else {
+                            val errJson = runCatching { JSONObject(responseBody).getString("error") }.getOrDefault("Invalid email or password.")
+                            errorMsg = errJson
+                        }
+                    } catch (e: Exception) {
+                        errorMsg = "Connection error. Please check your internet."
+                        Log.e("AgentPay", "Login error", e)
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3b82f6)),
+            enabled = !isLoading
         ) {
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -187,11 +231,164 @@ fun LoginScreen(onLogin: (String, String) -> Unit) {
                 Text("Sign In", fontSize = 16.sp)
             }
         }
-        
-        // Register Link
+
         Row(modifier = Modifier.padding(top = 20.dp)) {
             Text("Don't have an account? ", color = Color.Gray)
-            Text("Register", color = Color(0xFF3b82f6), modifier = Modifier.clickable { })
+            Text("Register", color = Color(0xFF3b82f6),
+                modifier = Modifier.clickable { onRegister() })
+        }
+    }
+}
+
+@Composable
+fun RegisterScreen(onRegistered: () -> Unit, onBack: () -> Unit) {
+    var businessName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf("") }
+    var successMsg by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+    val categories = listOf("HVAC","Plumbing","Electrical","Cleaning","Landscaping","Handyman","Roofing","Painting","Auto","Other")
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0f172a))
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp, top = 40.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text("←", color = Color(0xFF3b82f6), fontSize = 20.sp,
+                modifier = Modifier.clickable { onBack() }.padding(end = 12.dp))
+            Text("Create Provider Account", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Color.White)
+        }
+
+        if (errorMsg.isNotEmpty()) {
+            Text(errorMsg, color = Color(0xFFf87171), fontSize = 13.sp,
+                modifier = Modifier.padding(bottom = 12.dp))
+        }
+        if (successMsg.isNotEmpty()) {
+            Text(successMsg, color = Color(0xFF34d399), fontSize = 13.sp,
+                modifier = Modifier.padding(bottom = 12.dp))
+        }
+
+        listOf(
+            Triple("Business Name", businessName, { v: String -> businessName = v }),
+            Triple("Email", email, { v: String -> email = v }),
+            Triple("Phone", phone, { v: String -> phone = v }),
+            Triple("Password", password, { v: String -> password = v }),
+            Triple("Confirm Password", confirmPassword, { v: String -> confirmPassword = v })
+        ).forEach { (label, value, onChange) ->
+            TextField(
+                value = value,
+                onValueChange = { onChange(it); errorMsg = "" },
+                label = { Text(label) },
+                modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = when(label) {
+                        "Email" -> KeyboardType.Email
+                        "Phone" -> KeyboardType.Phone
+                        "Password", "Confirm Password" -> KeyboardType.Password
+                        else -> KeyboardType.Text
+                    }
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF1e293b),
+                    unfocusedContainerColor = Color(0xFF1e293b),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                )
+            )
+        }
+
+        // Category dropdown
+        Box(modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)) {
+            TextField(
+                value = if (category.isEmpty()) "" else category,
+                onValueChange = {},
+                label = { Text("Service Category") },
+                modifier = Modifier.fillMaxWidth().clickable { expanded = true },
+                enabled = false,
+                colors = TextFieldDefaults.colors(
+                    disabledContainerColor = Color(0xFF1e293b),
+                    disabledTextColor = Color.White,
+                    disabledLabelColor = Color.Gray
+                )
+            )
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+                modifier = Modifier.background(Color(0xFF1e293b))) {
+                categories.forEach { cat ->
+                    DropdownMenuItem(
+                        text = { Text(cat, color = Color.White) },
+                        onClick = { category = cat; expanded = false }
+                    )
+                }
+            }
+        }
+
+        Button(
+            onClick = {
+                errorMsg = ""
+                when {
+                    businessName.isBlank() -> errorMsg = "Business name is required."
+                    email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errorMsg = "Valid email required."
+                    phone.isBlank() -> errorMsg = "Phone number is required."
+                    password.length < 6 -> errorMsg = "Password must be at least 6 characters."
+                    password != confirmPassword -> errorMsg = "Passwords do not match."
+                    category.isBlank() -> errorMsg = "Please select a service category."
+                    else -> {
+                        isLoading = true
+                        coroutineScope.launch {
+                            try {
+                                val client = OkHttpClient()
+                                val json = JSONObject()
+                                json.put("businessName", businessName.trim())
+                                json.put("email", email.trim())
+                                json.put("phone", phone.trim())
+                                json.put("password", password)
+                                json.put("category", category)
+                                val body = json.toString().toRequestBody("application/json".toMediaType())
+                                val request = Request.Builder()
+                                    .url("https://www.x402-agent-pay.com/api/v1/provider/register")
+                                    .post(body)
+                                    .build()
+                                val response = client.newCall(request).execute()
+                                val responseBody = response.body?.string() ?: ""
+                                if (response.isSuccessful) {
+                                    successMsg = "Account created! Please sign in."
+                                    kotlinx.coroutines.delay(2000)
+                                    onRegistered()
+                                } else {
+                                    val errJson = runCatching { JSONObject(responseBody).getString("error") }.getOrDefault("Registration failed.")
+                                    errorMsg = errJson
+                                }
+                            } catch (e: Exception) {
+                                errorMsg = "Connection error. Please check your internet."
+                                Log.e("AgentPay", "Register error", e)
+                            } finally {
+                                isLoading = false
+                            }
+                        }
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3b82f6)),
+            enabled = !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Create Account", fontSize = 16.sp)
+            }
         }
     }
 }
