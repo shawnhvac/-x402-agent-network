@@ -532,6 +532,7 @@ fun ServicesManagementScreen(
 ) {
     val context = LocalContext.current
     val prefs = context.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+    val scope = rememberCoroutineScope()
 
     // Load services from SharedPreferences on first composition
     fun loadServices(): List<BusinessService> {
@@ -566,6 +567,39 @@ fun ServicesManagementScreen(
             })
         }
         prefs.edit().putString("services_list", arr.toString()).apply()
+    }
+
+    // Sync services to AgentPay server so agents can discover this provider
+    fun syncServicesToServer(list: List<BusinessService>) {
+        val token = prefs.getString("provider_token", null) ?: return
+        scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val arr = org.json.JSONArray()
+                list.forEach { s ->
+                    arr.put(org.json.JSONObject().apply {
+                        put("id",       s.id)
+                        put("name",     s.name)
+                        put("category", s.category)
+                        put("price",    s.price)
+                        put("duration", s.duration)
+                        put("available", s.available)
+                    })
+                }
+                val body = org.json.JSONObject().apply { put("services", arr) }.toString()
+                val client = okhttp3.OkHttpClient()
+                val request = okhttp3.Request.Builder()
+                    .url("https://www.x402-agent-pay.com/api/v1/provider/services")
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("x-provider-token", token)
+                    .post(okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/json"), body))
+                    .build()
+                val response = client.newCall(request).execute()
+                Log.d("AgentPay", "Services synced to server: \${response.code()}")
+                response.close()
+            } catch (e: Exception) {
+                Log.e("AgentPay", "Failed to sync services: \${e.message}")
+            }
+        }
     }
 
     var services by remember { mutableStateOf(loadServices()) }
@@ -609,6 +643,7 @@ fun ServicesManagementScreen(
                     val updated = services + service
                     services = updated
                     saveServices(updated)
+                    syncServicesToServer(updated)
                     showAddService = false
                 },
                 onDismiss = { showAddService = false }
@@ -639,6 +674,7 @@ fun ServicesManagementScreen(
                             val updated = services.filter { it.id != service.id }
                             services = updated
                             saveServices(updated)
+                            syncServicesToServer(updated)
                         }
                     )
                 }
