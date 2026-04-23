@@ -1,251 +1,529 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "AgentPay x402 API",
-    "description": "Autonomous service booking and payment API with x402 protocol support. Agents can search for services, book appointments, and make payments without human intervention.",
-    "version": "1.0.0",
+    "title": "AgentPay \u2014 AI Agent Commerce Network",
+    "description": "Global payment + service discovery for AI agents. Find businesses via OSM, search products, charge human cards autonomously (Stripe off-session), or pay on-chain with USDC/ETH/SOL across 8 networks.",
+    "version": "2.0.0",
     "contact": {
-      "email": "x402agentpay@gmail.com"
+      "name": "AgentPay",
+      "url": "https://www.x402-agent-pay.com",
+      "email": "X402agentpay@gmail.com"
     }
   },
   "servers": [
     {
-      "url": "https://agentpay.com",
-      "description": "Production API"
+      "url": "https://www.x402-agent-pay.com",
+      "description": "Production"
     }
   ],
   "paths": {
-    "/api/v1/search": {
+    "/api/v1/osm-search": {
+      "get": {
+        "operationId": "searchBusinesses",
+        "summary": "Find real businesses near a location",
+        "description": "Live OpenStreetMap search. Returns businesses sorted by distance. Free endpoint.",
+        "tags": [
+          "Service Discovery"
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hair-beauty",
+                "food-dining",
+                "auto-service",
+                "home-services",
+                "health-fitness",
+                "medical",
+                "pets",
+                "tech-repair",
+                "travel-transport",
+                "financial",
+                "real-estate",
+                "fashion-retail",
+                "events",
+                "education",
+                "professional"
+              ]
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "City/address if lat/lon not available"
+          },
+          {
+            "name": "radius_km",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 3
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Businesses found sorted by distance"
+          },
+          "400": {
+            "description": "Missing required parameters"
+          }
+        }
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "operationId": "listCategories",
+        "summary": "List all service categories",
+        "tags": [
+          "Service Discovery"
+        ],
+        "responses": {
+          "200": {
+            "description": "All 15 categories with sub-services"
+          }
+        }
+      }
+    },
+    "/api/v1/products": {
       "post": {
-        "summary": "Search for available services",
-        "description": "Find services by category, location, and date. Returns ranked list with pricing, ratings, and availability. Requires x402 payment of $0.001.",
-        "operationId": "searchServices",
-        "x-openai-isConsequential": false,
+        "operationId": "searchProducts",
+        "summary": "Search for a product \u2014 3 online options + local stores",
+        "description": "Returns online purchase links (Amazon, Walmart, Target) plus nearby physical stores via OSM.",
+        "tags": [
+          "Product Search"
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "query"
+                ],
                 "properties": {
-                  "category": {
+                  "query": {
                     "type": "string",
-                    "description": "Service category: salon, restaurant, mechanic, plumber, electrician, etc",
-                    "example": "salon"
+                    "example": "hair dye"
+                  },
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lon": {
+                    "type": "number"
                   },
                   "location": {
                     "type": "string",
-                    "description": "Location (address or coordinates)",
-                    "example": "New York, NY"
-                  },
-                  "date": {
+                    "example": "Phoenix, AZ"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Online + local product results"
+          },
+          "402": {
+            "description": "x402 payment required"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/setup-customer": {
+      "post": {
+        "operationId": "setupStripeCustomer",
+        "summary": "Register a human's card for autonomous agent charges (Step 1)",
+        "description": "Creates Stripe customer + returns setup_url. Human saves card once. Agent stores customer_id for all future charges.",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email"
+                ],
+                "properties": {
+                  "email": {
                     "type": "string",
-                    "description": "Desired service date (ISO 8601)",
-                    "example": "2026-04-20T14:00:00Z"
+                    "format": "email"
                   },
-                  "duration": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "agent_id": {
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns customer_id and setup_url to send to human"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/agent-charge": {
+      "post": {
+        "operationId": "agentChargeCard",
+        "summary": "Agent charges human's saved card autonomously (Step 2)",
+        "description": "Instantly charges the human's saved card. No human present, no redirect. Use after setup-customer. Handles card declined, insufficient funds, 3DS gracefully.",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "customer_id",
+                  "amount"
+                ],
+                "properties": {
+                  "customer_id": {
+                    "type": "string",
+                    "example": "cus_ABC123"
+                  },
+                  "amount": {
                     "type": "integer",
-                    "description": "Service duration in minutes (optional)",
-                    "example": 60
-                  }
-                },
-                "required": ["category", "location"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Services found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "services": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "id": {
-                            "type": "string",
-                            "description": "Unique service ID"
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "Service provider name"
-                          },
-                          "category": {
-                            "type": "string"
-                          },
-                          "rating": {
-                            "type": "number",
-                            "description": "Rating from 0-5"
-                          },
-                          "price_min": {
-                            "type": "number",
-                            "description": "Minimum price in USD"
-                          },
-                          "price_max": {
-                            "type": "number",
-                            "description": "Maximum price in USD"
-                          },
-                          "distance_miles": {
-                            "type": "number"
-                          },
-                          "availability": {
-                            "type": "array",
-                            "items": {
-                              "type": "string"
-                            },
-                            "description": "Available time slots"
-                          }
-                        },
-                        "required": ["id", "name", "price_min", "availability"]
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Payment required (x402 protocol)"
-          }
-        }
-      }
-    },
-    "/api/v1/book": {
-      "post": {
-        "summary": "Book a service appointment",
-        "description": "Reserve a service at specific time. Requires x402 payment of $0.002 plus service cost via escrow.",
-        "operationId": "bookService",
-        "x-openai-isConsequential": true,
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "service_id": {
-                    "type": "string",
-                    "description": "Service ID from search results"
+                    "description": "Cents \u2014 e.g. 5000 = $50.00",
+                    "example": 5000
                   },
-                  "booking_time": {
+                  "currency": {
                     "type": "string",
-                    "description": "Desired booking time (ISO 8601)"
+                    "default": "usd"
                   },
-                  "customer_wallet": {
+                  "service_name": {
                     "type": "string",
-                    "description": "Customer's Ethereum wallet address"
+                    "example": "Haircut at Mayfair Barbers"
                   },
-                  "customer_name": {
-                    "type": "string",
-                    "description": "Customer name for booking"
-                  }
-                },
-                "required": ["service_id", "booking_time", "customer_wallet"]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Booking confirmed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "booking_id": {
-                      "type": "string"
-                    },
-                    "status": {
-                      "type": "string",
-                      "enum": ["confirmed", "pending", "cancelled"]
-                    },
-                    "service_date": {
-                      "type": "string"
-                    },
-                    "service_name": {
-                      "type": "string"
-                    },
-                    "provider": {
-                      "type": "string"
-                    },
-                    "price": {
-                      "type": "number"
-                    },
-                    "confirmation_code": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Payment required"
-          }
-        }
-      }
-    },
-    "/api/v1/pay": {
-      "post": {
-        "summary": "Complete payment for booked service",
-        "description": "Lock funds in SmartEscrow and confirm booking. Funds released upon service completion.",
-        "operationId": "payForService",
-        "x-openai-isConsequential": true,
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
                   "booking_id": {
                     "type": "string"
                   },
-                  "service_price": {
-                    "type": "number"
+                  "agent_id": {
+                    "type": "string"
                   },
-                  "customer_wallet": {
+                  "business_name": {
                     "type": "string"
                   }
-                },
-                "required": ["booking_id", "service_price", "customer_wallet"]
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Payment processed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "transaction_hash": {
+            "description": "Card charged \u2014 returns receipt, card_last4, card_brand"
+          },
+          "402": {
+            "description": "Card declined / insufficient funds / 3DS required"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/customer/{customer_id}": {
+      "get": {
+        "operationId": "getStripeCustomer",
+        "summary": "Check if human has a card saved before booking",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "parameters": [
+          {
+            "name": "customer_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns has_saved_card, agent_can_charge, card details"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/verify": {
+      "post": {
+        "operationId": "verifyStripePayment",
+        "summary": "Verify a Stripe payment succeeded",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "payment_intent_id": {
+                    "type": "string"
+                  },
+                  "session_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment verification result"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/checkout": {
+      "post": {
+        "operationId": "createStripeCheckout",
+        "summary": "Create hosted Stripe checkout page (redirect)",
+        "description": "For one-off payments or users without a saved card. Returns checkout_url to redirect human to.",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "amount"
+                ],
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "example": 5000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "usd"
+                  },
+                  "service_name": {
+                    "type": "string"
+                  },
+                  "business_name": {
+                    "type": "string"
+                  },
+                  "booking_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns checkout_url to send to human"
+          }
+        }
+      }
+    },
+    "/api/v1/stripe/config": {
+      "get": {
+        "operationId": "getStripeConfig",
+        "summary": "Stripe publishable key + endpoint reference",
+        "tags": [
+          "Stripe Card Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Config + full flow documentation"
+          }
+        }
+      }
+    },
+    "/api/v1/payment/chains": {
+      "get": {
+        "operationId": "getPaymentChains",
+        "summary": "All supported crypto chains and token addresses",
+        "description": "Returns 7 EVM chains (Ethereum, Base, Polygon, Arbitrum, Optimism, Avalanche, BNB) + Solana with USDC/USDT/DAI contracts.",
+        "tags": [
+          "Crypto Payments"
+        ],
+        "responses": {
+          "200": {
+            "description": "Chain list with token contracts and receiver wallets"
+          }
+        }
+      }
+    },
+    "/api/v1/payment/verify-evm": {
+      "post": {
+        "operationId": "verifyEvmPayment",
+        "summary": "Verify an EVM transaction on any supported chain",
+        "tags": [
+          "Crypto Payments"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tx_hash"
+                ],
+                "properties": {
+                  "tx_hash": {
+                    "type": "string"
+                  },
+                  "chain": {
+                    "type": "string",
+                    "default": "base",
+                    "enum": [
+                      "ethereum",
+                      "base",
+                      "polygon",
+                      "arbitrum",
+                      "optimism",
+                      "avalanche",
+                      "bsc"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verified"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/v1/business/register": {
+      "post": {
+        "operationId": "registerBusiness",
+        "summary": "Register a business on the AgentPay marketplace",
+        "description": "Free to list. Business is instantly discoverable by AI agents. Also available at https://www.x402-agent-pay.com/register",
+        "tags": [
+          "Business Registration"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "businessName",
+                  "category"
+                ],
+                "properties": {
+                  "businessName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "address": {
+                    "type": "string"
+                  },
+                  "city": {
+                    "type": "string"
+                  },
+                  "country": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string"
+                  },
+                  "wallet": {
+                    "type": "string",
+                    "description": "Crypto wallet for USDC payouts"
+                  },
+                  "services": {
+                    "type": "array",
+                    "items": {
                       "type": "string"
-                    },
-                    "status": {
-                      "type": "string"
-                    },
-                    "escrow_address": {
-                      "type": "string"
-                    },
-                    "booking_id": {
-                      "type": "string"
-                    },
-                    "amount": {
-                      "type": "number"
                     }
                   }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Business live on marketplace"
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "Server health check",
+        "tags": [
+          "Health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Healthy"
           }
         }
       }

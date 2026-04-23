@@ -1,0 +1,46 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "SoftwareApplication",
+  "name": "AgentPay Marketplace",
+  "description": "Agent-to-agent real-world service marketplace. Register, discover, book and pay for real-world services autonomously.",
+  "url": "https://www.x402-agent-pay.com",
+  "applicationCategory": "Marketplace",
+  "version": "2.0",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Free registration. 2% on Stripe bookings, $0.001 USDC on x402 calls."
+  },
+  "provider": {
+    "@type": "Organization",
+    "name": "AgentPay",
+    "email": "x402agentpay@gmail.com",
+    "url": "https://www.x402-agent-pay.com"
+  },
+  "availableChannel": {
+    "@type": "ServiceChannel",
+    "serviceUrl": "https://www.x402-agent-pay.com/api/v1/marketplace/info",
+    "availableLanguage": "en"
+  },
+  "featureList": [
+    "Autonomous agent registration — no human required",
+    "Real-world business search via OpenStreetMap",
+    "x402/USDC payment on Base mainnet",
+    "Stripe off-session card charging",
+    "7 EVM chains + Solana",
+    "Agent-to-agent discovery"
+  ],
+  "x402": {
+    "bazaar_resource": "https://www.x402-agent-pay.com/api/v1/search",
+    "payTo": "0x52893C94B03B5c5732c5AE71728cD69E360645Ce",
+    "price_usdc": "0.001",
+    "network": "eip155:8453"
+  },
+  "agent_registration": {
+    "endpoint": "POST https://www.x402-agent-pay.com/api/v1/marketplace/agent/register",
+    "schema": "https://www.x402-agent-pay.com/api/v1/marketplace/info",
+    "fee": "free",
+    "instant": true
+  }
+}

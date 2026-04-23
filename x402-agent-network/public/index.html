@@ -256,18 +256,13 @@
         <option value="ko">🇰🇷 한국어</option>
       </select>
     </div>
-
-    <div style="background: #991b1b; padding: 12px 20px; text-align: center; color: #fca5a5; font-size: 0.95em; font-weight: 600; border-bottom: 2px solid #dc2626;">
-        <span id="betaWarning">⚠️ BETA TESTING - This platform is in active development. Features are being added weekly. Do not send real funds yet.</span>
-    </div>
-
     <div class="nav">
         <div style="font-weight: 600; color: #60a5fa; font-size: 1.1em;">🤖 AgentPay</div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
             <a href="/" class="nav-home" id="navHome">Home</a>
             <a href="/marketplace" id="navMarketplace">📍 Marketplace</a>
             <a href="/agent-dashboard" id="navDashboard">🤖 Dashboard</a>
-            <a href="/download.html" id="navDownload" style="color: #10b981; font-weight: 600;">📥 Download APK</a>
+            <a href="/downloads/agentpay-provider.apk" id="navDownload" style="color: #10b981; font-weight: 600;">📥 Download APK</a>
             <a href="/docs" id="navDocs">📚 Docs</a>
             <a href="/contact" id="navContact">💬 Contact</a>
             <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank" style="margin-left: 10px; padding-left: 10px; border-left: 1px solid #475569;" id="navGithub">💻 GitHub</a>
@@ -465,10 +460,10 @@
             <h2 style="color: #60a5fa; margin-bottom: 15px;">📱 For Businesses: Get AgentPay on Your Phone</h2>
             <p style="color: #cbd5e1; margin-bottom: 25px; font-size: 1.05em;">Manage your business's autonomous agent. Handle customer signups, appointments, pricing, and payments. Deploy your own LLM to negotiate and book services automatically.</p>
             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="/download/agentpay-2.0.0.apk" download style="padding: 12px 30px; background: #10b981; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                <a href="/downloads/agentpay-provider.apk" download style="padding: 12px 30px; background: #10b981; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
                     📥 Download APK v2.0.0 Now (29 MB)
                 </a>
-                <a href="/download.html" style="padding: 12px 30px; background: #3b82f6; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s;">
+                <a href="/downloads/agentpay-provider.apk" style="padding: 12px 30px; background: #3b82f6; color: white; border: none; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 1.05em; cursor: pointer; display: inline-block; transition: all 0.3s;">
                     📖 Installation Guide
                 </a>
                 <div style="display: flex; align-items: center; gap: 10px; color: #cbd5e1;">
@@ -550,8 +545,7 @@
       const lang = getCurrentLanguage();
       
       // Beta warning
-      const betaWarning = document.getElementById('betaWarning');
-      if (betaWarning) betaWarning.textContent = t('betaWarning');
+      // betaWarning removed
       
       // Navigation
       document.getElementById('navHome').textContent = t('nav.home');
@@ -610,5 +604,10 @@
       updatePageLanguage();
     });
     </script>
+
+  <!-- Admin access -->
+  <div style="text-align:center;padding:10px 0 20px;opacity:0.3;font-size:11px;">
+    <a href="/admin" style="color:#64748b;text-decoration:none;">admin</a>
+  </div>
 </body>
 </html>

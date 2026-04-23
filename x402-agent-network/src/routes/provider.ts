@@ -18,9 +18,12 @@ db.exec(`
     password_hash TEXT NOT NULL,
     category TEXT,
     status TEXT DEFAULT 'active',
+    token TEXT,
     created_at TEXT NOT NULL
   );
 `);
+// Migration: add token column if missing
+try { db.exec('ALTER TABLE providers ADD COLUMN token TEXT'); } catch {}
 console.log('[ProviderDB] SQLite ready at', DB_PATH);
 
 const router = Router();
@@ -76,6 +79,7 @@ router.post('/login', (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Account is inactive. Please contact support.' });
     }
     const token = crypto.randomBytes(32).toString('hex');
+    db.prepare('UPDATE providers SET token = ? WHERE id = ?').run(token, provider.id);
     console.log('[Provider] Login:', email);
     return res.json({
       ok: true,
@@ -93,5 +97,89 @@ router.post('/login', (req: Request, res: Response) => {
     return res.status(500).json({ error: 'Login failed. Please try again.' });
   }
 });
+
+
+// ── Auth middleware ───────────────────────────────────────────────────────────
+function requireAuth(req: any, res: Response, next: any) {
+  const auth = req.headers['authorization'] || '';
+  const token = auth.replace('Bearer ', '').trim();
+  if (!token) return res.status(401).json({ error: 'Unauthorized' });
+  const provider = db.prepare('SELECT * FROM providers WHERE token = ?').get(token) as any;
+  if (!provider) return res.status(401).json({ error: 'Invalid token' });
+  req.provider = provider;
+  next();
+}
+
+// ── GET /profile ──────────────────────────────────────────────────────────────
+router.get('/profile', requireAuth, (req: any, res: Response) => {
+  const p = req.provider;
+  return res.json({
+    ok: true,
+    provider: {
+      id: p.id,
+      businessName: p.business_name,
+      email: p.email,
+      phone: p.phone,
+      category: p.category,
+      status: p.status,
+      createdAt: p.created_at,
+    }
+  });
+});
+
+// ── PUT /profile — update business info ───────────────────────────────────────
+router.put('/profile', requireAuth, (req: any, res: Response) => {
+  const { businessName, phone, category } = req.body;
+  try {
+    db.prepare(
+      'UPDATE providers SET business_name = COALESCE(?, business_name), phone = COALESCE(?, phone), category = COALESCE(?, category) WHERE id = ?'
+    ).run(businessName || null, phone || null, category || null, req.provider.id);
+    return res.json({ ok: true, message: 'Profile updated.' });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Update failed.' });
+  }
+});
+
+// ── GET /bookings — provider's incoming bookings ──────────────────────────────
+router.get('/bookings', requireAuth, (req: any, res: Response) => {
+  try {
+    const bookingsDb = new Database('/var/lib/agentpay/bookings.db');
+    const bookings = bookingsDb.prepare(
+      "SELECT * FROM bookings WHERE provider_phone = ? OR provider_email = ? ORDER BY created_at DESC LIMIT 50"
+    ).all(req.provider.phone, req.provider.email);
+    return res.json({ ok: true, bookings });
+  } catch (err: any) {
+    console.error('[Provider] bookings error:', err);
+    return res.json({ ok: true, bookings: [] });
+  }
+});
+
+// ── POST /booking/:id/respond — confirm or decline a booking ─────────────────
+router.post('/booking/:id/respond', requireAuth, (req: any, res: Response) => {
+  const { id } = req.params;
+  const { action } = req.body; // "confirm" or "decline"
+  if (!['confirm', 'decline'].includes(action)) {
+    return res.status(400).json({ error: 'action must be confirm or decline' });
+  }
+  try {
+    const bookingsDb = new Database('/var/lib/agentpay/bookings.db');
+    const status = action === 'confirm' ? 'confirmed' : 'declined';
+    bookingsDb.prepare('UPDATE bookings SET status = ? WHERE id = ?').run(status, id);
+    return res.json({ ok: true, status });
+  } catch (err: any) {
+    return res.status(500).json({ error: 'Failed to respond.' });
+  }
+});
+
+// ── POST /logout ──────────────────────────────────────────────────────────────
+router.post('/logout', requireAuth, (req: any, res: Response) => {
+  try {
+    db.prepare("UPDATE providers SET token = NULL WHERE id = ?").run(req.provider.id);
+    return res.json({ ok: true });
+  } catch {
+    return res.json({ ok: true });
+  }
+});
+
 
 export default router;

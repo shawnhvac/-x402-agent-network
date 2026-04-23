@@ -6,12 +6,13 @@
     "moduleResolution": "bundler",
     "outDir": "./dist",
     "rootDir": "./src",
-    "noCheck": true,
     "skipLibCheck": true,
     "allowJs": true,
     "checkJs": false,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmitOnError": false,
+    "strict": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

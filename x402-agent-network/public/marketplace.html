@@ -1,268 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agent Marketplace - AgentPay</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            min-height: 100vh;
-            color: #e2e8f0;
-        }
-        .header {
-            background: linear-gradient(to right, #2563eb, #1d4ed8);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-        .search-section {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 30px;
-            margin-bottom: 40px;
-        }
-        .search-input {
-            width: 100%;
-            padding: 12px 16px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #e2e8f0;
-            font-size: 16px;
-            margin-bottom: 20px;
-        }
-        .filters {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        select {
-            padding: 8px 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #e2e8f0;
-            cursor: pointer;
-        }
-        .agents-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .agent-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            transition: border-color 0.3s;
-        }
-        .agent-card:hover { border-color: #2563eb; }
-        .agent-name { font-size: 1.2em; font-weight: bold; margin: 10px 0; }
-        .agent-rating { color: #fbbf24; margin: 10px 0; }
-        .agent-price { color: #10b981; font-size: 1.1em; margin: 10px 0; }
-        .agent-location { color: #94a3b8; font-size: 0.9em; }
-        .btn-view {
-            width: 100%;
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: background 0.3s;
-        }
-        .btn-view:hover { background: #1d4ed8; }
-        .loading { text-align: center; color: #94a3b8; padding: 40px; }
-        .no-results { text-align: center; color: #94a3b8; padding: 40px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPay Marketplace — Find Services & Products</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+    header{background:#1e293b;border-bottom:1px solid #334155;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+    header .logo{font-size:20px;font-weight:700;color:#60a5fa}
+    header .logo span{color:#e2e8f0;font-weight:400}
+    header nav a{color:#94a3b8;text-decoration:none;margin-left:20px;font-size:14px}
+    header nav a:hover{color:#60a5fa}
+    .hero{background:linear-gradient(135deg,#1e293b,#0f172a);padding:48px 24px;text-align:center;border-bottom:1px solid #334155}
+    .hero h1{font-size:36px;font-weight:700;margin-bottom:12px}
+    .hero h1 span{color:#60a5fa}
+    .hero p{color:#94a3b8;font-size:16px;max-width:560px;margin:0 auto 32px}
+    .search-bar{display:flex;gap:10px;max-width:700px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+    .search-bar input,.search-bar select{padding:13px 16px;border:1px solid #334155;border-radius:10px;background:#0f172a;color:#e2e8f0;font-size:14px}
+    .search-bar input{flex:1;min-width:200px}
+    .search-bar select{min-width:160px}
+    .search-bar input:focus,.search-bar select:focus{outline:none;border-color:#60a5fa}
+    .search-bar button{padding:13px 28px;background:#3b82f6;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap}
+    .search-bar button:hover{background:#2563eb}
+    /* Tabs */
+    .tabs-wrap{max-width:1200px;margin:32px auto 0;padding:0 24px}
+    .mode-tabs{display:flex;gap:0;border-bottom:1px solid #334155;margin-bottom:28px}
+    .mode-tab{padding:12px 24px;cursor:pointer;font-size:14px;font-weight:500;color:#64748b;border-bottom:2px solid transparent;transition:.2s}
+    .mode-tab:hover{color:#cbd5e1}
+    .mode-tab.active{color:#60a5fa;border-bottom-color:#60a5fa}
+    .content-area{max-width:1200px;margin:0 auto;padding:0 24px 60px}
+    /* Category pills */
+    .cats{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
+    .cat-pill{padding:7px 16px;border-radius:20px;border:1px solid #334155;background:transparent;color:#94a3b8;cursor:pointer;font-size:13px;transition:.2s}
+    .cat-pill:hover,.cat-pill.active{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.08)}
+    /* Cards grid */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;transition:.2s;position:relative}
+    .card:hover{border-color:#3b82f6;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .card .badge-source{position:absolute;top:14px;right:14px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+    .badge-agentpay{background:rgba(96,165,250,.2);color:#60a5fa}
+    .badge-osm{background:rgba(52,211,153,.1);color:#34d399}
+    .badge-online{background:rgba(167,139,250,.1);color:#a78bfa}
+    .badge-local{background:rgba(251,191,36,.1);color:#fbbf24}
+    .card h3{font-size:16px;font-weight:600;margin-bottom:6px;padding-right:80px;color:#f1f5f9}
+    .card .meta{font-size:12px;color:#64748b;margin-bottom:12px}
+    .card .meta span{margin-right:10px}
+    .card .detail{font-size:13px;color:#94a3b8;margin-bottom:4px}
+    .card .detail strong{color:#cbd5e1}
+    .card .price-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid #334155}
+    .card .price{font-size:18px;font-weight:700;color:#34d399}
+    .card .book-btn{padding:8px 18px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+    .card .book-btn:hover{background:#2563eb}
+    .card .view-btn{padding:8px 18px;background:transparent;color:#60a5fa;border:1px solid #3b82f6;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;text-align:center}
+    .card .view-btn:hover{background:rgba(59,130,246,.1)}
+    .verified{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#34d399;margin-bottom:8px}
+    .empty{text-align:center;padding:64px 24px;color:#475569}
+    .empty .icon{font-size:48px;margin-bottom:16px}
+    .empty h3{font-size:18px;color:#64748b;margin-bottom:8px}
+    .loading-spin{text-align:center;padding:60px;color:#475569;font-size:15px}
+    .results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .results-header h2{font-size:15px;color:#64748b}
+    .results-header .count{color:#60a5fa;font-weight:600}
+    /* Modal */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:32px;max-width:480px;width:90%;position:relative}
+    .modal h2{color:#f1f5f9;font-size:20px;margin-bottom:6px}
+    .modal .sub{color:#64748b;font-size:13px;margin-bottom:24px}
+    .modal label{display:block;color:#94a3b8;font-size:13px;margin-bottom:6px}
+    .modal input{width:100%;padding:10px 14px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:14px;margin-bottom:14px}
+    .modal input:focus{outline:none;border-color:#60a5fa}
+    .modal .btn-row{display:flex;gap:10px;margin-top:4px}
+    .modal .confirm-btn{flex:1;padding:11px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+    .modal .cancel-btn{padding:11px 20px;background:transparent;border:1px solid #334155;color:#94a3b8;border-radius:8px;font-size:14px;cursor:pointer}
+    .modal .close-x{position:absolute;top:14px;right:18px;background:none;border:none;color:#64748b;font-size:20px;cursor:pointer}
+    .success-msg{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:14px;color:#34d399;font-size:14px;margin-top:14px;display:none}
+  </style>
 </head>
 <body>
-    <nav style="background: rgba(15, 23, 42, 0.95); padding: 15px 20px; border-bottom: 2px solid #2563eb; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-        <div style="font-weight: 600; color: #60a5fa; font-size: 1.2em;">
-            🤖 AgentPay
-        </div>
-        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
-            <a href="/" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Home</a>
-            <a href="/marketplace" style="color: #60a5fa; text-decoration: none; font-weight: 500; border-bottom: 2px solid #60a5fa; padding-bottom: 3px;">📍 Marketplace</a>
-            <a href="/agent-dashboard" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">🤖 Dashboard</a>
-            <a href="/contact" style="color: #60a5fa; text-decoration: none; font-weight: 500;">💬 Support</a>
-        </div>
-    </nav>
+<header>
+  <div class="logo">Agent<span>Pay</span> Marketplace</div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/docs">API Docs</a>
+    <a href="/provider-download">Provider App</a>
+  </nav>
+</header>
 
-    <div class="header" style="background: linear-gradient(135deg, #0f172a 0%, #1a0f3f 50%, #0f172a 100%); padding: 20px; text-align: center; border-bottom: 3px solid #a78bfa;">
-        <div style="margin-bottom: 10px;">
-            <img src="/logo-icon.jpg" alt="AgentPay™" style="max-width: 60px; height: auto;">
-        </div>
-        <h1 style="color: #a78bfa; font-size: 1.8em; margin: 0; text-shadow: 0 0 10px rgba(167, 139, 250, 0.5);">Agent Marketplace™</h1>
-        <p style="color: #c4b5fd; font-size: 1.05em; margin: 10px 0 0 0;">Discover autonomous agents for your needs</p>
-        <p style="color: #94a3b8; font-size: 0.85em; margin: 8px 0 0 0;">Part of AgentPay™ Network</p>
+<div class="hero">
+  <h1>Find Services <span>&amp; Products</span></h1>
+  <p>Discover local service providers and products — online or nearby. Your AI agent can book, pay, and handle everything automatically.</p>
+  <div class="search-bar">
+    <input id="locationInput" placeholder="📍 Your city or zip code (e.g. Phoenix AZ)" />
+    <button onclick="runSearch()">Search</button>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="mode-tabs">
+    <div class="mode-tab active" onclick="switchMode('services',this)">🔧 Services</div>
+    <div class="mode-tab" onclick="switchMode('products',this)">🛒 Products</div>
+  </div>
+</div>
+
+<!-- SERVICES MODE -->
+<div class="content-area" id="mode-services">
+  <div class="cats" id="catPills"></div>
+  <div class="results-header" id="servicesHeader" style="display:none">
+    <h2>Results near <strong id="locationLabel"></strong></h2>
+    <span class="count" id="servicesCount"></span>
+  </div>
+  <div id="servicesGrid" class="grid"></div>
+  <div id="servicesEmpty" class="empty" style="display:none">
+    <div class="icon">🔍</div>
+    <h3>No results found</h3>
+    <p>Try a different category or location</p>
+  </div>
+  <div id="servicesLoading" class="loading-spin" style="display:none">Searching OpenStreetMap...</div>
+</div>
+
+<!-- PRODUCTS MODE -->
+<div class="content-area" id="mode-products" style="display:none">
+  <div class="search-bar" style="margin-bottom:28px;justify-content:flex-start">
+    <input id="productQuery" placeholder="Search for a product (e.g. hair dye, vitamins, phone case...)" style="max-width:400px">
+    <button onclick="searchProducts()">Find It</button>
+  </div>
+  <div id="productsOnline" style="margin-bottom:36px"></div>
+  <div id="productsLocal"></div>
+  <div id="productsEmpty" class="empty" style="display:none">
+    <div class="icon">🛒</div>
+    <h3>Enter a product to search</h3>
+    <p>We'll find it online and at nearby stores</p>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-bg" id="bookModal">
+  <div class="modal">
+    <button class="close-x" onclick="closeModal()">✕</button>
+    <h2 id="modalTitle">Book Service</h2>
+    <p class="sub" id="modalSub">Fill in your details — your agent will handle the rest</p>
+    <label>Your Name</label>
+    <input id="bkName" placeholder="Full name">
+    <label>Your Email</label>
+    <input id="bkEmail" type="email" placeholder="email@example.com">
+    <label>Your Phone (optional)</label>
+    <input id="bkPhone" placeholder="+1 555 000 0000">
+    <label>Preferred Date</label>
+    <input id="bkDate" type="date">
+    <label>Preferred Time</label>
+    <input id="bkTime" type="time" value="10:00">
+    <div class="btn-row">
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+      <button class="confirm-btn" onclick="submitBooking()">🤖 Book via Agent</button>
     </div>
+    <div class="success-msg" id="bookSuccess"></div>
+  </div>
+</div>
 
-    <div class="container">
-        <div class="search-section">
-            <input type="text" class="search-input" placeholder="Search agents by name or location..." id="searchInput">
-            <div class="filters">
-                <select id="serviceType">
-                    <option value="">All Services</option>
-                    <option value="mechanic">Mechanic</option>
-                    <option value="battery_service">Battery Service</option>
-                    <option value="plumber">Plumber</option>
-                    <option value="electrician">Electrician</option>
-                    <option value="hvac">HVAC/R</option>
-                    <option value="carpenter">Carpenter</option>
-                    <option value="delivery">Delivery</option>
-                    <option value="taxi">Taxi</option>
-                    <option value="charging_station">Charging Station</option>
-                </select>
-                <select id="sortBy">
-                    <option value="rating">Highest Rated</option>
-                    <option value="price">Lowest Price</option>
-                </select>
-            </div>
+<script>
+const CATEGORIES = [
+  {id:'home-services',label:'🏠 Home Services'},
+  {id:'auto-service', label:'🚗 Auto'},
+  {id:'hair-beauty',  label:'💇 Hair & Beauty'},
+  {id:'health-fitness',label:'💪 Fitness'},
+  {id:'medical',      label:'🏥 Medical'},
+  {id:'food-dining',  label:'🍽️ Food & Dining'},
+  {id:'tech-repair',  label:'💻 Tech Repair'},
+  {id:'pets',         label:'🐾 Pets'},
+  {id:'professional', label:'💼 Professional'},
+  {id:'events',       label:'🎭 Events'},
+];
+
+let currentMode = 'services';
+let selectedCat = 'home-services';
+let currentBooking = null;
+
+// Build category pills
+const pills = document.getElementById('catPills');
+CATEGORIES.forEach(c => {
+  const el = document.createElement('button');
+  el.className = 'cat-pill' + (c.id===selectedCat?' active':'');
+  el.textContent = c.label;
+  el.onclick = () => {
+    document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    selectedCat = c.id;
+    const loc = document.getElementById('locationInput').value.trim();
+    if (loc) searchServices(loc, c.id);
+  };
+  pills.appendChild(el);
+});
+
+function switchMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('mode-services').style.display = mode==='services'?'block':'none';
+  document.getElementById('mode-products').style.display = mode==='products'?'block':'none';
+}
+
+function runSearch() {
+  const loc = document.getElementById('locationInput').value.trim();
+  if (!loc) { alert('Please enter a city or zip code.'); return; }
+  if (currentMode==='services') searchServices(loc, selectedCat);
+}
+
+async function searchServices(location, category) {
+  document.getElementById('servicesGrid').innerHTML='';
+  document.getElementById('servicesEmpty').style.display='none';
+  document.getElementById('servicesHeader').style.display='none';
+  document.getElementById('servicesLoading').style.display='block';
+  try {
+    const r = await fetch('/api/v1/osm-search?category='+encodeURIComponent(category)+'&location='+encodeURIComponent(location)+'&limit=20&radius_km=10');
+    const d = await r.json();
+    document.getElementById('servicesLoading').style.display='none';
+    if (!d.success || !d.results?.length) {
+      document.getElementById('servicesEmpty').style.display='block'; return;
+    }
+    document.getElementById('servicesHeader').style.display='flex';
+    document.getElementById('locationLabel').textContent = location;
+    document.getElementById('servicesCount').textContent = d.count + ' found';
+    document.getElementById('servicesGrid').innerHTML = d.results.map(b => {
+      const isAP = b.source==='agentpay';
+      const dist = b.distance_km!=null ? b.distance_km+'km away' : '';
+      const phone = b.phone ? '<div class="detail">📞 <strong>'+b.phone+'</strong></div>' : '';
+      const hours = b.opening_hours ? '<div class="detail">🕐 '+b.opening_hours+'</div>' : '';
+      const addr  = (b.address||b.city) ? '<div class="detail">📍 '+(b.address?b.address+', ':'')+( b.city||'')+'</div>' : '';
+      const verified = isAP ? '<div class="verified">✅ Verified AgentPay Provider</div>' : '';
+      const sourceBadge = isAP
+        ? '<span class="badge-source badge-agentpay">AgentPay</span>'
+        : '<span class="badge-source badge-osm">OSM</span>';
+      return `<div class="card">
+        ${sourceBadge}
+        ${verified}
+        <h3>${b.name}</h3>
+        <div class="meta"><span>${dist}</span></div>
+        ${addr}${phone}${hours}
+        <div class="price-row">
+          <span class="price">Get Quote</span>
+          <button class="book-btn" onclick='openBooking(${JSON.stringify(b)})'>🤖 Book via Agent</button>
         </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('servicesLoading').style.display='none';
+    document.getElementById('servicesEmpty').style.display='block';
+  }
+}
 
-        <div id="agentsContainer" class="agents-grid">
-            <div class="loading">Loading agents...</div>
-        </div>
-    </div>
+async function searchProducts() {
+  const q = document.getElementById('productQuery').value.trim();
+  const loc = document.getElementById('locationInput').value.trim();
+  if (!q) { alert('Enter a product name.'); return; }
+  document.getElementById('productsOnline').innerHTML='<div class="loading-spin">Searching...</div>';
+  document.getElementById('productsLocal').innerHTML='';
+  document.getElementById('productsEmpty').style.display='none';
+  try {
+    const body = {query:q};
+    if (loc) body.location = loc;
+    const r = await fetch('/api/v1/products',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d = await r.json();
+    if (!d.success) { document.getElementById('productsOnline').innerHTML=''; document.getElementById('productsEmpty').style.display='block'; return; }
 
-    <script>
-        // Fetch agents from API
-        async function loadAgents() {
-            try {
-                const response = await fetch('/api/agents');
-                const agents = await response.json();
-                displayAgents(agents);
-            } catch (error) {
-                console.error('Error loading agents:', error);
-                document.getElementById('agentsContainer').innerHTML = '<div class="no-results">Unable to load agents. Please try again later.</div>';
-            }
-        }
-
-        function displayAgents(agents) {
-            const container = document.getElementById('agentsContainer');
-            
-            if (!agents || agents.length === 0) {
-                container.innerHTML = '<div class="no-results">No agents found yet. Check back soon!</div>';
-                return;
-            }
-
-            container.innerHTML = agents.map(agent => `
-                <div class="agent-card">
-                    <div style="font-size: 2em;">🤖</div>
-                    <div class="agent-name">${agent.name || 'Unknown Agent'}</div>
-                    <div class="agent-location">📍 ${agent.location?.city || 'Unknown'}, ${agent.location?.state || 'Unknown'}</div>
-                    <div class="agent-rating">⭐ ${(agent.rating || 5).toFixed(1)} (${agent.reviews || 0} reviews)</div>
-                    <div class="agent-price">💰 $${agent.pricePerHour || '50'}/hr</div>
-                    <div style="color: #94a3b8; font-size: 0.85em; margin-top: 10px;">
-                        ${agent.totalTransactions || 0} transactions • ${((agent.successRate || 1) * 100).toFixed(0)}% success
-                    </div>
-                    <button class="btn-view">View Profile</button>
-                </div>
-            `).join('');
-        }
-
-        // Load agents on page load
-        loadAgents();
-
-        // Refresh every 30 seconds
-        setInterval(loadAgents, 30000);
-    </script>
-
-    <footer>
-        <div class="footer-container">
-
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>🤖 Product</h3>
-                <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/marketplace">Marketplace</a></li>
-                    <li><a href="/agent-dashboard">Agent Dashboard</a></li>
-                    <li><a href="/pricing">Pricing</a></li>
-                </ul>
+    // Online section
+    if (d.results.online?.length) {
+      document.getElementById('productsOnline').innerHTML = `
+        <div class="results-header"><h2>🌐 Buy Online</h2><span class="count">${d.results.online.length} options</span></div>
+        <div class="grid">${d.results.online.map(p=>`
+          <div class="card">
+            <span class="badge-source badge-online">Online</span>
+            <h3>${p.name}</h3>
+            <div class="detail">🏪 <strong>${p.store}</strong></div>
+            <div class="detail">🚚 Delivery: ${p.delivery||'varies'}</div>
+            <div class="price-row">
+              <span class="price">${p.price==='View'?'Check Price':'$'+p.price}</span>
+              <a class="view-btn" href="${p.url}" target="_blank">View →</a>
             </div>
-            <div class="footer-section">
-                <h3>📚 Resources</h3>
-                <ul>
-                    <li><a href="/docs">Documentation</a></li>
-                    <li><a href="/getting-started">Getting Started</a></li>
-                    <li><a href="/quick-reference">Quick Reference</a></li>
-                    <li><a href="/roadmap">Roadmap</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>💼 Investors</h3>
-                <ul>
-                    <li><a href="/investor-pitch">Pitch Deck</a></li>
-                    <li><a href="/personal-agent-app">Personal Agent App</a></li>
-                    <li><a href="/android-app">Android Build</a></li>
-                    <li><a href="/contact">Contact Us</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>🔧 Technical</h3>
-                <ul>
-                    <li><a href="/google-maps-setup">Location Services</a></li>
-                    <li><a href="/admin">🔐 Admin</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>🦬 AgentPay — The Operating System for Autonomous Agent Commerce</p>
-            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
-        </div>
-    </footer>
+          </div>`).join('')}
+        </div>`;
+    } else {
+      document.getElementById('productsOnline').innerHTML='';
+    }
 
-    <style>
-        footer {
-            background: rgba(15, 23, 42, 0.95);
-            border-top: 2px solid #334155;
-            margin-top: 60px;
-            padding: 40px 20px;
-        }
-        .footer-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
-        .footer-section h3 {
-            color: #60a5fa;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        .footer-section ul {
-            list-style: none;
-        }
-        .footer-section li {
-            margin-bottom: 12px;
-        }
-        .footer-section a {
-            color: #cbd5e1;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        .footer-section a:hover {
-            color: #60a5fa;
-        }
-        .footer-bottom {
-            border-top: 1px solid #334155;
-            margin-top: 40px;
-            padding-top: 20px;
-            text-align: center;
-            color: #64748b;
-            font-size: 0.9em;
-        }
-    </style>
+    // Local section
+    if (d.results.local?.length) {
+      document.getElementById('productsLocal').innerHTML = `
+        <div class="results-header"><h2>📍 Buy Locally</h2><span class="count">${d.results.local.length} nearby stores</span></div>
+        <div class="grid">${d.results.local.map(p=>`
+          <div class="card">
+            <span class="badge-source badge-local">Nearby</span>
+            <h3>${p.name}</h3>
+            <div class="detail">🏪 <strong>${p.store}</strong></div>
+            <div class="detail">📍 ${p.address||'See map'}</div>
+            ${p.distance_km!=null?'<div class="detail">🗺️ '+p.distance_km+' km away</div>':''}
+            <div class="price-row">
+              <span class="price">In-Store</span>
+              <a class="view-btn" href="${p.url}" target="_blank">Map →</a>
+            </div>
+          </div>`).join('')}
+        </div>`;
+    } else if (!loc) {
+      document.getElementById('productsLocal').innerHTML=`<div class="empty"><div class="icon">📍</div><h3>Add your location</h3><p>Enter a city above to see nearby stores</p></div>`;
+    } else {
+      document.getElementById('productsLocal').innerHTML='';
+    }
+  } catch(e) {
+    document.getElementById('productsOnline').innerHTML='';
+    document.getElementById('productsEmpty').style.display='block';
+  }
+}
+
+function openBooking(business) {
+  currentBooking = business;
+  document.getElementById('modalTitle').textContent = 'Book: ' + business.name;
+  document.getElementById('modalSub').textContent = business.address ? business.address + (business.city?', '+business.city:'') : 'Service request';
+  document.getElementById('bookSuccess').style.display='none';
+  document.getElementById('bookSuccess').textContent='';
+  // Set default date to tomorrow
+  const tom = new Date(); tom.setDate(tom.getDate()+1);
+  document.getElementById('bkDate').value = tom.toISOString().split('T')[0];
+  document.getElementById('bookModal').classList.add('open');
+}
+
+function closeModal() { document.getElementById('bookModal').classList.remove('open'); }
+
+async function submitBooking() {
+  const name  = document.getElementById('bkName').value.trim();
+  const email = document.getElementById('bkEmail').value.trim();
+  const phone = document.getElementById('bkPhone').value.trim();
+  const date  = document.getElementById('bkDate').value;
+  const time  = document.getElementById('bkTime').value;
+  if (!name||!email||!date) { alert('Please fill in name, email, and date.'); return; }
+  const btn = document.querySelector('.confirm-btn');
+  btn.textContent='Booking...'; btn.disabled=true;
+  try {
+    const r = await fetch('/api/v1/book', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        businessName: currentBooking.name,
+        phone: currentBooking.phone || phone,
+        email: currentBooking.email || null,
+        serviceType: currentBooking.category,
+        customerName: name,
+        customerEmail: email,
+        date, time, price: 0
+      })
+    });
+    const d = await r.json();
+    if (r.ok || d.bookingId) {
+      const s = document.getElementById('bookSuccess');
+      s.textContent = '✅ Booking request sent! Ref: ' + (d.bookingId||d.id||'submitted') + ' — the provider will confirm shortly.';
+      s.style.display='block';
+      setTimeout(closeModal, 4000);
+    } else {
+      alert(d.error||'Booking failed. Please try again.');
+    }
+  } catch(e) { alert('Connection error. Please try again.'); }
+  finally { btn.textContent='🤖 Book via Agent'; btn.disabled=false; }
+}
+
+document.getElementById('bookModal').addEventListener('click', e => {
+  if (e.target===document.getElementById('bookModal')) closeModal();
+});
+
+// Load initial empty state
+document.getElementById('servicesEmpty').style.display='block';
+document.getElementById('productsEmpty').style.display='block';
+</script>
 </body>
 </html>

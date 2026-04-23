@@ -1,3 +1,7 @@
+import { fileURLToPath as _fup } from 'url';
+import { dirname as _dn } from 'path';
+const __filename = _fup(import.meta.url);
+const __dirname = _dn(__filename);
 import { Connection, PublicKey, Transaction, sendAndConfirmTransaction, SystemProgram } from '@solana/web3.js';
 import * as fs from 'fs';
 import * as path from 'path';
