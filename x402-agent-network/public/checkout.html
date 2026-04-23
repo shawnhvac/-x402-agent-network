@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pay Securely — AgentPay</title>
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e2e8f0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.card{background:#0d0d1a;border:1px solid #1e2040;border-radius:20px;padding:40px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(99,102,241,.2)}
+.logo{text-align:center;margin-bottom:28px}
+.logo span{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,#6366f1,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.amount-box{background:#111827;border:1px solid #1e2040;border-radius:12px;padding:20px;text-align:center;margin-bottom:28px}
+.amount-box .label{font-size:.8rem;color:#64748b;margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.amount-box .value{font-size:2.4rem;font-weight:800;color:#e2e8f0}
+.amount-box .service{font-size:.9rem;color:#94a3b8;margin-top:4px}
+.methods{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.method{flex:1;min-width:80px;background:#111827;border:1px solid #1e2040;border-radius:8px;padding:10px;text-align:center;font-size:.8rem;color:#64748b}
+.method span{display:block;font-size:1.2rem;margin-bottom:4px}
+#payment-element{margin-bottom:20px}
+.pay-btn{width:100%;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:12px;padding:16px;font-size:1rem;font-weight:700;cursor:pointer;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.pay-btn:hover{opacity:.9}
+.pay-btn:disabled{opacity:.5;cursor:not-allowed}
+.secure{text-align:center;margin-top:16px;font-size:.75rem;color:#475569;display:flex;align-items:center;justify-content:center;gap:6px}
+#error-msg{background:#1a0a0a;border:1px solid #dc2626;border-radius:8px;padding:12px;color:#f87171;font-size:.85rem;margin-bottom:16px;display:none}
+#success-msg{background:#052e16;border:1px solid #16a34a;border-radius:12px;padding:24px;text-align:center;display:none}
+#success-msg h3{color:#22c55e;margin-bottom:8px;font-size:1.2rem}
+#success-msg p{color:#86efac;font-size:.9rem}
+.or-divider{text-align:center;color:#475569;font-size:.8rem;margin:16px 0;position:relative}
+.or-divider::before,.or-divider::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:#1e2040}
+.or-divider::before{left:0}.or-divider::after{right:0}
+.crypto-btn{width:100%;background:#111827;border:1px solid #6366f1;color:#a78bfa;border-radius:12px;padding:14px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.crypto-btn:hover{background:#1e1b4b}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><span>🤖 AgentPay</span></div>
+
+  <div class="amount-box">
+    <div class="label">Amount Due</div>
+    <div class="value" id="displayAmount">$0.00</div>
+    <div class="service" id="displayService">AgentPay Booking</div>
+  </div>
+
+  <div class="methods">
+    <div class="method"><span>💳</span>Card</div>
+    <div class="method"><span>🍎</span>Apple Pay</div>
+    <div class="method"><span>🔵</span>Google Pay</div>
+    <div class="method"><span>🔗</span>Link</div>
+  </div>
+
+  <div id="success-msg">
+    <h3>✅ Payment Successful!</h3>
+    <p>Your booking is confirmed. You'll receive a confirmation shortly.</p>
+  </div>
+
+  <div id="error-msg"></div>
+
+  <form id="payment-form">
+    <div id="payment-element"></div>
+    <button class="pay-btn" id="pay-btn" type="submit">
+      <span>🔒</span> Pay Securely
+    </button>
+  </form>
+
+  <div class="or-divider">or pay with crypto</div>
+  <button class="crypto-btn" onclick="window.location.href='/marketplace'">⚡ Pay with USDC / ETH / SOL</button>
+
+  <div class="secure">🔒 Secured by Stripe · PCI DSS Compliant · 256-bit SSL</div>
+</div>
+
+<script>
+const stripe = Stripe('pk_live_51TMGCIExaIcieBhHPK7ORfXLlqllWXSsSy50HedUnbWMFvHYV4oAaWuZ183pbec2UfUlGEt1FVtMFfAaK5oc5FOa00B9lpjmIT');
+const params = new URLSearchParams(window.location.search);
+const amount = parseInt(params.get('amount') || '0');
+const serviceName = params.get('service') || 'AgentPay Booking';
+const bookingId = params.get('booking_id') || '';
+const currency = params.get('currency') || 'usd';
+
+// Display
+const symbols = {usd:'$',eur:'€',gbp:'£',cad:'CA$',aud:'A$',sgd:'S$',jpy:'¥'};
+const sym = symbols[currency] || '$';
+document.getElementById('displayAmount').textContent = sym + (amount/100).toFixed(2);
+document.getElementById('displayService').textContent = decodeURIComponent(serviceName);
+document.getElementById('pay-btn').innerHTML = '<span>🔒</span> Pay ' + sym + (amount/100).toFixed(2);
+
+let elements;
+
+async function init() {
+  if (!amount || amount < 50) {
+    document.getElementById('error-msg').style.display = 'block';
+    document.getElementById('error-msg').textContent = 'Invalid payment amount. Please go back and try again.';
+    document.getElementById('payment-form').style.display = 'none';
+    return;
+  }
+
+  const res = await fetch('/api/v1/stripe/payment-intent', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({ amount, currency, booking_id: bookingId, service_id: serviceName })
+  });
+  const data = await res.json();
+  if (!data.success) {
+    document.getElementById('error-msg').style.display = 'block';
+    document.getElementById('error-msg').textContent = data.error || 'Failed to initialize payment';
+    return;
+  }
+
+  elements = stripe.elements({ clientSecret: data.client_secret, appearance: {
+    theme: 'night',
+    variables: { colorPrimary: '#6366f1', colorBackground: '#111827', colorText: '#e2e8f0', colorDanger: '#ef4444', borderRadius: '10px' }
+  }});
+
+  const payEl = elements.create('payment');
+  payEl.mount('#payment-element');
+}
+
+document.getElementById('payment-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span>⏳</span> Processing...';
+  document.getElementById('error-msg').style.display = 'none';
+
+  const { error } = await stripe.confirmPayment({
+    elements,
+    confirmParams: {
+      return_url: window.location.origin + '/payment-success?booking_id=' + bookingId,
+    },
+    redirect: 'if_required'
+  });
+
+  if (error) {
+    document.getElementById('error-msg').style.display = 'block';
+    document.getElementById('error-msg').textContent = error.message;
+    btn.disabled = false;
+    btn.innerHTML = '<span>🔒</span> Pay ' + sym + (amount/100).toFixed(2);
+  } else {
+    document.getElementById('payment-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+});
+
+init();
+</script>
+</body>
+</html>

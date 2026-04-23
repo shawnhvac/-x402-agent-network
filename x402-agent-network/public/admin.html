@@ -1,373 +1,310 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - AgentPay Contacts</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            min-height: 100vh;
-            color: #e2e8f0;
-        }
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .login-form {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 40px;
-            max-width: 400px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        }
-        .login-form h1 {
-            color: #60a5fa;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 24px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            background: #0f172a;
-            color: #e2e8f0;
-            font-size: 14px;
-        }
-        .form-group input:focus {
-            outline: none;
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-        }
-        .login-form button {
-            width: 100%;
-            padding: 12px;
-            background: #60a5fa;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .login-form button:hover {
-            background: #3b82f6;
-        }
-        .error {
-            background: #7f1d1d;
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error.show {
-            display: block;
-        }
-        .dashboard {
-            display: none;
-        }
-        .dashboard.show {
-            display: block;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background: #1e293b;
-            border-bottom: 1px solid #334155;
-        }
-        .dashboard-header h1 {
-            color: #60a5fa;
-        }
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .contacts-grid {
-            display: grid;
-            gap: 20px;
-        }
-        .contact-card {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            transition: border-color 0.3s;
-        }
-        .contact-card:hover {
-            border-color: #3b82f6;
-        }
-        .contact-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 15px;
-        }
-        .contact-info h3 {
-            color: #60a5fa;
-            margin-bottom: 5px;
-        }
-        .contact-email {
-            color: #94a3b8;
-            font-size: 0.9em;
-            margin-bottom: 10px;
-        }
-        .contact-subject {
-            background: #0f172a;
-            padding: 8px 12px;
-            border-radius: 4px;
-            color: #cbd5e1;
-            font-weight: 500;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-        .contact-timestamp {
-            color: #64748b;
-            font-size: 0.85em;
-        }
-        .contact-message {
-            background: #0f172a;
-            padding: 15px;
-            border-radius: 6px;
-            color: #e2e8f0;
-            line-height: 1.6;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .stats {
-            background: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .stat-item h4 {
-            color: #94a3b8;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-        .stat-item .number {
-            color: #60a5fa;
-            font-size: 2em;
-            font-weight: 600;
-        }
-        .no-contacts {
-            text-align: center;
-            padding: 40px;
-            color: #94a3b8;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPay Admin Dashboard</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);min-height:100vh;color:#e2e8f0}
+    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+    .login-box{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:40px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .login-box h1{color:#60a5fa;margin-bottom:8px;text-align:center;font-size:26px}
+    .login-box .sub{color:#64748b;text-align:center;margin-bottom:28px;font-size:14px}
+    .form-group{margin-bottom:18px}
+    .form-group label{display:block;margin-bottom:6px;color:#cbd5e1;font-weight:500;font-size:14px}
+    .form-group input{width:100%;padding:11px 14px;border:1px solid #334155;border-radius:8px;background:#0f172a;color:#e2e8f0;font-size:14px}
+    .form-group input:focus{outline:none;border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.1)}
+    .btn{width:100%;padding:12px;background:#3b82f6;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:.2s}
+    .btn:hover{background:#2563eb}
+    .err-msg{color:#f87171;font-size:13px;margin-top:10px;text-align:center;display:none}
+    #dashboard{display:none}
+    .topbar{background:#1e293b;border-bottom:1px solid #334155;padding:16px 28px;display:flex;justify-content:space-between;align-items:center}
+    .topbar h1{color:#60a5fa;font-size:20px;font-weight:700}
+    .topbar .right{display:flex;align-items:center;gap:16px}
+    .topbar .site-link{color:#94a3b8;font-size:13px;text-decoration:none}
+    .topbar .site-link:hover{color:#60a5fa}
+    .logout-btn{padding:7px 16px;background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:6px;cursor:pointer;font-size:13px}
+    .logout-btn:hover{border-color:#f87171;color:#f87171}
+    /* Tabs */
+    .tabs{display:flex;gap:0;border-bottom:1px solid #334155;background:#1e293b;padding:0 28px}
+    .tab{padding:14px 22px;cursor:pointer;font-size:14px;font-weight:500;color:#64748b;border-bottom:2px solid transparent;transition:.2s}
+    .tab:hover{color:#cbd5e1}
+    .tab.active{color:#60a5fa;border-bottom-color:#60a5fa}
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+    .content{padding:28px;max-width:1400px;margin:0 auto}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px}
+    .stat-card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:20px;text-align:center}
+    .stat-card .val{font-size:32px;font-weight:700;margin-bottom:4px}
+    .stat-card .lbl{font-size:12px;color:#64748b;text-transform:uppercase;letter-spacing:.05em}
+    .stat-card.total .val{color:#60a5fa}
+    .stat-card.confirmed .val{color:#34d399}
+    .stat-card.pending .val{color:#fbbf24}
+    .stat-card.declined .val{color:#f87171}
+    .stat-card.revenue .val{color:#a78bfa}
+    .stat-card.providers .val{color:#38bdf8}
+    .section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    .section-header h2{font-size:16px;font-weight:600;color:#cbd5e1}
+    .refresh-btn{padding:7px 14px;background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:6px;cursor:pointer;font-size:13px}
+    .refresh-btn:hover{border-color:#60a5fa;color:#60a5fa}
+    .table-wrap{background:#1e293b;border:1px solid #334155;border-radius:10px;overflow:hidden;margin-bottom:32px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:#0f172a;padding:12px 14px;text-align:left;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-size:11px;border-bottom:1px solid #334155}
+    td{padding:12px 14px;border-bottom:1px solid #1e3a5f22;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(96,165,250,.04)}
+    .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase}
+    .badge.confirmed,.badge.active{background:rgba(52,211,153,.15);color:#34d399}
+    .badge.pending{background:rgba(251,191,36,.15);color:#fbbf24}
+    .badge.declined,.badge.inactive{background:rgba(248,113,113,.15);color:#f87171}
+    .badge.unknown{background:rgba(100,116,139,.15);color:#94a3b8}
+    .empty{text-align:center;padding:48px;color:#475569}
+    .empty .icon{font-size:40px;margin-bottom:12px}
+    .filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .filter-btn{padding:7px 16px;border-radius:20px;border:1px solid #334155;background:transparent;color:#94a3b8;cursor:pointer;font-size:13px;transition:.2s}
+    .filter-btn.active,.filter-btn:hover{border-color:#60a5fa;color:#60a5fa;background:rgba(96,165,250,.08)}
+    .loading{text-align:center;padding:40px;color:#475569}
+    .search-box{padding:9px 14px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#e2e8f0;font-size:13px;width:220px}
+    .search-box:focus{outline:none;border-color:#60a5fa}
+  </style>
 </head>
 <body>
-    <!-- Login Form -->
-    <div id="loginContainer" class="login-container">
-        <div class="login-form">
-            <h1>🔐 Admin Dashboard</h1>
-            <div id="loginError" class="error"></div>
-            <div class="form-group">
-                <label for="password">Admin Password</label>
-                <input type="password" id="password" placeholder="Enter admin password" required>
-            </div>
-            <button onclick="handleLogin()">Login</button>
-        </div>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <h1>🤖 AgentPay</h1>
+    <p class="sub">Admin Dashboard</p>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="pwInput" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
+    <button class="btn" onclick="doLogin()">Sign In</button>
+    <p class="err-msg" id="errMsg">Incorrect password. Try again.</p>
+  </div>
+</div>
 
-    <!-- Dashboard -->
-    <div id="dashboard" class="dashboard">
-        <div class="dashboard-header">
-            <h1>📧 Contact Form Submissions</h1>
-            <button class="logout-btn" onclick="handleLogout()">Logout</button>
-        </div>
-
-        <div class="container">
-            <div class="stats" id="stats"></div>
-            <div class="contacts-grid" id="contactsGrid"></div>
-        </div>
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <h1>🤖 AgentPay Admin</h1>
+    <div class="right">
+      <a class="site-link" href="https://www.x402-agent-pay.com" target="_blank">← Back to site</a>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
     </div>
+  </div>
 
-    <script>
-        // ✅ SECURITY: Backend-validated authentication
-        // Password never stored in browser
-        // Session managed via secure HttpOnly cookies
-        
-        async function handleLogin() {
-            const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('loginError');
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('bookings',this)">📋 Bookings</div>
+    <div class="tab" onclick="switchTab('providers',this)">🏢 Providers</div>
+  </div>
 
-            if (!password) {
-                errorDiv.textContent = '❌ Please enter a password';
-                errorDiv.classList.add('show');
-                return;
-            }
+  <!-- BOOKINGS TAB -->
+  <div id="tab-bookings" class="tab-panel active">
+    <div class="content">
+      <div class="stats-grid">
+        <div class="stat-card total"><div class="val" id="sTotal">—</div><div class="lbl">Total Bookings</div></div>
+        <div class="stat-card confirmed"><div class="val" id="sConfirmed">—</div><div class="lbl">Confirmed</div></div>
+        <div class="stat-card pending"><div class="val" id="sPending">—</div><div class="lbl">Pending</div></div>
+        <div class="stat-card declined"><div class="val" id="sDeclined">—</div><div class="lbl">Declined</div></div>
+        <div class="stat-card revenue"><div class="val" id="sRevenue">—</div><div class="lbl">Revenue (Fees)</div></div>
+        <div class="stat-card providers"><div class="val" id="sProviders">—</div><div class="lbl">Providers</div></div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('pending',this)">Pending</button>
+        <button class="filter-btn" onclick="setFilter('confirmed',this)">Confirmed</button>
+        <button class="filter-btn" onclick="setFilter('declined',this)">Declined</button>
+      </div>
+      <div class="section-header">
+        <h2>Bookings</h2>
+        <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ref</th><th>Status</th><th>Business</th><th>Service</th>
+              <th>Date / Time</th><th>Customer</th><th>Price</th>
+              <th>Fee (You Earn)</th><th>Via</th><th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTbody">
+            <tr><td colspan="10" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-            try {
-                const response = await fetch('/api/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include', // Send/receive cookies
-                    body: JSON.stringify({ password })
-                });
+  <!-- PROVIDERS TAB -->
+  <div id="tab-providers" class="tab-panel">
+    <div class="content">
+      <div class="section-header">
+        <h2>Registered Providers</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <input class="search-box" id="providerSearch" placeholder="Search name, email, category..." oninput="renderProviders()">
+          <button class="refresh-btn" onclick="loadProviders()">↻ Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Business Name</th><th>Email</th><th>Phone</th>
+              <th>Category</th><th>Status</th><th>Registered</th>
+            </tr>
+          </thead>
+          <tbody id="providersTbody">
+            <tr><td colspan="6" class="loading">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
-                if (response.ok) {
-                    // Backend set secure HttpOnly cookie
-                    document.getElementById('loginContainer').style.display = 'none';
-                    document.getElementById('dashboard').classList.add('show');
-                    document.getElementById('password').value = '';
-                    loadContacts();
-                } else {
-                    const data = await response.json();
-                    errorDiv.textContent = '❌ ' + (data.error || 'Login failed');
-                    errorDiv.classList.add('show');
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                errorDiv.textContent = '❌ Connection error. Please try again.';
-                errorDiv.classList.add('show');
-            }
-        }
+<script>
+  let allBookings = [];
+  let allProviders = [];
+  let currentFilter = 'all';
 
-        async function handleLogout() {
-            try {
-                await fetch('/api/admin/logout', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
-            
-            document.getElementById('password').value = '';
-            document.getElementById('dashboard').classList.remove('show');
-            document.getElementById('loginContainer').style.display = 'flex';
-            document.getElementById('loginError').classList.remove('show');
-        }
+  async function doLogin() {
+    const pw = document.getElementById('pwInput').value;
+    const err = document.getElementById('errMsg');
+    err.style.display = 'none';
+    try {
+      const r = await fetch('/api/admin/login', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        credentials: 'include', body: JSON.stringify({password: pw})
+      });
+      if (r.ok) {
+        document.getElementById('loginWrap').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadData();
+        setInterval(loadData, 30000);
+      } else { err.style.display = 'block'; }
+    } catch(e) { err.textContent = 'Connection error.'; err.style.display = 'block'; }
+  }
 
-        async function loadContacts() {
-            try {
-                const response = await fetch('/api/admin/contacts', {
-                    credentials: 'include' // Send HttpOnly cookie
-                });
+  async function doLogout() {
+    await fetch('/api/admin/logout', {method:'POST', credentials:'include'});
+    location.reload();
+  }
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        handleLogout();
-                        return;
-                    }
-                    throw new Error('Failed to load contacts');
-                }
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+    if (name === 'providers') loadProviders();
+  }
 
-                const contacts = await response.json();
-                renderContacts(contacts);
-            } catch (error) {
-                console.error('Error loading contacts:', error);
-                document.getElementById('contactsGrid').innerHTML = 
-                    '<div class="no-contacts">Error loading contacts. Please try again.</div>';
-            }
-        }
+  async function loadData() {
+    await Promise.all([loadStats(), loadBookings()]);
+  }
 
-        function renderContacts(contacts) {
-            const grid = document.getElementById('contactsGrid');
-            const statsDiv = document.getElementById('stats');
+  async function loadStats() {
+    try {
+      const r = await fetch('/api/admin/stats', {credentials:'include'});
+      if (!r.ok) return;
+      const s = await r.json();
+      document.getElementById('sTotal').textContent = s.total ?? 0;
+      document.getElementById('sConfirmed').textContent = s.confirmed ?? 0;
+      document.getElementById('sPending').textContent = s.pending ?? 0;
+      document.getElementById('sDeclined').textContent = s.declined ?? 0;
+      document.getElementById('sRevenue').textContent = '$' + (s.revenue_usd ?? 0).toFixed(2);
+    } catch(e) {}
+    try {
+      const r2 = await fetch('/api/admin/providers', {credentials:'include'});
+      if (r2.ok) {
+        const p = await r2.json();
+        document.getElementById('sProviders').textContent = p.length;
+      }
+    } catch(e) {}
+  }
 
-            if (!contacts || contacts.length === 0) {
-                grid.innerHTML = '<div class="no-contacts">No contact submissions yet</div>';
-                statsDiv.innerHTML = '<div class="stat-item"><h4>Total Submissions</h4><div class="number">0</div></div>';
-                return;
-            }
+  async function loadBookings() {
+    try {
+      const r = await fetch('/api/admin/bookings?limit=200', {credentials:'include'});
+      if (!r.ok) { if(r.status===401) location.reload(); return; }
+      allBookings = await r.json();
+      renderTable();
+    } catch(e) {}
+  }
 
-            // Stats
-            const uniqueEmails = new Set(contacts.map(c => c.email)).size;
-            const lastSubmission = new Date(contacts[0].timestamp).toLocaleString();
-            
-            const statsHtml = `
-                <div class="stat-item">
-                    <h4>Total Submissions</h4>
-                    <div class="number">${contacts.length}</div>
-                </div>
-                <div class="stat-item">
-                    <h4>Unique Emails</h4>
-                    <div class="number">${uniqueEmails}</div>
-                </div>
-                <div class="stat-item">
-                    <h4>Last Submission</h4>
-                    <div class="number" style="font-size: 0.9em; margin-top: 5px;">${lastSubmission}</div>
-                </div>
-            `;
-            statsDiv.innerHTML = statsHtml;
+  async function loadProviders() {
+    document.getElementById('providersTbody').innerHTML = '<tr><td colspan="6" class="loading">Loading...</td></tr>';
+    try {
+      const r = await fetch('/api/admin/providers', {credentials:'include'});
+      if (!r.ok) return;
+      allProviders = await r.json();
+      renderProviders();
+    } catch(e) {}
+  }
 
-            // Contacts
-            grid.innerHTML = contacts.map(contact => `
-                <div class="contact-card">
-                    <div class="contact-header">
-                        <div class="contact-info">
-                            <h3>${escapeHtml(contact.name)}</h3>
-                            <div class="contact-email">${escapeHtml(contact.email)}</div>
-                        </div>
-                        <div class="contact-timestamp">${new Date(contact.timestamp).toLocaleString()}</div>
-                    </div>
-                    <div class="contact-subject">${escapeHtml(contact.subject)}</div>
-                    <div class="contact-message">${escapeHtml(contact.message)}</div>
-                </div>
-            `).join('');
-        }
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderTable();
+  }
 
-        function escapeHtml(text) {
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.replace(/[&<>"']/g, m => map[m]);
-        }
+  function renderTable() {
+    const tbody = document.getElementById('bookingsTbody');
+    const filtered = currentFilter === 'all' ? allBookings : allBookings.filter(b => b.status === currentFilter);
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty"><div class="icon">📋</div>No bookings yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(b => {
+      const status = b.status || 'unknown';
+      const created = b.created_at ? new Date(b.created_at).toLocaleString() : '—';
+      const price = b.price != null ? '$' + parseFloat(b.price).toFixed(2) : '—';
+      const fee   = b.fee  != null ? '$' + parseFloat(b.fee).toFixed(2)  : '—';
+      const net   = b.net  != null ? '$' + parseFloat(b.net).toFixed(2)  : '—';
+      return `<tr>
+        <td style="font-family:monospace;font-size:11px;color:#94a3b8">${b.id||'—'}</td>
+        <td><span class="badge ${status}">${status}</span></td>
+        <td>${b.business_name||'—'}</td>
+        <td>${b.service_type||'—'}</td>
+        <td>${(b.date||'—')+' '+(b.time||'')}</td>
+        <td>${b.customer_name||b.customer_email||'—'}</td>
+        <td>${price}</td>
+        <td style="color:#a78bfa">${fee} <span style="color:#475569;font-size:11px">(net ${net})</span></td>
+        <td style="color:#64748b">${b.notification_method||'—'}</td>
+        <td style="color:#475569;font-size:11px">${created}</td>
+      </tr>`;
+    }).join('');
+  }
 
-        // Allow Enter key to submit login
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('password').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleLogin();
-                }
-            });
-        });
-    </script>
+  function renderProviders() {
+    const tbody = document.getElementById('providersTbody');
+    const q = (document.getElementById('providerSearch')?.value || '').toLowerCase();
+    const filtered = allProviders.filter(p =>
+      !q || p.business_name?.toLowerCase().includes(q) ||
+      p.email?.toLowerCase().includes(q) ||
+      p.category?.toLowerCase().includes(q)
+    );
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty"><div class="icon">🏢</div>No providers registered yet</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(p => {
+      const created = p.created_at ? new Date(p.created_at).toLocaleString() : '—';
+      const status = p.status || 'active';
+      return `<tr>
+        <td style="font-weight:600;color:#e2e8f0">${p.business_name||'—'}</td>
+        <td style="color:#94a3b8">${p.email||'—'}</td>
+        <td>${p.phone||'—'}</td>
+        <td><span style="background:rgba(96,165,250,.1);color:#60a5fa;padding:3px 10px;border-radius:20px;font-size:11px">${p.category||'—'}</span></td>
+        <td><span class="badge ${status}">${status}</span></td>
+        <td style="color:#475569;font-size:11px">${created}</td>
+      </tr>`;
+    }).join('');
+  }
+</script>
 </body>
 </html>

@@ -58,7 +58,7 @@ let bookings: Map<string, Booking> = new Map();
  */
 router.post('/business/register', (req: Request, res: Response) => {
   try {
-    const { email, password, businessName, category, location, phone } = req.body;
+    const { email, password, businessName, category, location, city, country, address, phone, services, description, website, wallet } = req.body;
 
     if (!email || !businessName || !category) {
       return res.status(400).json({
@@ -74,9 +74,14 @@ router.post('/business/register', (req: Request, res: Response) => {
       businessName,
       category,
       location,
-      address: '',
+      address: address || '',
       phone,
-      description: '',
+      description: description || '',
+      city: city || '',
+      country: country || '',
+      website: website || '',
+      wallet: wallet || '',
+      services_offered: services || [],
       rating: 0,
       reviews: 0,
       services: [],

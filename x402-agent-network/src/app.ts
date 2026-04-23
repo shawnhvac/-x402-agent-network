@@ -29,6 +29,7 @@ import walletRoutes from "./routes/wallet.js";
 import productsOsmRoutes from "./routes/products-osm.js";
 import agentMarketplaceRoutes from "./routes/agent-marketplace.js";
 import notifyRoutes from "./routes/notify.js";
+import providerRoutes from "./routes/provider.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -69,6 +70,14 @@ app.use(cors({
 
 // ✅ SECURITY: Cookie Parser for HttpOnly cookies
 app.use(cookieParser());
+
+// ✅ Body parsers — must be before ALL routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ FREE PUBLIC ROUTES — registered BEFORE x402 payment middleware
+// These must come first so paymentMiddleware never intercepts them
+app.use("/api/v1", productsOsmRoutes);
 
 // ✅ x402 PAYMENT MIDDLEWARE - Register Bazaar endpoints
 // setupX402Middleware is SYNCHRONOUS — Maps seeded before routes register
@@ -123,7 +132,6 @@ try {
   });
 });
 
-app.use(express.json());
 app.use(timeoutMiddleware(30000)); // 30 second timeout
 app.use(loggingMiddleware); // Log all requests
 // app.use(x402Middleware) — removed, old custom middleware replaced by @x402/express
@@ -344,6 +352,28 @@ app.get("/api/admin/stats", (req: Request, res: Response) => {
   }
 });
 
+/**
+ * ✅ SECURITY: Admin API - Get all registered providers
+ */
+app.get("/api/admin/providers", (req: Request, res: Response) => {
+  try {
+    const token = req.cookies.adminSession;
+    if (!token || !validateSessionToken(token)) {
+      return res.status(401).json({ error: "Unauthorized - please login" });
+    }
+    const Database = require('better-sqlite3');
+    const providerDb = new Database('/var/lib/agentpay/providers.db');
+    const providers = providerDb.prepare('SELECT id, business_name, email, phone, category, status, created_at FROM providers ORDER BY created_at DESC').all();
+    return res.json(providers);
+  } catch (error: any) {
+    if (error.message?.includes('no such table') || error.code === 'SQLITE_ERROR') {
+      return res.json([]);
+    }
+    console.error("Admin providers error:", error);
+    return res.status(500).json({ error: "Failed to load providers" });
+  }
+});
+
 // Documentation markdown files served as HTML
 
 const docFiles = {
@@ -489,8 +519,8 @@ app.use("/api/v1", stripePaymentRoutes);
  * Business Portal Routes
  */
 app.use("/api/v1", businessPortalRoutes);
-app.use("/api/v1", productsOsmRoutes);
 app.use("/api/v1", agentMarketplaceRoutes);
+app.use("/api/v1/provider", providerRoutes);
 app.use("/api/v1/notify", notifyRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 

@@ -1,33 +1,24 @@
-# AgentPay robots.txt
-# Guides search engine crawlers on site structure and access
-
-# Allow all search engines (default)
 User-agent: *
 Allow: /
 
-# Disallow private/admin areas
-Disallow: /admin
-Disallow: /api/internal
-Disallow: /config
-Disallow: /.env
-Disallow: /node_modules
-
-# Crawl delay (be respectful)
-Crawl-delay: 1
-
-# Sitemaps
-Sitemap: https://x402-agent-pay.com/sitemap.xml
-Sitemap: https://x402-agent-pay.com/blog/sitemap.xml
-
-# Specific crawlers (optional)
-User-agent: Googlebot
+# AI Agent Discovery
+User-agent: GPTBot
 Allow: /
-Crawl-delay: 0.5
 
-User-agent: Bingbot
+User-agent: ClaudeBot
 Allow: /
-Crawl-delay: 1
 
-User-agent: Slurp
+User-agent: anthropic-ai
 Allow: /
-Crawl-delay: 1
+
+User-agent: PerplexityBot
+Allow: /
+
+# Key agent-readable files
+Sitemap: https://www.x402-agent-pay.com/sitemap.xml
+
+# Agent marketplace discovery
+# Registration: POST /api/v1/marketplace/agent/register
+# Manifest: GET /api/v1/marketplace/info
+# OpenAPI: GET /openapi.json
+# LLMs: GET /llms.txt

@@ -1,68 +1,19 @@
 {
   "categories": [
-    {
-      "id": "hair-beauty",
-      "name": "Hair & Beauty",
-      "icon": "✂️",
-      "description": "Salons, spas, barber shops, nail services",
-      "average_duration_minutes": 45,
-      "services": ["haircut", "color", "styling", "manicure", "pedicure", "massage", "facial", "waxing"]
-    },
-    {
-      "id": "food-dining",
-      "name": "Food & Dining",
-      "icon": "🍽️",
-      "description": "Restaurants, cafes, catering, meal prep",
-      "average_duration_minutes": 90,
-      "services": ["dinner", "lunch", "brunch", "private event", "catering", "wine tasting", "cooking class"]
-    },
-    {
-      "id": "auto-service",
-      "name": "Auto Service",
-      "icon": "🔧",
-      "description": "Mechanics, car wash, detailing, tire service",
-      "average_duration_minutes": 120,
-      "services": ["oil change", "inspection", "repair", "detailing", "tires", "alignment", "maintenance"]
-    },
-    {
-      "id": "home-services",
-      "name": "Home Services",
-      "icon": "🏠",
-      "description": "Cleaning, maintenance, repair, landscaping",
-      "average_duration_minutes": 180,
-      "services": ["cleaning", "maintenance", "repair", "landscaping", "painting", "plumbing", "electrical"]
-    },
-    {
-      "id": "health-fitness",
-      "name": "Health & Fitness",
-      "icon": "💪",
-      "description": "Gyms, trainers, classes, wellness",
-      "average_duration_minutes": 60,
-      "services": ["gym membership", "personal training", "yoga", "pilates", "cycling", "crossfit", "boxing"]
-    },
-    {
-      "id": "education",
-      "name": "Education & Training",
-      "icon": "📚",
-      "description": "Tutors, classes, coaching, workshops",
-      "average_duration_minutes": 90,
-      "services": ["tutoring", "language", "music", "coding", "fitness coaching", "business coaching", "SAT prep"]
-    },
-    {
-      "id": "events",
-      "name": "Events & Entertainment",
-      "icon": "🎉",
-      "description": "Photography, videography, DJ, event planning",
-      "average_duration_minutes": 240,
-      "services": ["photography", "videography", "DJ", "event planning", "catering", "entertainment", "decorating"]
-    },
-    {
-      "id": "professional",
-      "name": "Professional Services",
-      "icon": "💼",
-      "description": "Consulting, legal, accounting, business services",
-      "average_duration_minutes": 60,
-      "services": ["consultation", "tax preparation", "legal review", "business coaching", "accounting", "bookkeeping"]
-    }
+    {"id":"hair-beauty","name":"Hair & Beauty","icon":"✂️","description":"Salons, spas, barber shops, nail services","average_duration_minutes":45,"services":["haircut","color","styling","manicure","pedicure","massage","facial","waxing","blowout","highlights","keratin"]},
+    {"id":"food-dining","name":"Food & Dining","icon":"🍽️","description":"Restaurants, cafes, catering, meal prep","average_duration_minutes":90,"services":["dinner","lunch","brunch","private event","catering","wine tasting","cooking class","takeout","delivery"]},
+    {"id":"auto-service","name":"Auto Service","icon":"🔧","description":"Mechanics, car wash, detailing, tire service","average_duration_minutes":120,"services":["oil change","inspection","repair","detailing","tires","alignment","maintenance","brake service","AC repair"]},
+    {"id":"home-services","name":"Home Services","icon":"🏠","description":"Cleaning, maintenance, repair, landscaping","average_duration_minutes":180,"services":["cleaning","maintenance","repair","landscaping","painting","plumbing","electrical","pest control","moving"]},
+    {"id":"health-fitness","name":"Health & Fitness","icon":"💪","description":"Gyms, trainers, classes, wellness","average_duration_minutes":60,"services":["gym membership","personal training","yoga","pilates","cycling","crossfit","boxing","nutrition","physiotherapy"]},
+    {"id":"education","name":"Education & Training","icon":"📚","description":"Tutors, classes, coaching, workshops","average_duration_minutes":90,"services":["tutoring","language","music","coding","fitness coaching","business coaching","SAT prep","driving lessons"]},
+    {"id":"events","name":"Events & Entertainment","icon":"🎉","description":"Photography, videography, DJ, event planning","average_duration_minutes":240,"services":["photography","videography","DJ","event planning","catering","entertainment","decorating","live music"]},
+    {"id":"professional","name":"Professional Services","icon":"💼","description":"Consulting, legal, accounting, business services","average_duration_minutes":60,"services":["consultation","tax preparation","legal review","business coaching","accounting","bookkeeping","notary","translation"]},
+    {"id":"travel-transport","name":"Travel & Transport","icon":"✈️","description":"Airlines, taxis, car hire, tours, airport transfers","average_duration_minutes":180,"services":["flight booking","airport transfer","taxi","car rental","bus","train","city tour","hotel","cruise","visa assistance"]},
+    {"id":"medical","name":"Medical & Dental","icon":"🏥","description":"Doctors, dentists, specialists, therapy","average_duration_minutes":45,"services":["general checkup","dental cleaning","specialist visit","therapy","physiotherapy","eye exam","blood test","vaccination"]},
+    {"id":"pets","name":"Pet Services","icon":"🐾","description":"Grooming, vets, boarding, training, walking","average_duration_minutes":60,"services":["grooming","vet visit","boarding","training","dog walking","pet sitting","microchipping","vaccinations"]},
+    {"id":"tech-repair","name":"Tech & Repair","icon":"💻","description":"Phone repair, computer fix, appliance repair","average_duration_minutes":90,"services":["phone screen repair","laptop repair","data recovery","appliance repair","TV repair","smart home setup","network setup"]},
+    {"id":"fashion-retail","name":"Fashion & Retail","icon":"👗","description":"Clothing stores, tailoring, styling, alterations","average_duration_minutes":60,"services":["personal styling","tailoring","alterations","shopping assistance","wardrobe consultation"]},
+    {"id":"real-estate","name":"Real Estate","icon":"🏡","description":"Property buying, renting, management, inspection","average_duration_minutes":60,"services":["property viewing","rental management","inspection","valuation","mortgage advice","moving coordination"]},
+    {"id":"financial","name":"Financial Services","icon":"💰","description":"Banking, insurance, investment, money transfer","average_duration_minutes":60,"services":["account setup","insurance","investment advice","money transfer","crypto exchange","loan application","tax filing"]}
   ]
 }

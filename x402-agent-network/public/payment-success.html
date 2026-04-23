@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Successful — AgentPay</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0f;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:#0d0d1a;border:1px solid #16a34a;border-radius:20px;padding:48px;max-width:440px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(22,163,74,.2)}
+.icon{font-size:4rem;margin-bottom:20px}
+h1{font-size:1.8rem;font-weight:800;color:#22c55e;margin-bottom:12px}
+p{color:#94a3b8;margin-bottom:24px;line-height:1.6}
+.ref{background:#111827;border:1px solid #1e2040;border-radius:8px;padding:12px;font-family:monospace;font-size:.8rem;color:#64748b;margin-bottom:24px;word-break:break-all}
+.btn{display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;text-decoration:none;border-radius:12px;padding:14px 32px;font-weight:700;font-size:.95rem}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">✅</div>
+  <h1>Payment Successful!</h1>
+  <p>Your booking is confirmed. The business has been notified and will contact you shortly.</p>
+  <div class="ref" id="refId">Loading confirmation...</div>
+  <a href="/" class="btn">Back to AgentPay</a>
+</div>
+<script>
+const p = new URLSearchParams(window.location.search);
+const ref = p.get('session_id') || p.get('payment_intent') || p.get('booking_id') || 'CONF-' + Date.now();
+document.getElementById('refId').textContent = 'Ref: ' + ref;
+</script>
+</body>
+</html>
