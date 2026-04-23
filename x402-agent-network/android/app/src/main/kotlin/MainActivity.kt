@@ -591,10 +591,10 @@ fun ServicesManagementScreen(
                     .url("https://www.x402-agent-pay.com/api/v1/provider/services")
                     .addHeader("Content-Type", "application/json")
                     .addHeader("x-provider-token", token)
-                    .post(okhttp3.RequestBody.create(okhttp3.MediaType.parse("application/json"), body))
+                    .post(body.toRequestBody("application/json".toMediaType()))
                     .build()
                 val response = client.newCall(request).execute()
-                Log.d("AgentPay", "Services synced to server: \${response.code()}")
+                Log.d("AgentPay", "Services synced to server: \${response.code}")
                 response.close()
             } catch (e: Exception) {
                 Log.e("AgentPay", "Failed to sync services: \${e.message}")
