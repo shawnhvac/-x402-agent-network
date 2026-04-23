@@ -71,12 +71,13 @@ router.post('/register', (req: Request, res: Response) => {
     if (existing) return res.status(409).json({ error: 'Email already registered' });
     const id = 'prov_' + Date.now();
     const token = makeToken();
+    const now = new Date().toISOString();
     db.prepare(`
-      INSERT INTO providers (id, business_name, email, phone, password_hash, category, address, city, lat, lon, description, token)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO providers (id, business_name, email, phone, password_hash, category, address, city, lat, lon, description, token, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
     `).run(id, businessName, email.toLowerCase().trim(), phone || null,
            hashPassword(password), category || null, address || null,
-           city || null, lat || null, lon || null, description || null, token);
+           city || null, lat || null, lon || null, description || null, token, now);
     console.log('[Provider] Registered:', email, businessName);
     res.json({ success: true, token, providerId: id });
   } catch (err: any) {
