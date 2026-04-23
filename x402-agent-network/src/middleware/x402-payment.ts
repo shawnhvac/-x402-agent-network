@@ -13,7 +13,7 @@ import { readFileSync } from "fs";
 import rateLimit from "express-rate-limit";
 
 // ── Wallet ────────────────────────────────────────────────────────────────────
-const WALLET = (process.env.AGENTPAY_WALLET || "0x52893C94B03B5c5732c5AE71728cD69E360645Ce") as `0x${string}`;
+const WALLET = (process.env.AGENTPAY_WALLET || "0x2a07182afDB346C84dFc5D116D84f34E1db4617d") as `0x${string}`;
 
 // SECURITY FIX 3: Wallet validation at startup
 if (!process.env.AGENTPAY_WALLET) console.warn("[SECURITY] AGENTPAY_WALLET not in .env — using fallback");

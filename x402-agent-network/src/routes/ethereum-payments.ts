@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-const RECEIVER_WALLET = process.env.ETHEREUM_RECEIVER_WALLET || '0x52893C94B03B5c5732c5AE71728cD69E360645Ce';
+const RECEIVER_WALLET = process.env.ETHEREUM_RECEIVER_WALLET || '0x2a07182afDB346C84dFc5D116D84f34E1db4617d';
 
 // ─── Chain Registry ───────────────────────────────────────────────────────
 const CHAINS: Record<string, {

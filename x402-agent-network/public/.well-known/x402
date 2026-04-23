@@ -1,0 +1,39 @@
+{
+  "version": "2.0",
+  "name": "AgentPay Service Marketplace",
+  "description": "AI-powered local service booking \u2014 HVAC, plumbing, hair salons, restaurants and more.",
+  "url": "https://www.x402-agent-pay.com",
+  "wallet": "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
+  "network": "eip155:8453",
+  "currency": "USDC",
+  "endpoints": [
+    {
+      "path": "/api/v1/search",
+      "method": "POST",
+      "price": "0.001",
+      "payTo": "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
+      "description": "Search local service providers"
+    },
+    {
+      "path": "/api/v1/book",
+      "method": "POST",
+      "price": "0.002",
+      "payTo": "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
+      "description": "Book a service appointment"
+    },
+    {
+      "path": "/api/v1/ai/search",
+      "method": "POST",
+      "price": "0.002",
+      "payTo": "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
+      "description": "AI natural language service search"
+    },
+    {
+      "path": "/api/v1/llm",
+      "method": "POST",
+      "price": "0.001",
+      "payTo": "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
+      "description": "LLM inference via NVIDIA NIM"
+    }
+  ]
+}
