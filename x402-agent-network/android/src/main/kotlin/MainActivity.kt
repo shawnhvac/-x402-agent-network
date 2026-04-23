@@ -35,6 +35,16 @@ import org.json.JSONObject
 import java.io.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.SwitchDefaults
 
 data class BusinessService(
     val id: String = "",
@@ -848,28 +858,329 @@ fun AnalyticsScreen(onBack: () -> Unit) {
 }
 
 @Composable
+@Composable
 fun SettingsScreen(profile: BusinessProfile?, onBack: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+
+    // Profile
+    var businessName by remember { mutableStateOf(prefs.getString("business_name", profile?.businessName ?: "") ?: "") }
+    var email        by remember { mutableStateOf(prefs.getString("email",  profile?.email  ?: "") ?: "") }
+    var phone        by remember { mutableStateOf(prefs.getString("phone",  profile?.phone  ?: "") ?: "") }
+    var address      by remember { mutableStateOf(prefs.getString("address",profile?.address ?: "") ?: "") }
+    var description  by remember { mutableStateOf(prefs.getString("description", profile?.description ?: "") ?: "") }
+
+    // Hours
+    val days         = listOf("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
+    val defOpen      = listOf("09:00","09:00","09:00","09:00","09:00","10:00","closed")
+    val defClose     = listOf("18:00","18:00","18:00","18:00","18:00","16:00","closed")
+    var hoursOpen  by remember { mutableStateOf(days.mapIndexed { i, d -> d to (prefs.getString("hrs_open_$i",  defOpen[i])  ?: defOpen[i])  }.toMap().toMutableMap()) }
+    var hoursClose by remember { mutableStateOf(days.mapIndexed { i, d -> d to (prefs.getString("hrs_close_$i", defClose[i]) ?: defClose[i]) }.toMap().toMutableMap()) }
+
+    // Appointment
+    var appointmentDuration by remember { mutableStateOf(prefs.getString("appt_dur",  "60") ?: "60") }
+    var appointmentBuffer   by remember { mutableStateOf(prefs.getString("appt_buf",  "15") ?: "15") }
+    var autoConfirm         by remember { mutableStateOf(prefs.getBoolean("auto_confirm", false)) }
+
+    // Notifications
+    var notifyNewBooking   by remember { mutableStateOf(prefs.getBoolean("ntfy_new",     true))  }
+    var notifyUpdate       by remember { mutableStateOf(prefs.getBoolean("ntfy_update",  true))  }
+    var notifyPayment      by remember { mutableStateOf(prefs.getBoolean("ntfy_payment", true))  }
+    var notifyReminder     by remember { mutableStateOf(prefs.getBoolean("ntfy_remind",  false)) }
+
+    var saveStatus by remember { mutableStateOf("") }
+    var activeTab  by remember { mutableStateOf(0) }
+
+    val timeOptions = listOf("06:00","07:00","07:30","08:00","08:30","09:00","09:30",
+        "10:00","10:30","11:00","11:30","12:00","13:00","14:00","15:00","16:00",
+        "17:00","18:00","19:00","20:00","21:00","22:00")
+
+    fun saveAll() {
+        val ed = prefs.edit()
+        ed.putString("business_name", businessName)
+        ed.putString("email",  email);  ed.putString("phone",   phone)
+        ed.putString("address",address);ed.putString("description", description)
+        days.forEachIndexed { i, d ->
+            ed.putString("hrs_open_$i",  hoursOpen[d]  ?: "closed")
+            ed.putString("hrs_close_$i", hoursClose[d] ?: "closed")
+        }
+        ed.putString("appt_dur", appointmentDuration)
+        ed.putString("appt_buf", appointmentBuffer)
+        ed.putBoolean("auto_confirm",  autoConfirm)
+        ed.putBoolean("ntfy_new",     notifyNewBooking)
+        ed.putBoolean("ntfy_update",  notifyUpdate)
+        ed.putBoolean("ntfy_payment", notifyPayment)
+        ed.putBoolean("ntfy_remind",  notifyReminder)
+        ed.apply()
+        saveStatus = "✓ Saved"
+    }
+
     Column(modifier = Modifier.fillMaxSize().background(Color(0xFF0f172a))) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1e293b))
-                .padding(20.dp)
-        ) {
+        // Header
+        Box(modifier = Modifier.fillMaxWidth().background(Color(0xFF1e293b)).padding(20.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack) {
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
-                Text("Settings", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Settings", fontSize = 20.sp, fontWeight = FontWeight.Bold,
+                    color = Color.White, modifier = Modifier.padding(start = 8.dp))
             }
         }
-        LazyColumn(modifier = Modifier.fillMaxSize().padding(20.dp)) {
-            item { Text("Profile settings coming soon", color = Color.Gray) }
+
+        // Tabs
+        ScrollableTabRow(selectedTabIndex = activeTab,
+            containerColor = Color(0xFF1e293b), contentColor = Color(0xFF3b82f6), edgePadding = 0.dp) {
+            listOf("Profile","Hours","Bookings","Alerts").forEachIndexed { i, t ->
+                Tab(selected = activeTab == i, onClick = { activeTab = i; saveStatus = "" },
+                    text = { Text(t, fontSize = 13.sp,
+                        color = if (activeTab == i) Color(0xFF3b82f6) else Color.Gray) })
+            }
+        }
+
+        if (saveStatus.isNotEmpty()) {
+            Text(saveStatus, color = Color(0xFF4ade80), fontSize = 13.sp,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp))
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            when (activeTab) {
+                // ── PROFILE ──────────────────────────────────────
+                0 -> {
+                    item { SettingsSectionHeader("Business Profile") }
+                    item { SettingsField("Business Name", businessName, Icons.Default.Business)       { businessName = it } }
+                    item { SettingsField("Email", email, Icons.Default.Email, KeyboardType.Email)     { email = it } }
+                    item { SettingsField("Phone", phone, Icons.Default.Phone, KeyboardType.Phone)     { phone = it } }
+                    item { SettingsField("Address", address, Icons.Default.LocationOn)                { address = it } }
+                    item { SettingsField("About Your Business", description, Icons.Default.Info, multiline = true) { description = it } }
+                    item { SettingsSaveButton { saveAll() } }
+                }
+
+                // ── HOURS ─────────────────────────────────────────
+                1 -> {
+                    item { SettingsSectionHeader("Business Hours") }
+                    items(days.size) { i ->
+                        val day    = days[i]
+                        val isOpen = hoursOpen[day] != "closed"
+                        Card(shape = RoundedCornerShape(10.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))) {
+                            Column(modifier = Modifier.padding(14.dp)) {
+                                Row(modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically) {
+                                    Text(day, color = Color.White, fontWeight = FontWeight.SemiBold)
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(if (isOpen) "Open" else "Closed",
+                                            color = if (isOpen) Color(0xFF4ade80) else Color.Gray,
+                                            fontSize = 13.sp)
+                                        Switch(checked = isOpen, onCheckedChange = { open ->
+                                            hoursOpen  = hoursOpen.toMutableMap().also  { it[day] = if (open) "09:00" else "closed" }
+                                            hoursClose = hoursClose.toMutableMap().also { it[day] = if (open) "18:00" else "closed" }
+                                        }, colors = SwitchDefaults.colors(
+                                            checkedThumbColor = Color.White, checkedTrackColor = Color(0xFF3b82f6)),
+                                            modifier = Modifier.padding(start = 8.dp))
+                                    }
+                                }
+                                if (isOpen) {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        SettingsTimeDropdown("Opens",  hoursOpen[day]  ?: "09:00", timeOptions, Modifier.weight(1f)) {
+                                            hoursOpen  = hoursOpen.toMutableMap().also  { m -> m[day] = it } }
+                                        SettingsTimeDropdown("Closes", hoursClose[day] ?: "18:00", timeOptions, Modifier.weight(1f)) {
+                                            hoursClose = hoursClose.toMutableMap().also { m -> m[day] = it } }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    item { SettingsSaveButton { saveAll() } }
+                }
+
+                // ── BOOKINGS ──────────────────────────────────────
+                2 -> {
+                    item { SettingsSectionHeader("Appointment Settings") }
+                    item {
+                        Card(shape = RoundedCornerShape(10.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))) {
+                            Column(modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                                Row(modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically) {
+                                    Column {
+                                        Text("Auto-Confirm Bookings", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                        Text("Confirm new bookings automatically", color = Color.Gray, fontSize = 12.sp)
+                                    }
+                                    Switch(checked = autoConfirm, onCheckedChange = { autoConfirm = it },
+                                        colors = SwitchDefaults.colors(
+                                            checkedThumbColor = Color.White, checkedTrackColor = Color(0xFF3b82f6)))
+                                }
+
+                                Divider(color = Color(0xFF334155))
+                                Text("Default Appointment Duration", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf("30","45","60","90","120").forEach { m ->
+                                        FilterChip(selected = appointmentDuration == m,
+                                            onClick = { appointmentDuration = m },
+                                            label = { Text("${m}m", fontSize = 12.sp) },
+                                            colors = FilterChipDefaults.filterChipColors(
+                                                selectedContainerColor = Color(0xFF3b82f6),
+                                                selectedLabelColor = Color.White,
+                                                containerColor = Color(0xFF334155),
+                                                labelColor = Color.Gray))
+                                    }
+                                }
+
+                                Divider(color = Color(0xFF334155))
+                                Text("Buffer Between Appointments", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                Text("Prep time between bookings", color = Color.Gray, fontSize = 12.sp)
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf("0","10","15","30").forEach { m ->
+                                        FilterChip(selected = appointmentBuffer == m,
+                                            onClick = { appointmentBuffer = m },
+                                            label = { Text(if (m == "0") "None" else "${m}m", fontSize = 12.sp) },
+                                            colors = FilterChipDefaults.filterChipColors(
+                                                selectedContainerColor = Color(0xFF3b82f6),
+                                                selectedLabelColor = Color.White,
+                                                containerColor = Color(0xFF334155),
+                                                labelColor = Color.Gray))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    item { SettingsSaveButton { saveAll() } }
+                }
+
+                // ── ALERTS ────────────────────────────────────────
+                3 -> {
+                    item { SettingsSectionHeader("Push Notifications") }
+                    item {
+                        Card(shape = RoundedCornerShape(10.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1e293b))) {
+                            Column(modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                SettingsNotifyRow(Icons.Default.Notifications,"New Booking",
+                                    "Alert when a customer books",notifyNewBooking) { notifyNewBooking = it }
+                                Divider(color = Color(0xFF334155), modifier = Modifier.padding(vertical = 6.dp))
+                                SettingsNotifyRow(Icons.Default.Edit,"Booking Updates",
+                                    "Cancellations & reschedules",notifyUpdate) { notifyUpdate = it }
+                                Divider(color = Color(0xFF334155), modifier = Modifier.padding(vertical = 6.dp))
+                                SettingsNotifyRow(Icons.Default.AttachMoney,"Payment Received",
+                                    "When a payment clears",notifyPayment) { notifyPayment = it }
+                                Divider(color = Color(0xFF334155), modifier = Modifier.padding(vertical = 6.dp))
+                                SettingsNotifyRow(Icons.Default.Alarm,"Appointment Reminders",
+                                    "30 min before each booking",notifyReminder) { notifyReminder = it }
+                            }
+                        }
+                    }
+                    item {
+                        Button(onClick = {
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                                (context as? android.app.Activity)?.requestPermissions(
+                                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 101)
+                            }
+                            saveAll()
+                        }, modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3b82f6)),
+                            shape = RoundedCornerShape(10.dp)) {
+                            Icon(Icons.Default.NotificationsActive, null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Enable Push Notifications")
+                        }
+                    }
+                    item { SettingsSaveButton { saveAll() } }
+                }
+            }
+            item { Spacer(modifier = Modifier.height(40.dp)) }
+        }
+    }
+}
+
+// ── Settings Helpers ──────────────────────────────────────────────────────────
+
+@Composable
+fun SettingsSectionHeader(title: String) {
+    Text(title, fontSize = 15.sp, fontWeight = FontWeight.Bold,
+        color = Color(0xFF3b82f6), modifier = Modifier.padding(vertical = 2.dp))
+}
+
+@Composable
+fun SettingsField(
+    label: String, value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    multiline: Boolean = false,
+    onChange: (String) -> Unit
+) {
+    TextField(value = value, onValueChange = onChange, label = { Text(label) },
+        leadingIcon = { Icon(icon, null, tint = Color(0xFF3b82f6)) },
+        modifier = Modifier.fillMaxWidth(),
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        maxLines = if (multiline) 4 else 1, minLines = if (multiline) 3 else 1,
+        shape = RoundedCornerShape(10.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color(0xFF1e293b), unfocusedContainerColor = Color(0xFF1e293b),
+            focusedTextColor = Color.White, unfocusedTextColor = Color.White,
+            focusedLabelColor = Color(0xFF3b82f6), unfocusedLabelColor = Color.Gray,
+            focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent))
+}
+
+@Composable
+fun SettingsTimeDropdown(label: String, selected: String, options: List<String>,
+                          modifier: Modifier = Modifier, onSelect: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+            border = BorderStroke(1.dp, Color(0xFF334155))) {
+            Text("$label: $selected", fontSize = 12.sp, color = Color.White)
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color(0xFF1e293b)).heightIn(max = 200.dp)) {
+            options.forEach { t ->
+                DropdownMenuItem(text = { Text(t, color = Color.White, fontSize = 13.sp) },
+                    onClick = { onSelect(t); expanded = false })
+            }
         }
     }
 }
 
 @Composable
+fun SettingsNotifyRow(icon: androidx.compose.ui.graphics.vector.ImageVector,
+                       title: String, subtitle: String, checked: Boolean, onToggle: (Boolean) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            Icon(icon, null, tint = Color(0xFF3b82f6), modifier = Modifier.size(22.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(title, color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(subtitle, color = Color.Gray, fontSize = 12.sp)
+            }
+        }
+        Switch(checked = checked, onCheckedChange = onToggle,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White, checkedTrackColor = Color(0xFF3b82f6),
+                uncheckedThumbColor = Color.Gray, uncheckedTrackColor = Color(0xFF334155)))
+    }
+}
+
+@Composable
+fun SettingsSaveButton(onSave: () -> Unit) {
+    Button(onClick = onSave, modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF059669)),
+        shape = RoundedCornerShape(10.dp)) {
+        Icon(Icons.Default.Save, null, modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("Save Settings")
+    }
+}
+
 fun StatCard(title: String, value: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.height(100.dp),
