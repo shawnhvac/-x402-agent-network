@@ -747,87 +747,135 @@ fun ServiceCard(
     }
 }
 
+// Master service list for autocomplete
+val ALL_SERVICES = listOf(
+    "AC Repair", "AC Installation", "AC Maintenance", "Heating Repair", "Furnace Install",
+    "Heat Pump Service", "Duct Cleaning", "Air Quality Test", "Thermostat Install",
+    "Drain Cleaning", "Pipe Repair", "Water Heater Install", "Leak Detection",
+    "Faucet Repair", "Toilet Repair", "Sewer Line Repair", "Water Softener Install",
+    "Electrical Repair", "Panel Upgrade", "Outlet Install", "Lighting Install",
+    "Ceiling Fan Install", "EV Charger Install", "Generator Install", "Wiring",
+    "Lawn Mowing", "Tree Trimming", "Sprinkler Repair", "Landscaping Design",
+    "Sod Install", "Weed Control", "Fertilization", "Leaf Removal",
+    "House Cleaning", "Deep Cleaning", "Move-Out Cleaning", "Window Cleaning",
+    "Carpet Cleaning", "Pressure Washing", "Gutter Cleaning", "Pool Cleaning",
+    "Oil Change", "Tire Rotation", "Brake Service", "Engine Diagnostics",
+    "Transmission Service", "Detailing", "Windshield Repair", "Battery Replacement",
+    "Haircut", "Hair Color", "Highlights", "Blowout", "Manicure", "Pedicure",
+    "Waxing", "Facial", "Massage", "Lash Extensions", "Brow Shaping",
+    "General Checkup", "Dental Cleaning", "Teeth Whitening", "Eye Exam",
+    "Physical Therapy", "Chiropractic", "Vaccination",
+    "Dog Grooming", "Dog Walking", "Pet Sitting", "Veterinary Checkup", "Pet Boarding",
+    "Phone Screen Repair", "Laptop Repair", "Virus Removal", "Data Recovery",
+    "Smart Home Setup", "WiFi Setup", "Security Camera Install",
+    "Drywall Repair", "Painting", "Flooring Install", "Roof Repair",
+    "Deck Building", "Fence Install", "Door Install", "Window Install",
+    "Moving Help", "Junk Removal", "Handyman Service", "Locksmith", "Pest Control"
+)
+
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun AddServiceDialog(
     onAdd: (BusinessService) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
+    var name     by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    var price    by remember { mutableStateOf("") }
     var duration by remember { mutableStateOf("60") }
-    
+    var errorMsg by remember { mutableStateOf("") }
+    var showSuggestions by remember { mutableStateOf(false) }
+
+    val suggestions = remember(name) {
+        if (name.length < 2) emptyList()
+        else ALL_SERVICES.filter { it.contains(name, ignoreCase = true) }.take(6)
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1e293b),
         title = { Text("Add Service", color = Color.White) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                TextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Service Name") },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF1e293b),
-                        unfocusedContainerColor = Color(0xFF1e293b),
-                        focusedTextColor = Color.White
+                Column {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it; showSuggestions = it.length >= 2 },
+                        label = { Text("Service Name") },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF10b981), focusedLabelColor = Color(0xFF10b981),
+                            cursorColor = Color(0xFF10b981), unfocusedTextColor = Color.White, focusedTextColor = Color.White)
                     )
-                )
-                TextField(
-                    value = category,
-                    onValueChange = { category = it },
+                    if (showSuggestions && suggestions.isNotEmpty()) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF334155)),
+                            shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                        ) {
+                            Column {
+                                suggestions.forEach { suggestion ->
+                                    Text(
+                                        text = suggestion,
+                                        color = Color.White,
+                                        fontSize = 14.sp,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                name = suggestion
+                                                category = when {
+                                                    listOf("AC","Heat","Furnace","Duct","Thermostat").any { suggestion.contains(it, true) } -> "HVAC"
+                                                    listOf("Drain","Pipe","Water Heater","Faucet","Toilet","Sewer").any { suggestion.contains(it, true) } -> "Plumbing"
+                                                    listOf("Electrical","Panel","Outlet","Lighting","Wiring","EV Charger","Generator").any { suggestion.contains(it, true) } -> "Electrical"
+                                                    listOf("Lawn","Tree","Sprinkler","Sod","Weed","Fertili","Leaf","Landscape").any { suggestion.contains(it, true) } -> "Landscaping"
+                                                    listOf("Clean","Carpet","Gutter","Pool","Pressure Wash").any { suggestion.contains(it, true) } -> "Cleaning"
+                                                    listOf("Oil Change","Tire","Brake","Engine","Transmission","Detail","Windshield","Battery Replace").any { suggestion.contains(it, true) } -> "Auto Service"
+                                                    listOf("Haircut","Hair Color","Manicure","Pedicure","Waxing","Facial","Massage","Lash","Brow").any { suggestion.contains(it, true) } -> "Hair & Beauty"
+                                                    listOf("Dental","Teeth","Eye Exam","Physical Therapy","Chiro","Checkup","Vaccination").any { suggestion.contains(it, true) } -> "Health"
+                                                    listOf("Dog","Pet","Vet","Boarding").any { suggestion.contains(it, true) } -> "Pets"
+                                                    listOf("Phone Screen","Laptop","Virus","Data Recovery","WiFi","Smart Home","Security Camera").any { suggestion.contains(it, true) } -> "Tech Repair"
+                                                    listOf("Drywall","Paint","Floor","Roof","Deck","Fence","Door Install","Window Install").any { suggestion.contains(it, true) } -> "Construction"
+                                                    else -> category
+                                                }
+                                                showSuggestions = false
+                                            }
+                                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                                    )
+                                    Divider(color = Color(0xFF475569), thickness = 0.5.dp)
+                                }
+                            }
+                        }
+                    }
+                }
+                OutlinedTextField(value = category, onValueChange = { category = it },
                     label = { Text("Category") },
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF1e293b),
-                        unfocusedContainerColor = Color(0xFF1e293b),
-                        focusedTextColor = Color.White
-                    )
-                )
-                TextField(
-                    value = price,
-                    onValueChange = { price = it },
-                    label = { Text("Price (\$)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF1e293b),
-                        unfocusedContainerColor = Color(0xFF1e293b),
-                        focusedTextColor = Color.White
-                    )
-                )
-                TextField(
-                    value = duration,
-                    onValueChange = { duration = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF10b981), focusedLabelColor = Color(0xFF10b981), cursorColor = Color(0xFF10b981), unfocusedTextColor = Color.White, focusedTextColor = Color.White))
+                OutlinedTextField(value = price, onValueChange = { price = it },
+                    label = { Text("Price (${'$'})") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF10b981), focusedLabelColor = Color(0xFF10b981), cursorColor = Color(0xFF10b981), unfocusedTextColor = Color.White, focusedTextColor = Color.White))
+                OutlinedTextField(value = duration, onValueChange = { duration = it },
                     label = { Text("Duration (minutes)") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFF1e293b),
-                        unfocusedContainerColor = Color(0xFF1e293b),
-                        focusedTextColor = Color.White
-                    )
-                )
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color(0xFF10b981), focusedLabelColor = Color(0xFF10b981), cursorColor = Color(0xFF10b981), unfocusedTextColor = Color.White, focusedTextColor = Color.White))
+                if (errorMsg.isNotEmpty()) Text(errorMsg, color = Color.Red, fontSize = 12.sp)
             }
         },
         confirmButton = {
-            Button(
-                onClick = {
-                    onAdd(
-                        BusinessService(
-                            id = System.currentTimeMillis().toString(),
-                            name = name,
-                            category = category,
-                            price = price.toDoubleOrNull() ?: 0.0,
-                            duration = duration.toIntOrNull() ?: 60
-                        )
-                    )
+            Button(onClick = {
+                val p = price.toDoubleOrNull() ?: 0.0
+                val d = duration.toIntOrNull() ?: 60
+                when {
+                    name.isBlank()     -> errorMsg = "Service name required."
+                    category.isBlank() -> errorMsg = "Category required."
+                    else -> onAdd(BusinessService(id = java.util.UUID.randomUUID().toString(), name = name.trim(), category = category.trim(), price = p, duration = d, available = true))
                 }
-            ) {
-                Text("Add")
-            }
+            }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10b981))) { Text("Add") }
         },
-        dismissButton = {
-            Button(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = Color.Gray) } }
     )
 }
 
