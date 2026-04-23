@@ -857,7 +857,7 @@ fun AnalyticsScreen(onBack: () -> Unit) {
     }
 }
 
-@Composable
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(profile: BusinessProfile?, onBack: () -> Unit) {
     val context = LocalContext.current
@@ -1129,6 +1129,7 @@ fun SettingsField(
             focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent))
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsTimeDropdown(label: String, selected: String, options: List<String>,
                           modifier: Modifier = Modifier, onSelect: (String) -> Unit) {
@@ -1181,6 +1182,7 @@ fun SettingsSaveButton(onSave: () -> Unit) {
     }
 }
 
+@Composable
 fun StatCard(title: String, value: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.height(100.dp),
