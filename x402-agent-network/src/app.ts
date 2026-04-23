@@ -30,6 +30,7 @@ import productsOsmRoutes from "./routes/products-osm.js";
 import agentMarketplaceRoutes from "./routes/agent-marketplace.js";
 import notifyRoutes from "./routes/notify.js";
 import providerRoutes from "./routes/provider.js";
+import osmClaimRouter from "./routes/osm-claim.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
