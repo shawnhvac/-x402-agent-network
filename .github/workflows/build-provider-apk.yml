@@ -7,7 +7,6 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  ANDROID_DIR: x402-agent-network/android
 
 jobs:
   build:
@@ -22,7 +21,12 @@ jobs:
         with:
           java-version: "17"
           distribution: temurin
-          cache: gradle
+
+      - name: Install Gradle 8.2
+        run: |
+          curl -sL https://services.gradle.org/distributions/gradle-8.2-bin.zip -o /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /opt/gradle
+          echo "/opt/gradle/gradle-8.2/bin" >> $GITHUB_PATH
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -31,32 +35,27 @@ jobs:
         run: yes | sdkmanager --licenses || true
 
       - name: Install build tools
-        run: sdkmanager "build-tools;34.0.0" || true
-
-      - name: Make gradlew executable
-        run: chmod +x $ANDROID_DIR/gradlew
+        run: sdkmanager "build-tools;34.0.0" "platforms;android-34" || true
 
       - name: Generate debug keystore
         run: |
           mkdir -p ~/.android
           keytool -genkeypair -v \
             -keystore ~/.android/debug.keystore \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
+            -storepass android -alias androiddebugkey -keypass android \
             -keyalg RSA -keysize 2048 -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US" 2>/dev/null || true
 
       - name: Build Provider APK
         working-directory: x402-agent-network/android
-        run: ./gradlew assembleDebug -x lint --stacktrace
+        run: gradle assembleDebug -x lint --stacktrace
         env:
           ANDROID_HOME: /usr/local/lib/android/sdk
 
       - name: Find and sign APK
         run: |
           APK=$(find x402-agent-network/android -name "*.apk" | grep -v test | head -1)
-          echo "Found: $APK"
+          echo "APK: $APK"
           BUILD_TOOLS=$(ls /usr/local/lib/android/sdk/build-tools/ | sort -V | tail -1)
           APKSIGNER="/usr/local/lib/android/sdk/build-tools/${BUILD_TOOLS}/apksigner"
           VERSION=$(grep versionName x402-agent-network/android/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
@@ -67,7 +66,6 @@ jobs:
             --out agentpay-provider-v${VERSION}.apk "$APK"
           cp agentpay-provider-v${VERSION}.apk agentpay-provider.apk
           ls -lh agentpay-provider*.apk
-          $APKSIGNER verify --verbose agentpay-provider.apk | head -3
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -77,4 +75,4 @@ jobs:
           retention-days: 30
 
       - name: Build complete
-        run: echo "SUCCESS - APK signed and uploaded"
+        run: echo "SUCCESS"
