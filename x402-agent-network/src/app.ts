@@ -207,6 +207,7 @@ app.get("/docs", (req: Request, res: Response) => {
 
 app.get("/contact", (req: Request, res: Response) => {
   res.sendFile("public/contact.html", { root: process.cwd() });
+app.get("/location-services", (req: Request, res: Response) => { res.sendFile("public/location-services.html", { root: process.cwd() }); });
 });
 
 app.get("/examples", (req: Request, res: Response) => {

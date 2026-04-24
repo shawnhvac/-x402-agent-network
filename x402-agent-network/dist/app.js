@@ -5445,6 +5445,9 @@ app.get("/docs", (req, res) => {
 });
 app.get("/contact", (req, res) => {
   res.sendFile("public/contact.html", { root: process.cwd() });
+  app.get("/location-services", (req2, res2) => {
+    res2.sendFile("public/location-services.html", { root: process.cwd() });
+  });
 });
 app.get("/examples", (req, res) => {
   res.sendFile("public/examples.html", { root: process.cwd() });
