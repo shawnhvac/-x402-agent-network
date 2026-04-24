@@ -483,6 +483,7 @@ app.post("/api/agent/execute", async (req: Request, res: Response) => {
     remaining: newRemaining,
     timestamp: new Date().toISOString()
   });
+});
 
 /**
  * DAYS 3-4: Agent Registry Routes
