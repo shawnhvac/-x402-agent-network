@@ -1,3 +1,98 @@
+
+// ── AgentPay Nav — injected safely so scripts execute ─────────────────────
+(function() {
+  function injectNav() {
+    fetch('/nav.html')
+      .then(r => r.text())
+      .then(html => {
+        // Parse out <style> and non-script HTML separately from <script>
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Insert styles
+        doc.querySelectorAll('style').forEach(s => {
+          const el = document.createElement('style');
+          el.textContent = s.textContent;
+          document.head.appendChild(el);
+        });
+
+        // Build nav HTML without <script> and <style> tags
+        const body = doc.body;
+        const scripts = Array.from(body.querySelectorAll('script'));
+        scripts.forEach(s => s.remove());
+        body.querySelectorAll('style').forEach(s => s.remove());
+
+        const placeholder = document.getElementById('nav-placeholder');
+        if (placeholder) {
+          placeholder.innerHTML = body.innerHTML;
+        } else {
+          // No placeholder — prepend to body
+          const div = document.createElement('div');
+          div.innerHTML = body.innerHTML;
+          document.body.insertBefore(div, document.body.firstChild);
+        }
+
+        // Now manually execute the nav scripts
+        initNav();
+      })
+      .catch(() => console.warn('Nav load failed'));
+  }
+
+  function initNav() {
+    // Use event delegation — works after dynamic injection
+    document.addEventListener('click', function(e) {
+      const toggleBtn = e.target.closest('[data-nav-toggle]');
+      const openBtn   = e.target.closest('[data-nav-open-drawer]');
+      const closeBtn  = e.target.closest('[data-nav-close-drawer]');
+
+      if (toggleBtn) {
+        e.stopPropagation();
+        const id = toggleBtn.getAttribute('data-nav-toggle');
+        document.querySelectorAll('.nav-menu').forEach(m => {
+          m.style.display = (m.id === id && m.style.display !== 'block') ? 'block' : 'none';
+        });
+        return;
+      }
+
+      if (openBtn) {
+        e.stopPropagation();
+        const drawer  = document.getElementById('nav-drawer');
+        const overlay = document.getElementById('nav-overlay');
+        if (drawer)  { drawer.style.display = 'block'; setTimeout(() => drawer.classList.add('open'), 10); }
+        if (overlay) { overlay.style.display = 'block'; setTimeout(() => overlay.classList.add('open'), 10); }
+        document.body.style.overflow = 'hidden';
+        return;
+      }
+
+      if (closeBtn) {
+        e.stopPropagation();
+        const drawer  = document.getElementById('nav-drawer');
+        const overlay = document.getElementById('nav-overlay');
+        if (drawer)  drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+          if (drawer && !drawer.classList.contains('open'))  drawer.style.display = 'none';
+          if (overlay && !overlay.classList.contains('open')) overlay.style.display = 'none';
+        }, 260);
+        return;
+      }
+
+      // Close dropdowns when clicking outside
+      if (!e.target.closest('.nav-dropdown')) {
+        document.querySelectorAll('.nav-menu').forEach(m => m.style.display = 'none');
+      }
+    }, true); // capture phase so it fires before anything else
+  }
+
+  // Run on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectNav);
+  } else {
+    injectNav();
+  }
+})();
+
 /**
  * AgentPay AI Chatbot — powered by Llama 3.3 70B via NVIDIA NIM
  */
