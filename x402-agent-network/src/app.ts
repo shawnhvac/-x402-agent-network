@@ -534,6 +534,7 @@ app.use("/api/v1", stripePaymentRoutes);
 app.use("/api/v1", businessPortalRoutes);
 app.use("/api/v1", agentMarketplaceRoutes);
 app.use("/api/v1/provider", providerRoutes);
+app.use("/api/v1/providers", providerRoutes); // alias — Android app uses plural
 app.use('/api/v1/osm-claim', osmClaimRouter);
 app.use("/api/v1/notify", notifyRoutes);
 app.use("/api/v1/wallet", walletRoutes);

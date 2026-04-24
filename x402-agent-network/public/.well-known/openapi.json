@@ -1,0 +1,56 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AgentPay x402 API",
+    "version": "2.0.0",
+    "description": "AI agent marketplace — search, book, and pay service providers via x402 micropayments"
+  },
+  "servers": [{"url": "https://www.x402-agent-pay.com/api/v1"}],
+  "paths": {
+    "/search": {
+      "get": {
+        "summary": "Search service providers",
+        "parameters": [
+          {"name": "q", "in": "query", "schema": {"type": "string"}},
+          {"name": "category", "in": "query", "schema": {"type": "string"}},
+          {"name": "location", "in": "query", "schema": {"type": "string"}}
+        ],
+        "responses": {"200": {"description": "List of providers"}}
+      }
+    },
+    "/book": {
+      "post": {
+        "summary": "Book a service provider",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "providerId": {"type": "string"},
+                  "service": {"type": "string"},
+                  "customerName": {"type": "string"},
+                  "customerPhone": {"type": "string"},
+                  "scheduledTime": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"200": {"description": "Booking confirmation"}}
+      }
+    },
+    "/provider/login": {
+      "post": {
+        "summary": "Provider login",
+        "responses": {"200": {"description": "Auth token"}}
+      }
+    },
+    "/provider/register": {
+      "post": {
+        "summary": "Register as a provider",
+        "responses": {"200": {"description": "Provider created"}}
+      }
+    }
+  }
+}

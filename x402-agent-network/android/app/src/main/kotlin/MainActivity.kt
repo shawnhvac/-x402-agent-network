@@ -123,6 +123,9 @@ fun AgentPayProviderApp() {
         "analytics" -> AnalyticsScreen(
             onBack = { currentScreen = "dashboard" }
         )
+        "chat" -> AIChatScreen(
+            onBack = { currentScreen = "dashboard" }
+        )
         "settings" -> SettingsScreen(
             profile = businessProfile,
             onBack = { currentScreen = "dashboard" }
@@ -1397,6 +1400,169 @@ fun MenuButton(
                 Text(subtitle, fontSize = 12.sp, color = Color.Gray)
             }
             Icon(Icons.Default.ChevronRight, contentDescription = "Go", tint = Color.Gray)
+        }
+    }
+}
+
+
+// ─── AI Chat Screen ───────────────────────────────────────────────────────────
+data class ChatMessage(val role: String, val content: String)
+
+@Composable
+fun AIChatScreen(onBack: () -> Unit) {
+    var messages by remember { mutableStateOf(listOf(
+        ChatMessage("assistant", "Hi! I'm your AgentPay AI assistant. I can help you manage bookings, set your availability, update pricing, or answer questions about your account. What do you need?")
+    )) }
+    var input by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+    val listState = androidx.compose.foundation.lazy.rememberLazyListState()
+
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF0f172a))
+    ) {
+        // Header
+        Row(
+            modifier = Modifier.fillMaxWidth().background(Color(0xFF1e293b)).padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+            }
+            Text("AI Assistant", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Spacer(modifier = Modifier.weight(1f))
+            Text("Llama 3.3", fontSize = 12.sp, color = Color(0xFF3b82f6))
+        }
+
+        // Messages
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.weight(1f).padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(vertical = 16.dp)
+        ) {
+            items(messages) { msg ->
+                val isUser = msg.role == "user"
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .widthIn(max = 280.dp)
+                            .background(
+                                if (isUser) Color(0xFF3b82f6) else Color(0xFF1e293b),
+                                RoundedCornerShape(
+                                    topStart = 16.dp, topEnd = 16.dp,
+                                    bottomStart = if (isUser) 16.dp else 4.dp,
+                                    bottomEnd = if (isUser) 4.dp else 16.dp
+                                )
+                            )
+                            .padding(12.dp)
+                    ) {
+                        Text(msg.content, color = Color.White, fontSize = 14.sp)
+                    }
+                }
+            }
+            if (isLoading) {
+                item {
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                        Box(
+                            modifier = Modifier
+                                .background(Color(0xFF1e293b), RoundedCornerShape(16.dp))
+                                .padding(12.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                color = Color(0xFF3b82f6),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Input bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF1e293b))
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextField(
+                value = input,
+                onValueChange = { input = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Ask me anything...", color = Color.Gray) },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF0f172a),
+                    unfocusedContainerColor = Color(0xFF0f172a),
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White
+                ),
+                maxLines = 3
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(
+                onClick = {
+                    val userText = input.trim()
+                    if (userText.isBlank() || isLoading) return@IconButton
+                    input = ""
+                    messages = messages + ChatMessage("user", userText)
+                    isLoading = true
+                    coroutineScope.launch {
+                        try {
+                            val reply = withContext(Dispatchers.IO) {
+                                val client = OkHttpClient.Builder()
+                                    .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+                                    .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                                    .build()
+                                val historyJson = org.json.JSONArray()
+                                messages.forEach { m ->
+                                    val obj = JSONObject()
+                                    obj.put("role", m.role)
+                                    obj.put("content", m.content)
+                                    historyJson.put(obj)
+                                }
+                                val payload = JSONObject()
+                                payload.put("messages", historyJson)
+                                payload.put("model", "meta/llama-3.3-70b-instruct")
+                                val body = payload.toString().toRequestBody("application/json".toMediaType())
+                                val request = Request.Builder()
+                                    .url("https://www.x402-agent-pay.com/api/v1/ai/chat")
+                                    .post(body)
+                                    .build()
+                                val response = client.newCall(request).execute()
+                                val respBody = response.body?.string() ?: ""
+                                if (response.isSuccessful) {
+                                    runCatching {
+                                        JSONObject(respBody).getString("reply")
+                                    }.getOrDefault("Got it! Let me help you with that.")
+                                } else {
+                                    "Sorry, I'm having trouble connecting right now. Please try again."
+                                }
+                            }
+                            messages = messages + ChatMessage("assistant", reply)
+                        } catch (e: Exception) {
+                            messages = messages + ChatMessage("assistant", "Connection error. Please check your internet and try again.")
+                        } finally {
+                            isLoading = false
+                        }
+                    }
+                },
+                enabled = !isLoading && input.isNotBlank(),
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(Color(0xFF3b82f6), RoundedCornerShape(24.dp))
+            ) {
+                Icon(Icons.Default.Send, contentDescription = "Send", tint = Color.White)
+            }
         }
     }
 }
