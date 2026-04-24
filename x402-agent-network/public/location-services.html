@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Services — AgentPay</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+  .hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(135deg,#0f172a,#1e293b)}
+  .hero h1{font-size:2.5em;font-weight:800;color:#fff;margin-bottom:16px}
+  .hero p{font-size:1.1em;color:#94a3b8;max-width:650px;margin:0 auto 30px}
+  .search-box{max-width:600px;margin:0 auto;display:flex;gap:12px;padding:0 20px}
+  .search-box input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px 20px;color:#fff;font-size:15px;outline:none}
+  .search-box button{background:#3b82f6;border:none;border-radius:10px;padding:14px 24px;color:#fff;cursor:pointer;font-weight:700}
+  .results{max-width:900px;margin:40px auto;padding:0 20px;min-height:200px}
+  .result-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px 24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+  .result-card.verified{border-color:#3b82f6}
+  .result-info h3{font-size:16px;color:#fff;margin-bottom:4px}
+  .result-info p{color:#94a3b8;font-size:13px}
+  .badge-v{background:rgba(59,130,246,0.15);color:#3b82f6;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:8px}
+  .badge-osm{background:rgba(34,197,94,0.1);color:#22c55e;padding:3px 10px;border-radius:20px;font-size:11px}
+  .book-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;font-weight:600;white-space:nowrap}
+  .how-it-works{max-width:900px;margin:60px auto;padding:0 20px}
+  .how-it-works h2{font-size:1.8em;color:#fff;text-align:center;margin-bottom:40px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+  .step{text-align:center;padding:24px}
+  .step .icon{font-size:2.5em;margin-bottom:16px}
+  .step h4{color:#fff;margin-bottom:8px}
+  .step p{color:#94a3b8;font-size:14px;line-height:1.5}
+  .empty{text-align:center;color:#475569;padding:60px 20px}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<div class="hero">
+  <h1>📍 Location Services</h1>
+  <p>AI agents and customers find your business via real-time location search. AgentPay blends verified providers with OpenStreetMap data — your business, discovered 24/7.</p>
+  <div class="search-box">
+    <input type="text" id="search-input" placeholder="Search plumbers, HVAC, electricians near me..." onkeydown="if(event.key==='Enter')search()"/>
+    <button onclick="search()">Search</button>
+  </div>
+</div>
+
+<div class="results" id="results">
+  <div class="empty">
+    <div style="font-size:3em;margin-bottom:16px">🗺️</div>
+    <p>Search for a service above to find providers near you</p>
+  </div>
+</div>
+
+<div class="how-it-works">
+  <h2>How Location Discovery Works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="icon">🤖</div>
+      <h4>AI Agent Searches</h4>
+      <p>An AI agent or customer searches for a service. AgentPay queries our provider database + OpenStreetMap simultaneously.</p>
+    </div>
+    <div class="step">
+      <div class="icon">🏆</div>
+      <h4>Verified First</h4>
+      <p>Registered AgentPay providers appear at the top with a Verified badge. OSM businesses fill in the rest.</p>
+    </div>
+    <div class="step">
+      <div class="icon">💰</div>
+      <h4>Instant Booking</h4>
+      <p>The agent pays a $0.001 USDC x402 micropayment to access results, then books your service automatically.</p>
+    </div>
+    <div class="step">
+      <div class="icon">📱</div>
+      <h4>You Get Notified</h4>
+      <p>Your AgentPay Provider app buzzes with the booking details. Accept with one tap — or let it auto-confirm.</p>
+    </div>
+  </div>
+</div>
+
+<script src="/chatbot.js"></script>
+<script>
+  fetch('/nav.html').then(r=>r.text()).then(h=>{document.getElementById('nav-placeholder').innerHTML=h});
+
+  async function search() {
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+    const box = document.getElementById('results');
+    box.innerHTML = '<div class="empty"><p>🔍 Searching...</p></div>';
+    try {
+      const res = await fetch('/api/v1/search?q=' + encodeURIComponent(q) + '&limit=10');
+      const data = await res.json();
+      const providers = data.providers || data.results || [];
+      if (!providers.length) {
+        box.innerHTML = '<div class="empty"><p>No providers found for "' + q + '". <a href="/provider-download" style="color:#3b82f6">Register yours →</a></p></div>';
+        return;
+      }
+      box.innerHTML = providers.map(p => `
+        <div class="result-card ${p.verified ? 'verified' : ''}">
+          <div class="result-info">
+            <h3>${p.name || p.businessName || 'Business'} ${p.verified ? '<span class="badge-v">✓ Verified</span>' : '<span class="badge-osm">OSM</span>'}</h3>
+            <p>${p.category || p.type || ''} ${p.address || p.location || ''}</p>
+            ${p.phone ? '<p>📞 ' + p.phone + '</p>' : ''}
+          </div>
+          <button class="book-btn" onclick="window.location='/marketplace'">View & Book</button>
+        </div>
+      `).join('');
+    } catch(e) {
+      box.innerHTML = '<div class="empty"><p>Search unavailable — please try again.</p></div>';
+    }
+  }
+</script>
+</body>
+</html>

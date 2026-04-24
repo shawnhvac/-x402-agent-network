@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap — AgentPay</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
+  .hero{text-align:center;padding:80px 20px 60px}
+  .hero h1{font-size:2.5em;font-weight:800;color:#fff;margin-bottom:16px}
+  .hero p{font-size:1.1em;color:#94a3b8;max-width:600px;margin:0 auto}
+  .timeline{max-width:800px;margin:0 auto;padding:0 20px 80px;position:relative}
+  .timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:#1e293b;transform:translateX(-50%)}
+  .phase{position:relative;margin-bottom:60px;display:flex;gap:40px;align-items:flex-start}
+  .phase:nth-child(even){flex-direction:row-reverse}
+  .phase-content{flex:1;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px}
+  .phase-content.done{border-color:#22c55e}
+  .phase-content.active{border-color:#3b82f6;box-shadow:0 0 20px rgba(59,130,246,0.15)}
+  .phase-content.future{opacity:0.7}
+  .dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:20px;z-index:1;position:relative}
+  .dot.done{background:#22c55e}
+  .dot.active{background:#3b82f6;box-shadow:0 0 12px #3b82f6}
+  .dot.future{background:#334155;border:2px solid #475569}
+  .tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:12px}
+  .tag.done{background:rgba(34,197,94,0.15);color:#22c55e}
+  .tag.active{background:rgba(59,130,246,0.15);color:#3b82f6}
+  .tag.future{background:rgba(71,85,105,0.3);color:#94a3b8}
+  h3{font-size:1.1em;color:#fff;margin-bottom:10px}
+  ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  ul li{color:#94a3b8;font-size:14px;padding-left:16px;position:relative}
+  ul li::before{content:'→';position:absolute;left:0;color:#475569}
+  ul li.done-item::before{content:'✓';color:#22c55e}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<div class="hero">
+  <h1>🗺️ AgentPay Roadmap</h1>
+  <p>Building the infrastructure layer for AI agent commerce — one milestone at a time.</p>
+</div>
+
+<div class="timeline">
+
+  <div class="phase">
+    <div class="phase-content done">
+      <span class="tag done">✅ SHIPPED — Q1 2026</span>
+      <h3>Phase 1: Foundation</h3>
+      <ul>
+        <li class="done-item">x402 micropayment protocol (HTTP 402)</li>
+        <li class="done-item">Base mainnet USDC payments</li>
+        <li class="done-item">Agent registry + API key system</li>
+        <li class="done-item">OSM business search integration</li>
+        <li class="done-item">Stripe card payments (10 currencies)</li>
+        <li class="done-item">7 EVM chains + Solana support</li>
+        <li class="done-item">Listed on Bazaar / agentic.market</li>
+      </ul>
+    </div>
+    <div class="dot done"></div>
+    <div style="flex:1"></div>
+  </div>
+
+  <div class="phase">
+    <div style="flex:1"></div>
+    <div class="dot done"></div>
+    <div class="phase-content done">
+      <span class="tag done">✅ SHIPPED — Q2 2026</span>
+      <h3>Phase 2: Provider Network</h3>
+      <ul>
+        <li class="done-item">Android Provider App (v2.0)</li>
+        <li class="done-item">SMS + voice booking notifications</li>
+        <li class="done-item">OSM business claiming with SMS verification</li>
+        <li class="done-item">Verified provider badges</li>
+        <li class="done-item">AI chat assistant in provider app</li>
+        <li class="done-item">Multi-agent backend (10 specialist agents)</li>
+        <li class="done-item">3-tier notification escalation</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-content active">
+      <span class="tag active">🔵 IN PROGRESS — Q2/Q3 2026</span>
+      <h3>Phase 3: App Stores + Scale</h3>
+      <ul>
+        <li class="done-item">Google Play Store submission</li>
+        <li>Apple App Store submission (iOS, Siri integration)</li>
+        <li>Push notifications (Firebase)</li>
+        <li>Provider onboarding funnel</li>
+        <li>100+ service provider categories</li>
+        <li>Real-time booking calendar</li>
+      </ul>
+    </div>
+    <div class="dot active"></div>
+    <div style="flex:1"></div>
+  </div>
+
+  <div class="phase">
+    <div style="flex:1"></div>
+    <div class="dot future"></div>
+    <div class="phase-content future">
+      <span class="tag future">⏳ PLANNED — Q3 2026</span>
+      <h3>Phase 4: Autonomous AI Commerce</h3>
+      <ul>
+        <li>Siri voice commands (iOS 27 App Intents)</li>
+        <li>Google Gemini MCP integration</li>
+        <li>UPTO variable pricing for AI agents</li>
+        <li>Agent-to-agent payment routing</li>
+        <li>Enterprise API tier (Fortune 500)</li>
+        <li>Multi-language provider app</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="phase">
+    <div class="phase-content future">
+      <span class="tag future">⏳ PLANNED — Q4 2026</span>
+      <h3>Phase 5: Global Expansion</h3>
+      <ul>
+        <li>International provider onboarding</li>
+        <li>Local currency settlements</li>
+        <li>Franchise / white-label API</li>
+        <li>Decentralized agent registry (on-chain)</li>
+        <li>$MUSKOX token utility integration</li>
+        <li>DAO governance for fee structure</li>
+      </ul>
+    </div>
+    <div class="dot future"></div>
+    <div style="flex:1"></div>
+  </div>
+
+</div>
+<script src="/chatbot.js"></script>
+<script>
+  fetch('/nav.html').then(r=>r.text()).then(h=>{document.getElementById('nav-placeholder').innerHTML=h});
+</script>
+</body>
+</html>
