@@ -650,6 +650,7 @@ app.get("/status", (req: Request, res: Response) => {
     },
     performance: getMetrics(),
   });
+});
 
 // Global error handler (MUST be last)
 app.use(errorHandler);
