@@ -132,7 +132,6 @@ try {
   app.get(path, (_req: Request, res: Response) => {
     res.redirect(302, "/downloads/agentpay-provider.apk");
   });
-});
 
 app.use(timeoutMiddleware(30000)); // 30 second timeout
 app.use(loggingMiddleware); // Log all requests
@@ -419,7 +418,6 @@ app.get('/getting-started', (req: Request, res: Response) => {
 app.get('/quick-reference', (req: Request, res: Response) => {
   res.sendFile('public/quick-reference.html', { root: process.cwd() });
 });
-});
 
 // Initialize database on startup
 let dbReady = false;
@@ -485,7 +483,6 @@ app.post("/api/agent/execute", async (req: Request, res: Response) => {
     remaining: newRemaining,
     timestamp: new Date().toISOString()
   });
-});
 
 /**
  * DAYS 3-4: Agent Registry Routes
@@ -599,7 +596,6 @@ app.get("/health", (req: Request, res: Response) => {
     database: dbReady ? "ready" : "connecting",
     timestamp: new Date().toISOString()
   });
-});
 
 /**
  * App version check endpoint (for in-app updates)
@@ -630,7 +626,6 @@ app.get("/api/app-version", (req: Request, res: Response) => {
       ]
     }
   });
-});
 
 /**
  * Metrics endpoint - Performance monitoring
@@ -641,7 +636,6 @@ app.get("/metrics", (req: Request, res: Response) => {
     performance: getMetrics(),
     recentRequests: getRequestLogs(10),
   });
-});
 
 /**
  * Status endpoint - Full system status
@@ -656,7 +650,6 @@ app.get("/status", (req: Request, res: Response) => {
     },
     performance: getMetrics(),
   });
-});
 
 // Global error handler (MUST be last)
 app.use(errorHandler);
