@@ -49,10 +49,7 @@
 </style>
 </head>
 <body>
-<nav>
-  <span class="logo">AgentPay</span>
-  <a href="/">← Back to home</a>
-</nav>
+<div id="nav-placeholder"></div>
 
 <div class="hero">
   <div class="badge">🌍 Now accepting businesses worldwide</div>
@@ -217,5 +214,14 @@ document.getElementById("regForm").addEventListener("submit", async function(e) 
   }
 });
 </script>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

@@ -160,6 +160,7 @@
     </style>
 </head>
 <body>
+<div id="nav-placeholder"></div>
     <div class="nav">
         <a href="/" style="font-weight: 600; color: #60a5fa; font-size: 1.1em;">AgentPay™</a>
         <div>
@@ -358,5 +359,14 @@
         <p>AgentPay™ - The Operating System for Autonomous Agent Commerce</p>
         <p style="margin-top: 10px; font-size: 0.85em;">© 2026 AgentPay. All rights reserved.</p>
     </footer>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

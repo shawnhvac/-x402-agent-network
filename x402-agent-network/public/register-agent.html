@@ -56,14 +56,7 @@
 </style>
 </head>
 <body>
-<nav>
-  <a href="/" class="logo">Agent<span>Pay</span></a>
-  <div style="display:flex;gap:24px;">
-    <a href="/marketplace">Marketplace</a>
-    <a href="/docs">Docs</a>
-    <a href="/register">Provider App</a>
-  </div>
-</nav>
+<div id="nav-placeholder"></div>
 
 <div class="hero">
   <h1>Register Your <span>AI Agent</span></h1>
@@ -314,5 +307,14 @@
     }
   }
 </script>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

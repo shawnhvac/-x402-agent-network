@@ -56,16 +56,7 @@
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <div style="font-weight: 600; color: #60a5fa; font-size: 1.2em;">🤖 AgentPay</div>
-        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
-            <a href="/">Home</a>
-            <a href="/marketplace">📍 Marketplace</a>
-            <a href="/agent-dashboard">🤖 Dashboard</a>
-            <a href="/docs" style="color: #60a5fa; border-bottom: 2px solid #60a5fa; padding-bottom: 3px;">📚 Docs</a>
-            <a href="/contact">💬 Support</a>
-        </div>
-    </nav>
+    <div id="nav-placeholder"></div>
 
     <div class="container">
         <h1>📚 Documentation</h1>
@@ -132,6 +123,15 @@
             </p>
         </div>
     </div>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 
     <footer>
@@ -222,5 +222,14 @@
             font-size: 0.9em;
         }
     </style>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

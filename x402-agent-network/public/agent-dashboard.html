@@ -118,17 +118,7 @@
     </style>
 </head>
 <body>
-    <nav style="background: rgba(15, 23, 42, 0.95); padding: 15px 20px; border-bottom: 2px solid #10b981; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
-        <div style="font-weight: 600; color: #60a5fa; font-size: 1.2em;">
-            🤖 AgentPay
-        </div>
-        <div style="display: flex; gap: 25px; flex-wrap: wrap;">
-            <a href="/" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">Home</a>
-            <a href="/marketplace" style="color: #e2e8f0; text-decoration: none; font-weight: 500;">📍 Marketplace</a>
-            <a href="/agent-dashboard" style="color: #60a5fa; text-decoration: none; font-weight: 500; border-bottom: 2px solid #60a5fa; padding-bottom: 3px;">🤖 Dashboard</a>
-            <a href="/contact" style="color: #60a5fa; text-decoration: none; font-weight: 500;">💬 Support</a>
-        </div>
-    </nav>
+    <div id="nav-placeholder"></div>
 
     <div class="header" style="background: linear-gradient(135deg, #0f172a 0%, #1a0f3f 50%, #0f172a 100%); padding: 20px; text-align: center; border-bottom: 3px solid #a78bfa;">
         <div style="margin-bottom: 10px;">
@@ -397,5 +387,14 @@
             font-size: 0.9em;
         }
     </style>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

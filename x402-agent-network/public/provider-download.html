@@ -204,6 +204,7 @@
     </style>
 </head>
 <body>
+<div id="nav-placeholder"></div>
     <div class="container">
         <header>
             <h1>📱 AgentPay Provider APK</h1>
@@ -286,5 +287,14 @@
             </p>
         </div>
     </div>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

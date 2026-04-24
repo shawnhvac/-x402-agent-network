@@ -81,11 +81,7 @@
 <body>
 <header>
   <div class="logo">Agent<span>Pay</span> Marketplace</div>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/docs">API Docs</a>
-    <a href="/provider-download">Provider App</a>
-  </nav>
+  <div id="nav-placeholder"></div>
 </header>
 
 <div class="hero">
@@ -369,5 +365,14 @@ document.getElementById('bookModal').addEventListener('click', e => {
 document.getElementById('servicesEmpty').style.display='block';
 document.getElementById('productsEmpty').style.display='block';
 </script>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

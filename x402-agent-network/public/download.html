@@ -212,6 +212,7 @@
     </style>
 </head>
 <body>
+<div id="nav-placeholder"></div>
     <div class="nav">
         <a href="/" class="nav-home">← AgentPay</a>
         <a href="/marketplace.html">Agents</a>
@@ -413,5 +414,14 @@
         // Refresh every 30 seconds to catch new builds
         setInterval(checkAPKStatus, 30000);
     </script>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

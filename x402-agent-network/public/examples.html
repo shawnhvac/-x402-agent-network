@@ -37,6 +37,7 @@
     </style>
 </head>
 <body>
+<div id="nav-placeholder"></div>
     <div class="nav">
         <div style="font-weight: 600; color: #60a5fa;">🤖 AgentPay</div>
         <div style="display: flex; gap: 15px;">
@@ -567,5 +568,14 @@
         document.querySelector('#example-content').innerHTML = example.content;
         document.title = example.title + ' - AgentPay';
     </script>
+
+  <script src="/chatbot.js"></script>
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(h=>{
+      const el=document.getElementById('nav-placeholder');
+      if(el)el.innerHTML=h;
+    });
+  </script>
+
 </body>
 </html>

@@ -610,5 +610,17 @@
   <div style="text-align:center;padding:10px 0 20px;opacity:0.3;font-size:11px;">
     <a href="/admin" style="color:#64748b;text-decoration:none;">admin</a>
   </div>
+
+  <!-- AI Chatbot -->
+  <script src="/chatbot.js"></script>
+
+  <!-- Load nav dynamically -->
+  <script>
+    fetch('/nav.html').then(r=>r.text()).then(html=>{
+      const placeholder = document.getElementById('nav-placeholder');
+      if(placeholder) placeholder.innerHTML = html;
+    });
+  </script>
+
 </body>
 </html>
