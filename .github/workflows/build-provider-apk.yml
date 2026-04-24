@@ -58,7 +58,7 @@ jobs:
           echo "APK: $APK"
           BUILD_TOOLS=$(ls /usr/local/lib/android/sdk/build-tools/ | sort -V | tail -1)
           APKSIGNER="/usr/local/lib/android/sdk/build-tools/${BUILD_TOOLS}/apksigner"
-          VERSION=$(grep versionName x402-agent-network/android/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
+          VERSION=$(grep versionName x402-agent-network/android/app/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
           $APKSIGNER sign \
             --ks ~/.android/debug.keystore \
             --ks-pass pass:android --key-pass pass:android \
