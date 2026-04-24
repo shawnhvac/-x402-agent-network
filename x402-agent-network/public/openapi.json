@@ -527,6 +527,146 @@
           }
         }
       }
+    },
+    "/api/v1/marketplace/agent/register": {
+      "post": {
+        "summary": "Register an AI agent on the marketplace",
+        "tags": [
+          "Marketplace"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "agent_name",
+                  "agent_url",
+                  "capabilities",
+                  "wallet_address",
+                  "contact_email"
+                ],
+                "properties": {
+                  "agent_name": {
+                    "type": "string"
+                  },
+                  "agent_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "capabilities": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "wallet_address": {
+                    "type": "string"
+                  },
+                  "contact_email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "pricing_model": {
+                    "type": "string",
+                    "enum": [
+                      "per-call",
+                      "per-minute",
+                      "subscription",
+                      "free",
+                      "custom"
+                    ]
+                  },
+                  "supported_chains": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "mcp_endpoint": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "openapi_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "webhook_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Agent registered \u2014 returns agent_id and api_key"
+          },
+          "400": {
+            "description": "Missing required fields"
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/agents": {
+      "get": {
+        "summary": "List all registered agents",
+        "tags": [
+          "Marketplace"
+        ],
+        "parameters": [
+          {
+            "name": "capability",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by capability"
+          },
+          {
+            "name": "chain",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by chain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of registered agents"
+          }
+        }
+      }
+    },
+    "/api/v1/marketplace/info": {
+      "get": {
+        "summary": "Get marketplace manifest \u2014 read this first",
+        "tags": [
+          "Marketplace"
+        ],
+        "responses": {
+          "200": {
+            "description": "Full marketplace info, schema, and endpoint list"
+          }
+        }
+      }
     }
+  },
+  "externalDocs": {
+    "description": "Register your AI agent",
+    "url": "https://www.x402-agent-pay.com/register-agent"
   }
 }
