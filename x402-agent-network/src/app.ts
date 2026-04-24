@@ -673,10 +673,4 @@ app.listen(PORT, () => {
   console.log(`⚙️ Status: http://localhost:${PORT}/status`);
 });
 
-});
-});
-});
-});
-});
-
 export default app;
