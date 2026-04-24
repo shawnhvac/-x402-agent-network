@@ -1,46 +1,95 @@
-name: Build AgentPay Provider APK
+name: Build AgentPay Provider APK + AAB
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'x402-agent-network/android/**'
+      - '.github/workflows/build-provider-apk.yml'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
-          java-version: "17"
-          distribution: temurin
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Gradle 8.2
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.2-bin.zip
+          unzip -q gradle-8.2-bin.zip
+          sudo mv gradle-8.2 /opt/gradle
+          echo "/opt/gradle/bin" >> $GITHUB_PATH
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: "8.2"
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
 
-      - name: Build Provider APK
-        working-directory: x402-agent-network/android
-        run: gradle clean assembleDebug -x lint --no-daemon --stacktrace
+      - name: Install build tools
+        run: sdkmanager "build-tools;34.0.0" "platforms;android-34"
 
-      - name: Find and upload APK
+      - name: Decode release keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
         run: |
-          APK=$(find x402-agent-network/android -name "*.apk" -type f | head -1)
-          echo "Found APK: $APK"
-          cp "$APK" agentpay-provider.apk
+          echo "$KEYSTORE_B64" | base64 -d > x402-agent-network/android/app/agentpay-release.keystore
+          ls -lh x402-agent-network/android/app/agentpay-release.keystore
 
-      - name: Upload APK artifact
+      - name: Write keystore.properties
+        run: |
+          printf 'storeFile=app/agentpay-release.keystore\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" \
+            > x402-agent-network/android/keystore.properties
+
+      - name: Build release APK
+        working-directory: x402-agent-network/android
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Build release AAB
+        working-directory: x402-agent-network/android
+        run: gradle bundleRelease --no-daemon --stacktrace
+
+      - name: Collect artifacts
+        run: |
+          VERSION=$(grep versionName x402-agent-network/android/app/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
+          BUILD=${{ github.run_number }}
+          APK=$(find x402-agent-network/android -name "*.apk" | grep -v test | head -1)
+          AAB=$(find x402-agent-network/android -name "*.aab" | head -1)
+          cp "$APK" "agentpay-provider-v${VERSION}-build${BUILD}.apk"
+          cp "$APK" "agentpay-provider.apk"
+          if [ -n "$AAB" ]; then
+            cp "$AAB" "agentpay-provider-v${VERSION}-build${BUILD}.aab"
+            cp "$AAB" "agentpay-provider.aab"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BUILD=$BUILD" >> $GITHUB_ENV
+          ls -lh agentpay-provider*
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: agentpay-provider-apk
-          path: agentpay-provider.apk
-          retention-days: 30
+          path: agentpay-provider*.apk
 
-      - name: Done
-        run: echo "SUCCESS: agentpay-provider.apk built"
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentpay-provider-aab
+          path: agentpay-provider*.aab
+          if-no-files-found: warn
+
+      - name: Build complete
+        run: echo "Release APK + AAB ready"
