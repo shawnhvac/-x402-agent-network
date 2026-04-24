@@ -1,2 +1,33 @@
-.env.env
+# Dependencies
+node_modules/
+dist/
+build/
+.next/
+.cache/
+
+# ===== SECRETS — NEVER COMMIT =====
+.env
+.env.*
 *.env
+.env.local
+.env.production
+.env.development
+.env.backup
+
+# Keys & credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+cdp_key.json
+keystore.jks
+release.keystore
+google-services.json
+
+# Misc
+.DS_Store
+*.log
+*.tmp
+__pycache__/
