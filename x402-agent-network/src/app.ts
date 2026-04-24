@@ -405,6 +405,9 @@ app.get('/getting-started', (req: Request, res: Response) => {
 app.get('/quick-reference', (req: Request, res: Response) => {
   res.sendFile('public/quick-reference.html', { root: process.cwd() });
 });
+app.get('/google-maps-setup', (req: Request, res: Response) => {
+  res.sendFile('public/google-maps-setup.html', { root: process.cwd() });
+});
 app.get('/pricing', (req: Request, res: Response) => {
   res.sendFile('public/pricing.html', { root: process.cwd() });
 });
@@ -415,7 +418,6 @@ app.get('/roadmap', (req: Request, res: Response) => {
 // Documentation markdown files served as HTML
 
 const docFiles = {
-  '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
 };
 
 // Special: investor-pitch served as HTML, not markdown

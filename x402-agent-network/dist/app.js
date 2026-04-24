@@ -5658,15 +5658,16 @@ app.get("/getting-started", (req, res) => {
 app.get("/quick-reference", (req, res) => {
   res.sendFile("public/quick-reference.html", { root: process.cwd() });
 });
+app.get("/google-maps-setup", (req, res) => {
+  res.sendFile("public/google-maps-setup.html", { root: process.cwd() });
+});
 app.get("/pricing", (req, res) => {
   res.sendFile("public/pricing.html", { root: process.cwd() });
 });
 app.get("/roadmap", (req, res) => {
   res.sendFile("public/roadmap.html", { root: process.cwd() });
 });
-var docFiles = {
-  "/google-maps-setup": "GOOGLE_MAPS_SETUP.md"
-};
+var docFiles = {};
 app.get("/investor-pitch", (req, res) => {
   res.sendFile("public/investor-pitch.html", { root: process.cwd() });
 });
