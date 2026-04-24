@@ -29,6 +29,10 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.webkit.JavascriptInterface
+import androidx.compose.ui.viewinterop.AndroidView
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
@@ -127,6 +131,15 @@ fun AgentPayProviderApp() {
         )
         "chat" -> AIChatScreen(
             onBack = { currentScreen = "dashboard" }
+        )
+        "claim-osm" -> ClaimOsmScreen(
+            onBack = { currentScreen = "services" },
+            onVerified = {
+                val ctx = context
+                ctx.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+                    .edit().putBoolean("provider_osm_verified", true).apply()
+                currentScreen = "services"
+            }
         )
         "settings" -> SettingsScreen(
             profile = businessProfile,
@@ -533,6 +546,7 @@ fun DashboardScreen(
 @Composable
 fun ServicesManagementScreen(
     onBack: () -> Unit,
+    onNavigate: (String) -> Unit = {},
     businessId: String
 ) {
     val context = LocalContext.current
@@ -662,7 +676,7 @@ fun ServicesManagementScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp)
-                    .clickable { val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.x402-agent-pay.com/claim-osm")); context.startActivity(intent) },
+                    .clickable { onNavigate("claim-osm") },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1e3a5f)),
                 shape = RoundedCornerShape(10.dp)
             ) {
@@ -1568,3 +1582,86 @@ fun AIChatScreen(onBack: () -> Unit) {
         }
     }
 }
+
+// ── ClaimOsmScreen — in-app WebView with AgentPayBridge JS interface ──────────
+class AgentPayBridge(
+    private val onVerified: () -> Unit,
+    private val context: android.content.Context
+) {
+    @JavascriptInterface
+    fun onOsmVerified() {
+        android.os.Handler(android.os.Looper.getMainLooper()).post { onVerified() }
+    }
+}
+
+@androidx.compose.runtime.Composable
+fun ClaimOsmScreen(onBack: () -> Unit, onVerified: () -> Unit) {
+    val context = LocalContext.current
+    val prefs = context.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+    val token = prefs.getString("provider_token", "") ?: ""
+
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0f172a))
+    ) {
+        androidx.compose.foundation.layout.Column(modifier = Modifier.fillMaxSize()) {
+            // Top bar
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF1e293b))
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.material3.IconButton(onClick = onBack) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color(0xFF3b82f6))
+                }
+                Text(
+                    "🗺️  Claim Business on OSM",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+            // WebView
+            AndroidView(
+                factory = { ctx ->
+                    WebView(ctx).apply {
+                        settings.javaScriptEnabled = true
+                        settings.domStorageEnabled = true
+                        settings.setSupportZoom(false)
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView, url: String) {
+                                // Inject token so the page can pre-fill / skip login
+                                if (token.isNotEmpty()) {
+                                    view.evaluateJavascript(
+                                        "window._providerToken = '${token}';" +
+                                        "if(typeof providerToken !== 'undefined') providerToken = '${token}';" +
+                                        // Auto-fill and hide login step if token present
+                                        "(function(){ " +
+                                        "  if(document.getElementById('step-login') && typeof show === 'function'){" +
+                                        "    providerToken = '${token}';" +
+                                        "    document.getElementById('step-login').classList.add('hidden');" +
+                                        "    show('step-search');" +
+                                        "  }" +
+                                        "})();",
+                                        null
+                                    )
+                                }
+                            }
+                        }
+                        addJavascriptInterface(
+                            AgentPayBridge(onVerified, ctx),
+                            "AgentPayBridge"
+                        )
+                        loadUrl("https://www.x402-agent-pay.com/claim-osm")
+                    }
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
