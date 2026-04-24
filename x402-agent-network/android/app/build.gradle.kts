@@ -15,9 +15,23 @@ android {
         versionName = "2.0.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePropsFile = rootProject.file("keystore.properties")
+            if (keystorePropsFile.exists()) {
+                val props = java.util.Properties().also { it.load(keystorePropsFile.inputStream()) }
+                storeFile = file(props["storeFile"] as String)
+                storePassword = props["storePassword"] as String
+                keyAlias = props["keyAlias"] as String
+                keyPassword = props["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
