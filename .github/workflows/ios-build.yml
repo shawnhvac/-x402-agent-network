@@ -16,8 +16,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
+      - name: Show available Xcode versions
+        run: ls /Applications/ | grep Xcode
+
+      - name: Select latest Xcode
+        run: |
+          XCODE=$(ls /Applications/ | grep "^Xcode" | sort -V | tail -1)
+          echo "Using: $XCODE"
+          sudo xcode-select -s /Applications/$XCODE/Contents/Developer
+          xcodebuild -version
 
       - name: Install xcodegen
         run: brew install xcodegen
@@ -160,5 +167,5 @@ jobs:
               --private-key AuthKey.p8 \
               --type ios
           else
-            echo "No Apple API key set — skipping App Store upload"
+            echo "No Apple API key — skipping App Store upload"
           fi
