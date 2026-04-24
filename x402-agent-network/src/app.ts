@@ -423,6 +423,9 @@ const docFiles = {
 // Special: investor-pitch served as HTML, not markdown
 app.get('/investor-pitch', (req: Request, res: Response) => {
   res.sendFile('public/investor-pitch.html', { root: process.cwd() });
+app.get("/claim-osm", (req: Request, res: Response) => {
+  res.sendFile("public/claim-osm.html", { root: process.cwd() });
+});
 });
 
 Object.entries(docFiles).forEach(([route, filename]) => {

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claim Your Business on OpenStreetMap — AgentPay</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+    .header { background: #1e293b; padding: 16px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #334155; }
+    .header a { color: #3b82f6; text-decoration: none; font-size: 14px; }
+    .header h1 { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+    .container { max-width: 600px; margin: 0 auto; padding: 24px 20px; }
+    .hero { background: linear-gradient(135deg, #1e3a5f, #1e40af); border-radius: 16px; padding: 28px; margin-bottom: 24px; text-align: center; }
+    .hero .icon { font-size: 48px; margin-bottom: 12px; }
+    .hero h2 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .hero p { color: #bfdbfe; font-size: 14px; line-height: 1.6; }
+    .badge { display: inline-block; background: #10b981; color: #fff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-top: 12px; }
+    .steps { margin-bottom: 24px; }
+    .step { background: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; border: 1px solid #334155; }
+    .step-num { background: #3b82f6; color: #fff; font-weight: 700; font-size: 14px; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step h3 { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+    .step p { font-size: 13px; color: #94a3b8; line-height: 1.5; }
+    .form-section { background: #1e293b; border-radius: 16px; padding: 24px; border: 1px solid #334155; margin-bottom: 24px; }
+    .form-section h3 { font-size: 16px; font-weight: 700; color: #f1f5f9; margin-bottom: 16px; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 13px; color: #94a3b8; margin-bottom: 6px; font-weight: 500; }
+    input, select { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px 14px; color: #f1f5f9; font-size: 14px; outline: none; transition: border-color 0.2s; }
+    input:focus, select:focus { border-color: #3b82f6; }
+    input::placeholder { color: #475569; }
+    .btn { width: 100%; background: #3b82f6; color: #fff; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #2563eb; }
+    .btn:disabled { background: #334155; color: #64748b; cursor: not-allowed; }
+    .status-box { background: #0f172a; border-radius: 10px; padding: 16px; margin-top: 16px; display: none; text-align: center; }
+    .status-box.success { border: 1px solid #10b981; color: #10b981; }
+    .status-box.error { border: 1px solid #ef4444; color: #ef4444; }
+    .status-box.loading { border: 1px solid #3b82f6; color: #3b82f6; }
+    .osm-link { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; text-decoration: none; transition: border-color 0.2s; }
+    .osm-link:hover { border-color: #3b82f6; }
+    .osm-link .icon { font-size: 24px; }
+    .osm-link .text h4 { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+    .osm-link .text p { font-size: 12px; color: #64748b; }
+    .verified-banner { background: #052e16; border: 1px solid #10b981; border-radius: 12px; padding: 20px; text-align: center; display: none; }
+    .verified-banner h3 { color: #10b981; font-size: 18px; margin-bottom: 8px; }
+    .verified-banner p { color: #6ee7b7; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <a href="javascript:history.back()">← Back</a>
+  <h1>Claim Business on OSM</h1>
+</div>
+
+<div class="container">
+
+  <div class="hero">
+    <div class="icon">🗺️</div>
+    <h2>Get Verified on AgentPay</h2>
+    <p>Link your business to OpenStreetMap so AI agents can find you, book your services, and pay you automatically.</p>
+    <span class="badge">✓ Verified Badge + Priority Search Ranking</span>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h3>Find your business on OSM</h3>
+        <p>Search OpenStreetMap for your business. If it's not listed yet, you can add it for free.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h3>Enter your OSM details below</h3>
+        <p>Paste your business name and OSM Node ID (found in the OSM URL when you click your business).</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h3>We send a verification SMS</h3>
+        <p>We'll text your registered phone number with a 6-digit code to confirm ownership.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 16px;">
+    <a class="osm-link" href="https://www.openstreetmap.org/search" target="_blank">
+      <span class="icon">🔍</span>
+      <div class="text">
+        <h4>Search OpenStreetMap</h4>
+        <p>Find your business — tap to open OSM</p>
+      </div>
+    </a>
+    <a class="osm-link" href="https://www.openstreetmap.org/edit" target="_blank">
+      <span class="icon">➕</span>
+      <div class="text">
+        <h4>Add Your Business to OSM</h4>
+        <p>Not listed yet? Add it for free in minutes</p>
+      </div>
+    </a>
+  </div>
+
+  <div class="form-section" id="claim-form-section">
+    <h3>Verify Your Business</h3>
+
+    <div id="step-one">
+      <div class="form-group">
+        <label>Business Name on OSM</label>
+        <input type="text" id="osm-name" placeholder="e.g. Jiffy Lube Grand Canyon" />
+      </div>
+      <div class="form-group">
+        <label>OSM Node ID <span style="color:#64748b;font-size:11px;">(from URL: openstreetmap.org/node/123456789)</span></label>
+        <input type="text" id="osm-node-id" placeholder="e.g. 123456789" inputmode="numeric" />
+      </div>
+      <div class="form-group">
+        <label>Your Phone Number (registered with AgentPay)</label>
+        <input type="tel" id="phone" placeholder="+1 (555) 000-0000" />
+      </div>
+      <button class="btn" id="send-sms-btn" onclick="sendVerificationSMS()">Send Verification Code</button>
+      <div class="status-box" id="sms-status"></div>
+    </div>
+
+    <div id="step-two" style="display:none;">
+      <div class="form-group">
+        <label>Enter 6-digit verification code</label>
+        <input type="text" id="verify-code" placeholder="000000" maxlength="6" inputmode="numeric" style="letter-spacing:8px;font-size:20px;text-align:center;" />
+      </div>
+      <button class="btn" id="verify-btn" onclick="verifyCode()">Verify &amp; Claim Business</button>
+      <div class="status-box" id="verify-status"></div>
+      <p style="text-align:center;margin-top:12px;font-size:13px;color:#64748b;">
+        <a href="#" onclick="document.getElementById('step-one').style.display='block';document.getElementById('step-two').style.display='none';return false;" style="color:#3b82f6;">Didn't get the code? Go back</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="verified-banner" id="verified-banner">
+    <h3>✅ Business Verified!</h3>
+    <p>Your business is now linked to OpenStreetMap. AI agents will prioritize you in searches and can book your services automatically.</p>
+  </div>
+
+</div>
+
+<script>
+  const BASE = 'https://www.x402-agent-pay.com';
+  let sessionToken = '';
+
+  async function sendVerificationSMS() {
+    const name = document.getElementById('osm-name').value.trim();
+    const nodeId = document.getElementById('osm-node-id').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const status = document.getElementById('sms-status');
+    const btn = document.getElementById('send-sms-btn');
+
+    if (!name || !nodeId || !phone) {
+      showStatus(status, 'error', 'Please fill in all fields.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+    showStatus(status, 'loading', 'Sending verification code...');
+
+    try {
+      const res = await fetch(`${BASE}/api/v1/osm/claim/initiate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ osm_name: name, osm_node_id: nodeId, phone })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        sessionToken = data.session_token || '';
+        showStatus(status, 'success', '✓ Code sent! Check your messages.');
+        document.getElementById('step-one').style.display = 'none';
+        document.getElementById('step-two').style.display = 'block';
+      } else {
+        showStatus(status, 'error', data.error || 'Failed to send code. Try again.');
+        btn.disabled = false;
+        btn.textContent = 'Send Verification Code';
+      }
+    } catch (e) {
+      showStatus(status, 'error', 'Network error. Check connection and try again.');
+      btn.disabled = false;
+      btn.textContent = 'Send Verification Code';
+    }
+  }
+
+  async function verifyCode() {
+    const code = document.getElementById('verify-code').value.trim();
+    const status = document.getElementById('verify-status');
+    const btn = document.getElementById('verify-btn');
+
+    if (code.length !== 6) {
+      showStatus(status, 'error', 'Enter the 6-digit code from your SMS.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Verifying...';
+    showStatus(status, 'loading', 'Verifying...');
+
+    try {
+      const res = await fetch(`${BASE}/api/v1/osm/claim/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, session_token: sessionToken })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        document.getElementById('claim-form-section').style.display = 'none';
+        document.getElementById('verified-banner').style.display = 'block';
+        // Notify the Android app
+        if (window.AgentPayBridge) window.AgentPayBridge.onOsmVerified();
+      } else {
+        showStatus(status, 'error', data.error || 'Invalid code. Try again.');
+        btn.disabled = false;
+        btn.textContent = 'Verify & Claim Business';
+      }
+    } catch (e) {
+      showStatus(status, 'error', 'Network error. Try again.');
+      btn.disabled = false;
+      btn.textContent = 'Verify & Claim Business';
+    }
+  }
+
+  function showStatus(el, type, msg) {
+    el.className = `status-box ${type}`;
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+</script>
+
+</body>
+</html>

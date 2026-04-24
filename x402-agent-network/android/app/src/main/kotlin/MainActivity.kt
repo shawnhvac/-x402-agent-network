@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import android.util.Log
+import android.content.Intent
+import android.net.Uri
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaType
@@ -660,7 +662,7 @@ fun ServicesManagementScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 8.dp)
-                    .clickable { /* TODO: navigate to OSM claim screen */ },
+                    .clickable { val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.x402-agent-pay.com/claim-osm")); context.startActivity(intent) },
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF1e3a5f)),
                 shape = RoundedCornerShape(10.dp)
             ) {
