@@ -5454,408 +5454,380 @@ try {
   app.get(path8, (_req, res) => {
     res.redirect(302, "/downloads/agentpay-provider.apk");
   });
-});
-app.use(timeoutMiddleware(3e4));
-app.use(loggingMiddleware);
-var loginLimiter = rateLimit2({
-  windowMs: 15 * 60 * 1e3,
-  // 15 minutes
-  max: 5,
-  // 5 attempts
-  message: "Too many login attempts, please try again later",
-  standardHeaders: true,
-  legacyHeaders: false
-});
-var apiLimiter = rateLimit2({
-  windowMs: 1 * 60 * 1e3,
-  // 1 minute
-  max: 100,
-  // 100 requests per minute
-  skip: (req) => req.path === "/health" || req.path === "/"
-});
-app.use("/api/", apiLimiter);
-var sessionTokens = /* @__PURE__ */ new Map();
-function validateSessionToken(token) {
-  const expiry = sessionTokens.get(token);
-  if (!expiry || expiry < Date.now()) {
-    sessionTokens.delete(token);
-    return false;
+  app.use(timeoutMiddleware(3e4));
+  app.use(loggingMiddleware);
+  const loginLimiter = rateLimit2({
+    windowMs: 15 * 60 * 1e3,
+    // 15 minutes
+    max: 5,
+    // 5 attempts
+    message: "Too many login attempts, please try again later",
+    standardHeaders: true,
+    legacyHeaders: false
+  });
+  const apiLimiter = rateLimit2({
+    windowMs: 1 * 60 * 1e3,
+    // 1 minute
+    max: 100,
+    // 100 requests per minute
+    skip: (req) => req.path === "/health" || req.path === "/"
+  });
+  app.use("/api/", apiLimiter);
+  const sessionTokens = /* @__PURE__ */ new Map();
+  function validateSessionToken(token) {
+    const expiry = sessionTokens.get(token);
+    if (!expiry || expiry < Date.now()) {
+      sessionTokens.delete(token);
+      return false;
+    }
+    return true;
   }
-  return true;
-}
-app.use(express7.static("public", { dotfiles: "allow" }));
-app.get("/.well-known/:file", (req, res) => {
-  res.sendFile(req.params.file, { root: "public/.well-known", dotfiles: "allow" });
-});
-app.get("/marketplace", (req, res) => {
-  res.sendFile("public/marketplace.html", { root: process.cwd() });
-});
-app.get("/provider-download", (req, res) => {
-  res.sendFile("public/provider-download.html", { root: process.cwd() });
-});
-app.get("/provider-download.html", (req, res) => {
-  res.sendFile("public/provider-download.html", { root: process.cwd() });
-});
-app.get("/agent-dashboard", (req, res) => {
-  res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
-});
-app.get("/privacy", (req, res) => {
-  res.sendFile("public/privacy.html", { root: process.cwd() });
-});
-app.get("/register-agent", (req, res) => {
-  res.sendFile("public/register-agent.html", { root: process.cwd() });
-});
-app.get("/docs", (req, res) => {
-  res.sendFile("public/docs.html", { root: process.cwd() });
-});
-app.get("/contact", (req, res) => {
-  res.sendFile("public/contact.html", { root: process.cwd() });
-});
-app.get("/location-services", (req, res) => {
-  res.sendFile("public/location-services.html", { root: process.cwd() });
-});
-app.get("/examples", (req, res) => {
-  res.sendFile("public/examples.html", { root: process.cwd() });
-});
-app.get("/trademark", (req, res) => {
-  res.sendFile("public/trademark.html", { root: process.cwd() });
-});
-app.get("/admin", (req, res) => {
-  res.sendFile("public/admin.html", { root: process.cwd() });
-});
-app.get("/register", (req, res) => {
-  res.sendFile("public/register.html", { root: process.cwd() });
-});
-app.get("/register-business", (req, res) => {
-  res.sendFile("public/register.html", { root: process.cwd() });
-});
-app.get("/register-agent", (req, res) => {
-  res.sendFile("public/register-agent.html", { root: process.cwd() });
-});
-app.get("/checkout", (req, res) => {
-  res.sendFile("public/checkout.html", { root: process.cwd() });
-});
-app.get("/payment-success", (req, res) => {
-  res.sendFile("public/payment-success.html", { root: process.cwd() });
-});
-app.get("/payment-cancel", (req, res) => {
-  res.redirect("/?payment=cancelled");
-});
-app.post("/api/admin/login", loginLimiter, (req, res) => {
-  try {
-    const { password } = req.body;
-    const adminPassword = process.env.ADMIN_PASSWORD;
-    if (!adminPassword) {
-      console.error("\u274C ADMIN_PASSWORD not set in environment");
-      return res.status(500).json({ error: "Server configuration error" });
-    }
-    if (!password || password !== adminPassword) {
-      console.warn(`\u274C Unauthorized login attempt at ${(/* @__PURE__ */ new Date()).toISOString()}`);
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-    const token = crypto4.randomBytes(32).toString("hex");
-    const expiryTime = Date.now() + 36e5;
-    sessionTokens.set(token, expiryTime);
-    res.cookie("adminSession", token, {
-      httpOnly: true,
-      // Prevents JavaScript access
-      secure: process.env.NODE_ENV !== "development",
-      // HTTPS only in production
-      sameSite: "strict",
-      // CSRF protection
-      maxAge: 36e5,
-      // 1 hour
-      path: "/api/admin"
-      // Scope to admin endpoints
-    });
-    console.log(`\u2705 Admin login successful`);
-    res.json({ success: true, message: "Login successful" });
-  } catch (error) {
-    console.error("Login error:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-app.post("/api/admin/logout", (req, res) => {
-  const token = req.cookies.adminSession;
-  if (token) {
-    sessionTokens.delete(token);
-  }
-  res.clearCookie("adminSession");
-  res.json({ success: true, message: "Logged out" });
-});
-app.get("/api/admin/contacts", (req, res) => {
-  try {
-    const token = req.cookies.adminSession;
-    if (!token || !validateSessionToken(token)) {
-      return res.status(401).json({ error: "Unauthorized - please login" });
-    }
-    const contactsFile = pathJoin(process.cwd(), "contacts.jsonl");
-    if (!existsSync4(contactsFile)) {
-      return res.json([]);
-    }
-    const content = readFileSync4(contactsFile, "utf8");
-    const contacts = content.split("\n").filter((line) => line.trim()).map((line) => JSON.parse(line));
-    res.json(contacts);
-  } catch (error) {
-    console.error("Admin contacts error:", error);
-    res.status(500).json({ error: "Failed to load contacts" });
-  }
-});
-app.get("/api/admin/bookings", (req, res) => {
-  try {
-    const token = req.cookies.adminSession;
-    if (!token || !validateSessionToken(token)) {
-      return res.status(401).json({ error: "Unauthorized - please login" });
-    }
-    const limit = parseInt(req.query.limit || "100");
-    const offset = parseInt(req.query.offset || "0");
-    const bookings2 = listBookings(limit, offset);
-    return res.json(bookings2);
-  } catch (error) {
-    console.error("Admin bookings error:", error);
-    return res.status(500).json({ error: "Failed to load bookings" });
-  }
-});
-app.get("/api/admin/stats", (req, res) => {
-  try {
-    const token = req.cookies.adminSession;
-    if (!token || !validateSessionToken(token)) {
-      return res.status(401).json({ error: "Unauthorized - please login" });
-    }
-    return res.json(getStats());
-  } catch (error) {
-    console.error("Admin stats error:", error);
-    return res.status(500).json({ error: "Failed to load stats" });
-  }
-});
-app.get("/api/admin/providers", (req, res) => {
-  try {
-    const token = req.cookies.adminSession;
-    if (!token || !validateSessionToken(token)) {
-      return res.status(401).json({ error: "Unauthorized - please login" });
-    }
-    const Database6 = __require("better-sqlite3");
-    const providerDb = new Database6("/var/lib/agentpay/providers.db");
-    const providers = providerDb.prepare("SELECT id, business_name, email, phone, category, status, created_at FROM providers ORDER BY created_at DESC").all();
-    return res.json(providers);
-  } catch (error) {
-    if (error.message?.includes("no such table") || error.code === "SQLITE_ERROR") {
-      return res.json([]);
-    }
-    console.error("Admin providers error:", error);
-    return res.status(500).json({ error: "Failed to load providers" });
-  }
-});
-app.get("/google-maps-setup", (req, res) => {
-  res.sendFile("public/google-maps-setup.html", { root: process.cwd() });
-});
-app.get("/android-app", (req, res) => {
-  res.sendFile("public/android-app.html", { root: process.cwd() });
-});
-app.get("/pricing", (req, res) => {
-  res.sendFile("public/pricing.html", { root: process.cwd() });
-});
-app.get("/roadmap", (req, res) => {
-  res.sendFile("public/roadmap.html", { root: process.cwd() });
-});
-var docFiles = {
-  "/getting-started": "GETTING_STARTED.md",
-  "/quick-reference": "QUICK_REFERENCE.md",
-  "/personal-agent-app": "PERSONAL_AGENT_APP.md"
-};
-app.get("/investor-pitch", (req, res) => {
-  res.sendFile("public/investor-pitch.html", { root: process.cwd() });
-});
-Object.entries(docFiles).forEach(([route, filename]) => {
-  app.get(route, (req, res) => {
+  app.use(express7.static("public", { dotfiles: "allow" }));
+  app.get("/.well-known/:file", (req, res) => {
+    res.sendFile(req.params.file, { root: "public/.well-known", dotfiles: "allow" });
+  });
+  app.get("/marketplace", (req, res) => {
+    res.sendFile("public/marketplace.html", { root: process.cwd() });
+  });
+  app.get("/provider-download", (req, res) => {
+    res.sendFile("public/provider-download.html", { root: process.cwd() });
+  });
+  app.get("/provider-download.html", (req, res) => {
+    res.sendFile("public/provider-download.html", { root: process.cwd() });
+  });
+  app.get("/agent-dashboard", (req, res) => {
+    res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
+  });
+  app.get("/privacy", (req, res) => {
+    res.sendFile("public/privacy.html", { root: process.cwd() });
+  });
+  app.get("/register-agent", (req, res) => {
+    res.sendFile("public/register-agent.html", { root: process.cwd() });
+  });
+  app.get("/docs", (req, res) => {
+    res.sendFile("public/docs.html", { root: process.cwd() });
+  });
+  app.get("/contact", (req, res) => {
+    res.sendFile("public/contact.html", { root: process.cwd() });
+  });
+  app.get("/location-services", (req, res) => {
+    res.sendFile("public/location-services.html", { root: process.cwd() });
+  });
+  app.get("/examples", (req, res) => {
+    res.sendFile("public/examples.html", { root: process.cwd() });
+  });
+  app.get("/trademark", (req, res) => {
+    res.sendFile("public/trademark.html", { root: process.cwd() });
+  });
+  app.get("/admin", (req, res) => {
+    res.sendFile("public/admin.html", { root: process.cwd() });
+  });
+  app.get("/register", (req, res) => {
+    res.sendFile("public/register.html", { root: process.cwd() });
+  });
+  app.get("/register-business", (req, res) => {
+    res.sendFile("public/register.html", { root: process.cwd() });
+  });
+  app.get("/register-agent", (req, res) => {
+    res.sendFile("public/register-agent.html", { root: process.cwd() });
+  });
+  app.get("/checkout", (req, res) => {
+    res.sendFile("public/checkout.html", { root: process.cwd() });
+  });
+  app.get("/payment-success", (req, res) => {
+    res.sendFile("public/payment-success.html", { root: process.cwd() });
+  });
+  app.get("/payment-cancel", (req, res) => {
+    res.redirect("/?payment=cancelled");
+  });
+  app.post("/api/admin/login", loginLimiter, (req, res) => {
     try {
-      const filePath = pathJoin(process.cwd(), filename);
-      const data = readFileSync4(filePath, "utf8");
-      const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${filename} - AgentPay</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; padding: 20px; max-width: 1000px; margin: 0 auto; line-height: 1.6; }
-    a { color: #60a5fa; }
-    code { background: #1e293b; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
-    pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #334155; }
-    h1, h2, h3 { color: #60a5fa; margin-top: 30px; }
-    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-    td, th { border: 1px solid #334155; padding: 10px; text-align: left; }
-  </style>
-</head>
-<body>
-  <a href="/docs">\u2190 Back to Docs</a>
-  <pre>${data.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
-</body>
-</html>`;
-      res.send(html);
-    } catch (err) {
-      res.status(404).send(`<pre>Document not found: ${filename}</pre>`);
+      const { password } = req.body;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      if (!adminPassword) {
+        console.error("\u274C ADMIN_PASSWORD not set in environment");
+        return res.status(500).json({ error: "Server configuration error" });
+      }
+      if (!password || password !== adminPassword) {
+        console.warn(`\u274C Unauthorized login attempt at ${(/* @__PURE__ */ new Date()).toISOString()}`);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      const token = crypto4.randomBytes(32).toString("hex");
+      const expiryTime = Date.now() + 36e5;
+      sessionTokens.set(token, expiryTime);
+      res.cookie("adminSession", token, {
+        httpOnly: true,
+        // Prevents JavaScript access
+        secure: process.env.NODE_ENV !== "development",
+        // HTTPS only in production
+        sameSite: "strict",
+        // CSRF protection
+        maxAge: 36e5,
+        // 1 hour
+        path: "/api/admin"
+        // Scope to admin endpoints
+      });
+      console.log(`\u2705 Admin login successful`);
+      res.json({ success: true, message: "Login successful" });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
-});
-var dbReady = false;
-try {
-  initializeDatabase();
-  dbReady = true;
-  console.log("\u2705 Database ready");
-} catch (err) {
-  console.error("\u274C Failed to initialize database:", err);
-  process.exit(1);
-}
-app.post("/api/agent/execute", async (req, res) => {
-  const requester = req.headers["x-requester-wallet"];
-  const txHash = req.headers["x-payment-txhash"];
-  const agentId = req.body.agentId;
-  if (!requester) {
-    return res.status(400).json({ error: "Missing X-Requester-Wallet header" });
-  }
-  if (!dbReady) {
-    return res.status(503).json({ error: "Database not ready. Try again in a moment." });
-  }
-  const remaining = await getQuota(requester);
-  if (remaining <= 0 && !txHash) {
-    return res.paymentRequired({
-      price: "0.10",
-      paymentAddress: process.env.TREASURY_WALLET,
-      merchantName: "MUSKOX Agent Network",
-      reason: "quota_exceeded"
-    });
-  }
-  if (txHash) {
-    const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    await recordPayment({
-      requestId,
-      agentId,
-      payer: requester,
-      amount: "0.10",
-      chainId: 1,
-      txHash
-    });
-  }
-  const newRemaining = await decrementQuota(requester);
-  res.json({
-    success: true,
-    executionId: `exec-${Date.now()}`,
-    outcome: "executed",
-    remaining: newRemaining,
-    timestamp: (/* @__PURE__ */ new Date()).toISOString()
+  app.post("/api/admin/logout", (req, res) => {
+    const token = req.cookies.adminSession;
+    if (token) {
+      sessionTokens.delete(token);
+    }
+    res.clearCookie("adminSession");
+    res.json({ success: true, message: "Logged out" });
   });
-});
-app.use("/agents", agents_default);
-app.use("/api/v1", services_default);
-app.use("/api/v1", solana_payments_default);
-app.use("/api/v1", ethereum_payments_default);
-app.use("/api/v1", stripe_payments_default);
-app.use("/api/v1", business_portal_default);
-app.use("/api/v1", agent_marketplace_default);
-app.use("/api/v1/provider", provider_default);
-app.use("/api/v1/providers", provider_default);
-app.use("/api/v1/osm-claim", osm_claim_default);
-app.use("/api/v1/ai", ai_default);
-app.use("/api/v1/notify", notify_default);
-app.use("/api/v1/wallet", wallet_default);
-app.use("/api/apk", apk_default);
-app.use("/", demo_agents_default);
-if (telegramBridge) {
-  app.use("/webhooks/telegram", telegramBridge.getRouter());
-  console.log("\u2705 Telegram webhook routes registered at /webhooks/telegram/*");
-}
-if (zoBridge) {
-  app.use("/webhooks/zo", zoBridge.getRouter());
-  console.log("\u2705 Zo agent bridge routes registered at /webhooks/zo/*");
-}
-if (collabBot) {
-  app.use("/webhooks", collabBot.getRouter());
-  console.log("\u2705 Telegram collaboration bot routes registered at /webhooks/*");
-}
-app.post("/api/contact", async (req, res) => {
+  app.get("/api/admin/contacts", (req, res) => {
+    try {
+      const token = req.cookies.adminSession;
+      if (!token || !validateSessionToken(token)) {
+        return res.status(401).json({ error: "Unauthorized - please login" });
+      }
+      const contactsFile = pathJoin(process.cwd(), "contacts.jsonl");
+      if (!existsSync4(contactsFile)) {
+        return res.json([]);
+      }
+      const content = readFileSync4(contactsFile, "utf8");
+      const contacts = content.split("\n").filter((line) => line.trim()).map((line) => JSON.parse(line));
+      res.json(contacts);
+    } catch (error) {
+      console.error("Admin contacts error:", error);
+      res.status(500).json({ error: "Failed to load contacts" });
+    }
+  });
+  app.get("/api/admin/bookings", (req, res) => {
+    try {
+      const token = req.cookies.adminSession;
+      if (!token || !validateSessionToken(token)) {
+        return res.status(401).json({ error: "Unauthorized - please login" });
+      }
+      const limit = parseInt(req.query.limit || "100");
+      const offset = parseInt(req.query.offset || "0");
+      const bookings2 = listBookings(limit, offset);
+      return res.json(bookings2);
+    } catch (error) {
+      console.error("Admin bookings error:", error);
+      return res.status(500).json({ error: "Failed to load bookings" });
+    }
+  });
+  app.get("/api/admin/stats", (req, res) => {
+    try {
+      const token = req.cookies.adminSession;
+      if (!token || !validateSessionToken(token)) {
+        return res.status(401).json({ error: "Unauthorized - please login" });
+      }
+      return res.json(getStats());
+    } catch (error) {
+      console.error("Admin stats error:", error);
+      return res.status(500).json({ error: "Failed to load stats" });
+    }
+  });
+  app.get("/api/admin/providers", (req, res) => {
+    try {
+      const token = req.cookies.adminSession;
+      if (!token || !validateSessionToken(token)) {
+        return res.status(401).json({ error: "Unauthorized - please login" });
+      }
+      const Database6 = __require("better-sqlite3");
+      const providerDb = new Database6("/var/lib/agentpay/providers.db");
+      const providers = providerDb.prepare("SELECT id, business_name, email, phone, category, status, created_at FROM providers ORDER BY created_at DESC").all();
+      return res.json(providers);
+    } catch (error) {
+      if (error.message?.includes("no such table") || error.code === "SQLITE_ERROR") {
+        return res.json([]);
+      }
+      console.error("Admin providers error:", error);
+      return res.status(500).json({ error: "Failed to load providers" });
+    }
+  });
+  app.get("/google-maps-setup", (req, res) => {
+    res.sendFile("public/google-maps-setup.html", { root: process.cwd() });
+  });
+  app.get("/android-app", (req, res) => {
+    res.sendFile("public/android-app.html", { root: process.cwd() });
+  });
+  app.get("/pricing", (req, res) => {
+    res.sendFile("public/pricing.html", { root: process.cwd() });
+  });
+  app.get("/roadmap", (req, res) => {
+    res.sendFile("public/roadmap.html", { root: process.cwd() });
+  });
+  app.get("/investor-pitch", (req, res) => {
+    res.sendFile("public/investor-pitch.html", { root: process.cwd() });
+  });
+  app.get("/personal-agent-app", (req, res) => {
+    res.sendFile("public/personal-agent-app.html", { root: process.cwd() });
+  });
+  app.get("/getting-started", (req, res) => {
+    res.sendFile("public/getting-started.html", { root: process.cwd() });
+  });
+  app.get("/quick-reference", (req, res) => {
+    res.sendFile("public/quick-reference.html", { root: process.cwd() });
+  });
+  let dbReady = false;
   try {
-    const { name, email, subject, message } = req.body;
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-    const contactsFile = pathJoin(process.cwd(), "contacts.jsonl");
-    const contactEntry = {
-      timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-      name,
-      email,
-      subject,
-      message
-    };
-    appendFileSync2(contactsFile, JSON.stringify(contactEntry) + "\n");
-    console.log(`\u{1F4E7} New contact: ${name} (${email}) - ${subject}`);
-    res.json({ success: true, message: "Message received! We'll get back to you soon." });
-  } catch (error) {
-    console.error("Contact form error:", error);
-    res.status(500).json({ error: "Failed to process submission" });
+    initializeDatabase();
+    dbReady = true;
+    console.log("\u2705 Database ready");
+  } catch (err) {
+    console.error("\u274C Failed to initialize database:", err);
+    process.exit(1);
   }
-});
-app.get("/health", (req, res) => {
-  res.json({
-    status: dbReady ? "healthy" : "initializing",
-    database: dbReady ? "ready" : "connecting",
-    timestamp: (/* @__PURE__ */ new Date()).toISOString()
-  });
-});
-app.get("/api/app-version", (req, res) => {
-  res.json({
-    currentVersion: "1.1.0",
-    minimumVersion: "1.0.0",
-    downloadUrl: "https://x402-agent-pay.com/download/agentpay-latest.apk",
-    releaseNotes: "Voice commands, editable budget limits, functional Top Up wallet",
-    isMandatory: false,
-    forceUpdate: false,
-    updateAvailable: false,
-    lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
-    changelog: {
-      "1.1.0": [
-        "Added voice command interface",
-        "Made budget limits editable",
-        "Functional Top Up wallet with variable amounts",
-        "Improved UI responsiveness",
-        "Fixed navigation bugs"
-      ],
-      "1.0.0": [
-        "Initial launch",
-        "Basic app structure",
-        "4-tab navigation (Voice, Settings, History, Wallet)"
-      ]
+  app.post("/api/agent/execute", async (req, res) => {
+    const requester = req.headers["x-requester-wallet"];
+    const txHash = req.headers["x-payment-txhash"];
+    const agentId = req.body.agentId;
+    if (!requester) {
+      return res.status(400).json({ error: "Missing X-Requester-Wallet header" });
     }
+    if (!dbReady) {
+      return res.status(503).json({ error: "Database not ready. Try again in a moment." });
+    }
+    const remaining = await getQuota(requester);
+    if (remaining <= 0 && !txHash) {
+      return res.paymentRequired({
+        price: "0.10",
+        paymentAddress: process.env.TREASURY_WALLET,
+        merchantName: "MUSKOX Agent Network",
+        reason: "quota_exceeded"
+      });
+    }
+    if (txHash) {
+      const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      await recordPayment({
+        requestId,
+        agentId,
+        payer: requester,
+        amount: "0.10",
+        chainId: 1,
+        txHash
+      });
+    }
+    const newRemaining = await decrementQuota(requester);
+    res.json({
+      success: true,
+      executionId: `exec-${Date.now()}`,
+      outcome: "executed",
+      remaining: newRemaining,
+      timestamp: (/* @__PURE__ */ new Date()).toISOString()
+    });
+    app.use("/agents", agents_default);
+    app.use("/api/v1", services_default);
+    app.use("/api/v1", solana_payments_default);
+    app.use("/api/v1", ethereum_payments_default);
+    app.use("/api/v1", stripe_payments_default);
+    app.use("/api/v1", business_portal_default);
+    app.use("/api/v1", agent_marketplace_default);
+    app.use("/api/v1/provider", provider_default);
+    app.use("/api/v1/providers", provider_default);
+    app.use("/api/v1/osm-claim", osm_claim_default);
+    app.use("/api/v1/ai", ai_default);
+    app.use("/api/v1/notify", notify_default);
+    app.use("/api/v1/wallet", wallet_default);
+    app.use("/api/apk", apk_default);
+    app.use("/", demo_agents_default);
+    if (telegramBridge) {
+      app.use("/webhooks/telegram", telegramBridge.getRouter());
+      console.log("\u2705 Telegram webhook routes registered at /webhooks/telegram/*");
+    }
+    if (zoBridge) {
+      app.use("/webhooks/zo", zoBridge.getRouter());
+      console.log("\u2705 Zo agent bridge routes registered at /webhooks/zo/*");
+    }
+    if (collabBot) {
+      app.use("/webhooks", collabBot.getRouter());
+      console.log("\u2705 Telegram collaboration bot routes registered at /webhooks/*");
+    }
+    app.post("/api/contact", async (req2, res2) => {
+      try {
+        const { name, email, subject, message } = req2.body;
+        if (!name || !email || !subject || !message) {
+          return res2.status(400).json({ error: "Missing required fields" });
+        }
+        const contactsFile = pathJoin(process.cwd(), "contacts.jsonl");
+        const contactEntry = {
+          timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+          name,
+          email,
+          subject,
+          message
+        };
+        appendFileSync2(contactsFile, JSON.stringify(contactEntry) + "\n");
+        console.log(`\u{1F4E7} New contact: ${name} (${email}) - ${subject}`);
+        res2.json({ success: true, message: "Message received! We'll get back to you soon." });
+      } catch (error) {
+        console.error("Contact form error:", error);
+        res2.status(500).json({ error: "Failed to process submission" });
+      }
+    });
+    app.get("/health", (req2, res2) => {
+      res2.json({
+        status: dbReady ? "healthy" : "initializing",
+        database: dbReady ? "ready" : "connecting",
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      app.get("/api/app-version", (req3, res3) => {
+        res3.json({
+          currentVersion: "1.1.0",
+          minimumVersion: "1.0.0",
+          downloadUrl: "https://x402-agent-pay.com/download/agentpay-latest.apk",
+          releaseNotes: "Voice commands, editable budget limits, functional Top Up wallet",
+          isMandatory: false,
+          forceUpdate: false,
+          updateAvailable: false,
+          lastUpdated: (/* @__PURE__ */ new Date()).toISOString(),
+          changelog: {
+            "1.1.0": [
+              "Added voice command interface",
+              "Made budget limits editable",
+              "Functional Top Up wallet with variable amounts",
+              "Improved UI responsiveness",
+              "Fixed navigation bugs"
+            ],
+            "1.0.0": [
+              "Initial launch",
+              "Basic app structure",
+              "4-tab navigation (Voice, Settings, History, Wallet)"
+            ]
+          }
+        });
+        app.get("/metrics", (req4, res4) => {
+          res4.json({
+            timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+            performance: getMetrics(),
+            recentRequests: getRequestLogs(10)
+          });
+          app.get("/status", (req5, res5) => {
+            res5.json({
+              timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+              system: {
+                database: dbReady ? "ready" : "initializing",
+                uptime: process.uptime(),
+                memoryUsage: process.memoryUsage()
+              },
+              performance: getMetrics()
+            });
+          });
+          app.use(errorHandler);
+          process.on("unhandledRejection", handleUnhandledRejection);
+          process.on("uncaughtException", handleUncaughtException);
+          const PORT = process.env.PORT || 3001;
+          app.listen(PORT, () => {
+            console.log(`\u2705 MUSKOX x402 Agent Network running on port ${PORT}`);
+            console.log(`\u{1F4DD} API: http://localhost:${PORT}/api/agent/execute`);
+            console.log(`\u{1F3E5} Health: http://localhost:${PORT}/health`);
+            console.log(`\u{1F4CA} Metrics: http://localhost:${PORT}/metrics`);
+            console.log(`\u2699\uFE0F Status: http://localhost:${PORT}/status`);
+          });
+        });
+      });
+    });
   });
-});
-app.get("/metrics", (req, res) => {
-  res.json({
-    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    performance: getMetrics(),
-    recentRequests: getRequestLogs(10)
-  });
-});
-app.get("/status", (req, res) => {
-  res.json({
-    timestamp: (/* @__PURE__ */ new Date()).toISOString(),
-    system: {
-      database: dbReady ? "ready" : "initializing",
-      uptime: process.uptime(),
-      memoryUsage: process.memoryUsage()
-    },
-    performance: getMetrics()
-  });
-});
-app.use(errorHandler);
-process.on("unhandledRejection", handleUnhandledRejection);
-process.on("uncaughtException", handleUncaughtException);
-var PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`\u2705 MUSKOX x402 Agent Network running on port ${PORT}`);
-  console.log(`\u{1F4DD} API: http://localhost:${PORT}/api/agent/execute`);
-  console.log(`\u{1F3E5} Health: http://localhost:${PORT}/health`);
-  console.log(`\u{1F4CA} Metrics: http://localhost:${PORT}/metrics`);
-  console.log(`\u2699\uFE0F Status: http://localhost:${PORT}/status`);
 });
 var app_default = app;
 export {
