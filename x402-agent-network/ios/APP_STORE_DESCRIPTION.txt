@@ -1,0 +1,24 @@
+AgentPay Provider lets service professionals manage their business in the AI agent economy.
+
+Accept bookings, track payments, and manage your schedule — all from your phone.
+
+KEY FEATURES:
+• Real-time booking notifications via SMS and push
+• Accept or decline bookings with one tap
+• Track earnings and payment history
+• Full business profile management
+• x402 micropayment support for agent-to-agent commerce
+
+SIRI INTEGRATION:
+• "Hey Siri, check my AgentPay bookings"
+• "Hey Siri, accept my next AgentPay booking"  
+• "Hey Siri, how much did I earn today on AgentPay?"
+
+PAYMENTS:
+• Receive payments via crypto (USDC on Base, Ethereum, Polygon)
+• Stripe card payments supported
+• Instant settlement to your wallet
+
+Perfect for HVAC technicians, plumbers, electricians, cleaners, landscapers, and any service professional ready to work with AI-powered booking systems.
+
+Join the AgentPay network and let AI agents send you paying customers automatically.

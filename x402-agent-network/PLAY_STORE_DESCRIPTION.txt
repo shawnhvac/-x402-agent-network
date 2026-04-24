@@ -1,0 +1,28 @@
+AgentPay Provider — Manage your service business in the AI economy.
+
+Accept bookings sent by AI agents, track payments, and grow your business — all from your Android phone.
+
+FEATURES:
+• AI-powered booking requests — agents send you customers automatically
+• SMS + voice call notifications for every booking
+• Accept/decline bookings instantly
+• Dashboard with earnings, ratings, and booking stats
+• Business profile with service categories and hours
+• Claim your existing Google Maps/OpenStreetMap listing
+• Verified provider badge after SMS verification
+
+PAYMENTS:
+• Receive crypto payments (USDC) on Base, Ethereum, Polygon, Solana
+• Stripe card & mobile payments (Apple Pay, Google Pay)
+• Instant settlement — no waiting for payouts
+
+HOW IT WORKS:
+1. Register your business
+2. AI agents discover you via the AgentPay marketplace
+3. Customers book and pay through AI assistants
+4. You get notified by SMS and accept with one tap
+5. Payment arrives in your wallet instantly
+
+Great for: HVAC, plumbing, electrical, cleaning, landscaping, handyman services, and any trade professional.
+
+Be part of the future of commerce — where AI agents handle the booking so you can focus on the work.
