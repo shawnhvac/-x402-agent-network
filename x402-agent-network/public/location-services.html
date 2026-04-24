@@ -5,107 +5,236 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Location Services — AgentPay</title>
 <style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-  .hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(135deg,#0f172a,#1e293b)}
-  .hero h1{font-size:2.5em;font-weight:800;color:#fff;margin-bottom:16px}
-  .hero p{font-size:1.1em;color:#94a3b8;max-width:650px;margin:0 auto 30px}
-  .search-box{max-width:600px;margin:0 auto;display:flex;gap:12px;padding:0 20px}
-  .search-box input{flex:1;background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px 20px;color:#fff;font-size:15px;outline:none}
-  .search-box button{background:#3b82f6;border:none;border-radius:10px;padding:14px 24px;color:#fff;cursor:pointer;font-weight:700}
-  .results{max-width:900px;margin:40px auto;padding:0 20px;min-height:200px}
-  .result-card{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px 24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:16px}
-  .result-card.verified{border-color:#3b82f6}
-  .result-info h3{font-size:16px;color:#fff;margin-bottom:4px}
-  .result-info p{color:#94a3b8;font-size:13px}
-  .badge-v{background:rgba(59,130,246,0.15);color:#3b82f6;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;margin-left:8px}
-  .badge-osm{background:rgba(34,197,94,0.1);color:#22c55e;padding:3px 10px;border-radius:20px;font-size:11px}
-  .book-btn{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:10px 20px;cursor:pointer;font-weight:600;white-space:nowrap}
-  .how-it-works{max-width:900px;margin:60px auto;padding:0 20px}
-  .how-it-works h2{font-size:1.8em;color:#fff;text-align:center;margin-bottom:40px}
-  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
-  .step{text-align:center;padding:24px}
-  .step .icon{font-size:2.5em;margin-bottom:16px}
-  .step h4{color:#fff;margin-bottom:8px}
-  .step p{color:#94a3b8;font-size:14px;line-height:1.5}
-  .empty{text-align:center;color:#475569;padding:60px 20px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%)}
+.hero .badge{display:inline-block;background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.3);padding:6px 18px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:20px}
+.hero h1{font-size:2.4em;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.2}
+.hero p{font-size:1.1em;color:#94a3b8;max-width:600px;margin:0 auto 32px}
+.btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;display:inline-block;transition:all 0.2s}
+.btn-blue{background:#3b82f6;color:#fff}.btn-blue:hover{background:#2563eb}
+.btn-outline{border:2px solid #334155;color:#94a3b8}.btn-outline:hover{border-color:#3b82f6;color:#3b82f6}
+
+.section{max-width:960px;margin:0 auto;padding:60px 20px}
+.section h2{font-size:1.8em;font-weight:800;color:#fff;margin-bottom:10px}
+.section .sub{color:#64748b;margin-bottom:36px;font-size:15px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px}
+.card .icon{font-size:2em;margin-bottom:14px}
+.card h3{color:#fff;font-size:16px;margin-bottom:8px}
+.card p{color:#94a3b8;font-size:14px;line-height:1.6}
+
+.flow{display:flex;flex-direction:column;gap:0;background:#1e293b;border:1px solid #334155;border-radius:14px;overflow:hidden}
+.flow-step{display:flex;align-items:flex-start;gap:20px;padding:22px 24px;border-bottom:1px solid #0f172a}
+.flow-step:last-child{border-bottom:none}
+.flow-num{width:32px;height:32px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;margin-top:2px}
+.flow-content h4{color:#fff;font-size:14px;margin-bottom:5px}
+.flow-content p{color:#94a3b8;font-size:13px;line-height:1.5}
+.flow-content code{background:#0f172a;color:#60a5fa;padding:2px 7px;border-radius:4px;font-size:12px}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:640px){.two-col{grid-template-columns:1fr}}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:40px}
+.stat{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px;text-align:center}
+.stat .val{font-size:1.9em;font-weight:800;color:#60a5fa}
+.stat .lbl{color:#64748b;font-size:12px;margin-top:6px}
+
+.source-block{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px}
+.source-block h4{color:#fff;font-size:15px;margin-bottom:16px}
+.source-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid #0f172a}
+.source-item:last-child{border-bottom:none}
+.source-icon{font-size:1.5em;flex-shrink:0;width:36px;text-align:center}
+.source-text h5{color:#e2e8f0;font-size:14px;margin-bottom:4px}
+.source-text p{color:#64748b;font-size:13px;line-height:1.5}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-left:8px}
+.tag-green{background:rgba(34,197,94,0.15);color:#22c55e}
+.tag-blue{background:rgba(59,130,246,0.15);color:#60a5fa}
+
+.api-box{background:#0f172a;border:1px solid #1e293b;border-radius:10px;padding:20px;font-family:monospace;font-size:13px;color:#94a3b8;overflow-x:auto}
+.api-box .method{color:#22c55e;font-weight:700}
+.api-box .path{color:#60a5fa}
+.api-box .param{color:#f59e0b}
+.api-box .comment{color:#475569}
+
+.cta{background:linear-gradient(135deg,#1e3a5f,#1e293b);border:1px solid #334155;border-radius:16px;padding:48px 32px;text-align:center;margin:0 20px 60px}
+.cta h2{font-size:1.8em;color:#fff;margin-bottom:12px}
+.cta p{color:#94a3b8;margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto}
 </style>
 </head>
 <body>
 <div id="nav-placeholder"></div>
+
 <div class="hero">
-  <h1>📍 Location Services</h1>
-  <p>AI agents and customers find your business via real-time location search. AgentPay blends verified providers with OpenStreetMap data — your business, discovered 24/7.</p>
-  <div class="search-box">
-    <input type="text" id="search-input" placeholder="Search plumbers, HVAC, electricians near me..." onkeydown="if(event.key==='Enter')search()"/>
-    <button onclick="search()">Search</button>
+  <div class="badge">📍 Powered by OpenStreetMap + AgentPay Registry</div>
+  <h1>Location Discovery</h1>
+  <p>Find any service provider — anywhere in the world. AgentPay blends our live provider registry with OpenStreetMap's global database of 500M+ businesses.</p>
+  <div class="btn-row">
+    <a href="/marketplace" class="btn btn-blue">🔍 Try the Marketplace</a>
+    <a href="/docs" class="btn btn-outline">📖 API Docs</a>
   </div>
 </div>
 
-<div class="results" id="results">
-  <div class="empty">
-    <div style="font-size:3em;margin-bottom:16px">🗺️</div>
-    <p>Search for a service above to find providers near you</p>
+<div class="section" style="padding-top:40px;padding-bottom:20px">
+  <div class="stat-row">
+    <div class="stat"><div class="val">500M+</div><div class="lbl">OSM Businesses</div></div>
+    <div class="stat"><div class="val">190+</div><div class="lbl">Countries</div></div>
+    <div class="stat"><div class="val">$0.001</div><div class="lbl">Per Search (USDC)</div></div>
+    <div class="stat"><div class="val">✅</div><div class="lbl">Verified Providers First</div></div>
+    <div class="stat"><div class="val">AI</div><div class="lbl">Smart Ranking</div></div>
   </div>
 </div>
 
-<div class="how-it-works">
-  <h2>How Location Discovery Works</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="icon">🤖</div>
-      <h4>AI Agent Searches</h4>
-      <p>An AI agent or customer searches for a service. AgentPay queries our provider database + OpenStreetMap simultaneously.</p>
+<!-- How search works -->
+<div class="section" style="padding-top:20px">
+  <h2>How Location Search Works</h2>
+  <p class="sub">Every search blends two data sources and returns ranked results in milliseconds</p>
+  <div class="two-col">
+    <div class="source-block">
+      <h4>Data Sources</h4>
+      <div class="source-item">
+        <div class="source-icon">🤖</div>
+        <div class="source-text">
+          <h5>AgentPay Registry <span class="tag tag-green">PRIORITY</span></h5>
+          <p>Verified providers who registered on AgentPay. Have real pricing, availability, and booking capability. Always ranked first.</p>
+        </div>
+      </div>
+      <div class="source-item">
+        <div class="source-icon">🗺️</div>
+        <div class="source-text">
+          <h5>OpenStreetMap <span class="tag tag-blue">GLOBAL</span></h5>
+          <p>500M+ worldwide business listings with addresses, categories, hours, and contact info. Fills results where no AgentPay provider exists yet.</p>
+        </div>
+      </div>
     </div>
-    <div class="step">
-      <div class="icon">🏆</div>
-      <h4>Verified First</h4>
-      <p>Registered AgentPay providers appear at the top with a Verified badge. OSM businesses fill in the rest.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <h4>Query comes in</h4>
+          <p>AI agent or user sends search with query + location (city, zip, or coordinates)</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <h4>Registry lookup</h4>
+          <p>Check AgentPay DB for matching verified providers near the location</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <h4>OSM fallback</h4>
+          <p>Supplement with OpenStreetMap results to fill gaps in coverage</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <h4>Ranked results</h4>
+          <p>AgentPay Verified always shown first, then OSM results by relevance</p>
+        </div>
+      </div>
     </div>
-    <div class="step">
-      <div class="icon">💰</div>
-      <h4>Instant Booking</h4>
-      <p>The agent pays a $0.001 USDC x402 micropayment to access results, then books your service automatically.</p>
+  </div>
+</div>
+
+<!-- API reference -->
+<div class="section" style="padding-top:0">
+  <h2>Search API</h2>
+  <p class="sub">x402 micropayment required — $0.001 USDC per call on Base mainnet</p>
+  <div class="api-box">
+    <span class="method">POST</span> <span class="path">/api/v1/search</span><br>
+    <span class="comment">// Headers: x-payment: &lt;x402 payment token&gt;</span><br><br>
+    {<br>
+    &nbsp;&nbsp;<span class="param">"query"</span>: <span style="color:#a3e635">"hvac repair"</span>,<br>
+    &nbsp;&nbsp;<span class="param">"location"</span>: <span style="color:#a3e635">"Phoenix, AZ"</span>,&nbsp;&nbsp;<span class="comment">// city, state OR zip OR "lat,lng"</span><br>
+    &nbsp;&nbsp;<span class="param">"category"</span>: <span style="color:#a3e635">"hvac"</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// optional filter</span><br>
+    &nbsp;&nbsp;<span class="param">"radius_km"</span>: <span style="color:#f59e0b">25</span>,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// default 25km</span><br>
+    &nbsp;&nbsp;<span class="param">"max_results"</span>: <span style="color:#f59e0b">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">// default 10</span><br>
+    }
+  </div>
+  <div class="api-box" style="margin-top:12px">
+    <span class="comment">// Response</span><br>
+    {<br>
+    &nbsp;&nbsp;<span class="param">"success"</span>: <span style="color:#22c55e">true</span>,<br>
+    &nbsp;&nbsp;<span class="param">"count"</span>: <span style="color:#f59e0b">5</span>,<br>
+    &nbsp;&nbsp;<span class="param">"results"</span>: [{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"id"</span>: <span style="color:#a3e635">"hvac-phx-001"</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"name"</span>: <span style="color:#a3e635">"Desert Air HVAC"</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"verified"</span>: <span style="color:#22c55e">true</span>,&nbsp;&nbsp;<span class="comment">// AgentPay registered</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"price"</span>: <span style="color:#f59e0b">99</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"rating"</span>: <span style="color:#f59e0b">4.8</span>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="param">"distance_km"</span>: <span style="color:#f59e0b">3.2</span><br>
+    &nbsp;&nbsp;}]<br>
+    }
+  </div>
+</div>
+
+<!-- Service categories -->
+<div class="section" style="padding-top:0">
+  <h2>Supported Service Categories</h2>
+  <p class="sub">All categories searchable via API or the Marketplace</p>
+  <div class="cards">
+    <div class="card"><div class="icon">🏠</div><h3>Home Services</h3><p>HVAC, plumbing, electrical, roofing, landscaping, cleaning, pest control, locksmith</p></div>
+    <div class="card"><div class="icon">🚗</div><h3>Auto</h3><p>Oil change, tire service, detailing, body repair, towing, diagnostics, transmission</p></div>
+    <div class="card"><div class="icon">💇</div><h3>Hair & Beauty</h3><p>Haircuts, coloring, nails, waxing, massage, facials, lash extensions, barber</p></div>
+    <div class="card"><div class="icon">💪</div><h3>Fitness & Health</h3><p>Personal trainers, yoga, physical therapy, chiropractor, nutrition, sports coaching</p></div>
+    <div class="card"><div class="icon">🏥</div><h3>Medical</h3><p>Urgent care, dentist, optometrist, veterinarian, pharmacy, mental health</p></div>
+    <div class="card"><div class="icon">🍕</div><h3>Food & Dining</h3><p>Restaurants, catering, food delivery, meal prep, bakeries, coffee shops</p></div>
+  </div>
+</div>
+
+<!-- Claim your listing -->
+<div class="section" style="padding-top:0">
+  <h2>Claim Your Business Listing</h2>
+  <p class="sub">Already on OpenStreetMap? Claim it to get Verified and priority ranking</p>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="flow-num">1</div>
+      <div class="flow-content">
+        <h4>Search for your business</h4>
+        <p>Find your business on the AgentPay Marketplace or OSM. It may already be listed.</p>
+      </div>
     </div>
-    <div class="step">
-      <div class="icon">📱</div>
-      <h4>You Get Notified</h4>
-      <p>Your AgentPay Provider app buzzes with the booking details. Accept with one tap — or let it auto-confirm.</p>
+    <div class="flow-step">
+      <div class="flow-num">2</div>
+      <div class="flow-content">
+        <h4>Tap "Claim This Listing"</h4>
+        <p>Available in the Android Provider App. Enter your business phone number.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">3</div>
+      <div class="flow-content">
+        <h4>Verify via SMS</h4>
+        <p>We send a 6-digit code to the phone number on the OSM listing. Enter it in the app.</p>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="flow-num">4</div>
+      <div class="flow-content">
+        <h4>Get your ✅ Verified badge</h4>
+        <p>Your listing is now AgentPay Verified. AI agents will prioritize you in all search results.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:0 auto">
+  <div class="cta">
+    <h2>📍 Get Found by AI Agents Worldwide</h2>
+    <p>Register your business free — no monthly fees. Only pay when you get booked.</p>
+    <div class="btn-row">
+      <a href="/register" class="btn btn-blue">🚀 Register Your Business</a>
+      <a href="/provider-download" class="btn btn-outline">📱 Download Provider App</a>
     </div>
   </div>
 </div>
 
 <script src="/chatbot.js"></script>
-<script>
-  fetch('/nav.html').then(r=>r.text()).then(h=>{document.getElementById('nav-placeholder').innerHTML=h});
-
-  async function search() {
-    const q = document.getElementById('search-input').value.trim();
-    if (!q) return;
-    const box = document.getElementById('results');
-    box.innerHTML = '<div class="empty"><p>🔍 Searching...</p></div>';
-    try {
-      const res = await fetch('/api/v1/search?q=' + encodeURIComponent(q) + '&limit=10');
-      const data = await res.json();
-      const providers = data.providers || data.results || [];
-      if (!providers.length) {
-        box.innerHTML = '<div class="empty"><p>No providers found for "' + q + '". <a href="/provider-download" style="color:#3b82f6">Register yours →</a></p></div>';
-        return;
-      }
-      box.innerHTML = providers.map(p => `
-        <div class="result-card ${p.verified ? 'verified' : ''}">
-          <div class="result-info">
-            <h3>${p.name || p.businessName || 'Business'} ${p.verified ? '<span class="badge-v">✓ Verified</span>' : '<span class="badge-osm">OSM</span>'}</h3>
-            <p>${p.category || p.type || ''} ${p.address || p.location || ''}</p>
-            ${p.phone ? '<p>📞 ' + p.phone + '</p>' : ''}
-          </div>
-          <button class="book-btn" onclick="window.location='/marketplace'">View & Book</button>
-        </div>
-      `).join('');
-    } catch(e) {
-      box.innerHTML = '<div class="empty"><p>Search unavailable — please try again.</p></div>';
-    }
-  }
-</script>
 </body>
 </html>

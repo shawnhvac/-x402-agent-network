@@ -5646,6 +5646,9 @@ app.get("/api/admin/providers", (req, res) => {
     return res.status(500).json({ error: "Failed to load providers" });
   }
 });
+app.get("/google-maps-setup", (req, res) => {
+  res.sendFile("public/google-maps-setup.html", { root: process.cwd() });
+});
 app.get("/android-app", (req, res) => {
   res.sendFile("public/android-app.html", { root: process.cwd() });
 });
@@ -5658,8 +5661,7 @@ app.get("/roadmap", (req, res) => {
 var docFiles = {
   "/getting-started": "GETTING_STARTED.md",
   "/quick-reference": "QUICK_REFERENCE.md",
-  "/personal-agent-app": "PERSONAL_AGENT_APP.md",
-  "/google-maps-setup": "GOOGLE_MAPS_SETUP.md"
+  "/personal-agent-app": "PERSONAL_AGENT_APP.md"
 };
 app.get("/investor-pitch", (req, res) => {
   res.sendFile("public/investor-pitch.html", { root: process.cwd() });

@@ -393,6 +393,9 @@ app.get("/api/admin/providers", (req: Request, res: Response) => {
 });
 
 // ── Dedicated HTML pages (override markdown versions) ──────────────────────
+app.get('/google-maps-setup', (req: Request, res: Response) => {
+  res.sendFile('public/google-maps-setup.html', { root: process.cwd() });
+});
 app.get('/android-app', (req: Request, res: Response) => {
   res.sendFile('public/android-app.html', { root: process.cwd() });
 });
@@ -409,7 +412,6 @@ const docFiles = {
   '/getting-started': 'GETTING_STARTED.md',
   '/quick-reference': 'QUICK_REFERENCE.md',
   '/personal-agent-app': 'PERSONAL_AGENT_APP.md',
-  '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
 };
 
 // Special: investor-pitch served as HTML, not markdown
