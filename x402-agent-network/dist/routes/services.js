@@ -3,6 +3,9 @@ import { dirname as _dn } from 'path';
 const __filename = _fup(import.meta.url);
 const __dirname = _dn(__filename);
 import { Router } from 'express';
+import { notifyBusiness, calculateFee, feePercent } from '../services/twilio-notify.js';
+import { registerBooking } from './notify.js';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 const router = Router();
@@ -264,9 +267,9 @@ router.post('/search', (req, res) => {
  * Book a service appointment (x402 endpoint)
  * Body: { service_id: string, date: string, time: string, service_type: string }
  */
-router.post('/book', (req, res) => {
+router.post('/book', async (req, res) => {
     try {
-        const { service_id, date, time, service_type } = req.body;
+        const { service_id, date, time, service_type, customer_name, estimated_price } = req.body;
         if (!service_id || !date || !time || !service_type) {
             return res.status(400).json({
                 success: false,
@@ -280,25 +283,63 @@ router.post('/book', (req, res) => {
                 error: 'Service not found'
             });
         }
-        if (!service.services.includes(service_type)) {
-            return res.status(400).json({
-                success: false,
-                error: `Service type '${service_type}' not available at this location`
-            });
-        }
-        const price = service.pricing[service_type.replace(' ', '_')] || 0;
+        const price = estimated_price || service.pricing[service_type.replace(/ /g, '_')] || 0;
+        const fee = calculateFee(price);
+        const pct = feePercent(price);
+        const net = Math.round((price - fee) * 100) / 100;
+        const bookingId = `BK-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+        // Register booking so SMS reply handler can look it up
+        registerBooking({
+            id: bookingId,
+            phone: service.phone,
+            businessName: service.name,
+            serviceType: service_type,
+            date,
+            time,
+            price,
+        });
+        // Respond immediately — notification is async
         res.json({
             success: true,
             booking: {
-                id: `BK-${Date.now()}`,
+                id: bookingId,
                 service_id,
                 service_name: service.name,
                 service_type,
                 date,
                 time,
                 price,
+                platform_fee: fee,
+                fee_percent: pct,
+                business_payout: net,
                 status: 'pending_confirmation',
-                confirmation_required: true
+                confirmation_required: true,
+                notification: 'Business is being notified now'
+            }
+        });
+        // Fire-and-forget: notify business via SMS/voice/email
+        setImmediate(async () => {
+            try {
+                const result = await notifyBusiness({
+                    bookingId,
+                    businessName: service.name,
+                    businessPhone: service.phone,
+                    businessEmail: service.email,
+                    serviceType: service_type,
+                    customerName: customer_name,
+                    date,
+                    time,
+                    price,
+                    attempt: 1
+                });
+                console.log(`[Booking ${bookingId}] Notification result:`, result);
+                // Attempt 2 after 30 min if no response (simplified — in production use a job queue)
+                if (!result.sent) {
+                    console.warn(`[Booking ${bookingId}] Initial notification failed — will retry`);
+                }
+            }
+            catch (err) {
+                console.error(`[Booking ${bookingId}] Notification error:`, err);
             }
         });
     }
@@ -309,6 +350,32 @@ router.post('/book', (req, res) => {
             error: 'Booking failed'
         });
     }
+});
+/**
+ * POST /api/v1/notify/ivr-response/:bookingId
+ * Twilio IVR webhook — business pressed 1 (confirm) or 2 (decline)
+ */
+router.post('/notify/ivr-response/:bookingId', (req, res) => {
+    const { bookingId } = req.params;
+    const digit = req.body.Digits;
+    console.log(`[IVR] Booking ${bookingId} — pressed: ${digit}`);
+    let message = '';
+    if (digit === '1') {
+        message = 'Thank you! The booking has been confirmed. We will send you the customer details shortly. Goodbye.';
+        console.log(`[IVR] Booking ${bookingId} CONFIRMED by business`);
+    }
+    else if (digit === '2') {
+        message = 'The booking has been declined. We will find another provider for the customer. Goodbye.';
+        console.log(`[IVR] Booking ${bookingId} DECLINED by business`);
+    }
+    else {
+        message = 'We did not receive a valid response. Please call AgentPay support if you have questions. Goodbye.';
+    }
+    // Respond with TwiML
+    res.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Joanna">${message}</Say>
+</Response>`);
 });
 /**
  * POST /api/v1/pay
@@ -371,6 +438,112 @@ router.get('/stats', (req, res) => {
             success: false,
             error: 'Failed to fetch statistics'
         });
+    }
+});
+/**
+ * POST /api/v1/llm - Real AI Inference via NVIDIA NIM (x402 protected)
+ */
+import { nvidiaNIM, NVIDIA_MODELS, DEFAULT_MODEL } from "../services/nvidia-nim.js";
+router.post("/llm", async (req, res) => {
+    try {
+        const { prompt, messages, model, max_tokens = 512, temperature = 0.7 } = req.body;
+        let msgs = messages;
+        if (!msgs && prompt)
+            msgs = [{ role: "user", content: prompt }];
+        if (!Array.isArray(msgs) || msgs.length === 0) {
+            return res.status(400).json({ error: "Provide prompt or messages[]" });
+        }
+        const resolvedModel = (model && NVIDIA_MODELS[model]) ? model : DEFAULT_MODEL;
+        const resp = await nvidiaNIM.chat({ model: resolvedModel, messages: msgs, max_tokens, temperature });
+        const completion = resp.choices[0]?.message?.content || "";
+        return res.json({
+            success: true,
+            output: {
+                model: resp.model,
+                completion,
+                usage: resp.usage,
+                cost: 0.001,
+                provider: "NVIDIA NIM",
+            },
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message || "LLM inference failed" });
+    }
+});
+/**
+ * POST /api/v1/ai/search — AI-powered natural language service search
+ * Uses NVIDIA NIM to interpret the query, then searches the services database.
+ * x402 protected: $0.002 USDC per call
+ */
+router.post("/ai/search", async (req, res) => {
+    try {
+        const { query, location, max_results = 5 } = req.body;
+        if (!query || typeof query !== "string") {
+            return res.status(400).json({ error: "query string is required" });
+        }
+        // Step 1: Ask NVIDIA NIM to interpret the query
+        const systemPrompt = `You are a service search assistant. Extract structured intent from a user's natural language service request.
+Return ONLY valid JSON with these fields:
+- category: one of [hvac, plumbing, electrical, hair-beauty, food-dining, mechanic, cleaning, landscaping, other]
+- keywords: array of 3-5 relevant search terms
+- location: city/area if mentioned, or null
+- urgency: "high" | "normal" | "low"
+- intent: short phrase describing what they want (max 8 words)`;
+        const nimResp = await nvidiaNIM.chat({
+            model: "meta/llama-3.3-70b-instruct",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: query },
+            ],
+            max_tokens: 200,
+            temperature: 0.1,
+        });
+        let interpreted = { category: "other", keywords: [query], location: null, urgency: "normal", intent: query };
+        try {
+            const raw = nimResp.choices[0]?.message?.content || "{}";
+            const jsonMatch = raw.match(/\{[\s\S]*\}/);
+            if (jsonMatch)
+                interpreted = JSON.parse(jsonMatch[0]);
+        }
+        catch (_) { }
+        // Step 2: Search services with AI-extracted keywords
+        const searchTerms = [
+            ...(interpreted.keywords || []),
+            interpreted.category !== "other" ? interpreted.category : "",
+            location || interpreted.location || "",
+        ].filter(Boolean).map((t) => t.toLowerCase());
+        const locationHint = (location || interpreted.location || "").toLowerCase();
+        let candidates = [...services];
+        if (locationHint) {
+            candidates = candidates.filter(s => s.location.toLowerCase().includes(locationHint) ||
+                s.city.toLowerCase().includes(locationHint));
+        }
+        if (interpreted.category && interpreted.category !== "other") {
+            const catMatches = candidates.filter(s => s.category.toLowerCase() === interpreted.category.toLowerCase());
+            if (catMatches.length > 0)
+                candidates = catMatches;
+        }
+        // Step 3: Score each result by keyword overlap
+        const scored = candidates.map(s => {
+            const blob = [s.name, s.description, s.category, ...s.services].join(" ").toLowerCase();
+            const hits = searchTerms.filter(t => blob.includes(t)).length;
+            const score = searchTerms.length > 0 ? hits / searchTerms.length : 0.5;
+            return { ...s, relevance_score: parseFloat(score.toFixed(2)) };
+        });
+        const results = scored
+            .sort((a, b) => b.relevance_score - a.relevance_score)
+            .slice(0, max_results);
+        return res.json({
+            success: true,
+            query,
+            ai_interpreted: interpreted,
+            count: results.length,
+            results,
+        });
+    }
+    catch (err) {
+        return res.status(500).json({ error: err.message || "AI search failed" });
     }
 });
 export default router;

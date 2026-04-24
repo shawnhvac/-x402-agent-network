@@ -12,9 +12,9 @@
  * 6. Test timeout refunds
  */
 import { PublicKey, Keypair } from '@solana/web3.js';
-import { VehicleAgent } from '../agents/vehicle-agent';
-import { MechanicAgent } from '../agents/mechanic-agent';
-import { AutonomousNegotiationEngine } from '../engines/negotiation-engine';
+import { VehicleAgent } from '../agents/vehicle-agent.js';
+import { MechanicAgent } from '../agents/mechanic-agent.js';
+import { AutonomousNegotiationEngine } from '../engines/negotiation-engine.js';
 import { SmartEscrowIntegration } from './escrow-integration';
 // ===== TEST REGISTRY =====
 class TestAgentRegistry {

@@ -14,7 +14,7 @@
  *
  * NO HUMAN INTERVENTION REQUIRED
  */
-import { autonomousNegotiate } from '../engines/negotiation-engine';
+import { autonomousNegotiate } from '../engines/negotiation-engine.js';
 /**
  * Vehicle Agent Class
  *

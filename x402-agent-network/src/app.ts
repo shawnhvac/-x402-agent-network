@@ -192,6 +192,14 @@ app.get("/agent-dashboard", (req: Request, res: Response) => {
   res.sendFile("public/agent-dashboard.html", { root: process.cwd() });
 });
 
+app.get("/privacy", (req: Request, res: Response) => {
+  res.sendFile("public/privacy.html", { root: process.cwd() });
+});
+
+app.get("/register-agent", (req: Request, res: Response) => {
+  res.sendFile("public/register-agent.html", { root: process.cwd() });
+});
+
 app.get("/docs", (req: Request, res: Response) => {
   res.sendFile("public/docs.html", { root: process.cwd() });
 });

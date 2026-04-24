@@ -14,9 +14,9 @@
  *
  * ZERO HUMAN INTERVENTION
  */
-import { VehicleAgent } from '../agents/vehicle-agent';
-import { MechanicAgent } from '../agents/mechanic-agent';
-import { AutonomousNegotiationEngine } from '../engines/negotiation-engine';
+import { VehicleAgent } from '../agents/vehicle-agent.js';
+import { MechanicAgent } from '../agents/mechanic-agent.js';
+import { AutonomousNegotiationEngine } from '../engines/negotiation-engine.js';
 // ===== MOCK AGENT REGISTRY =====
 /**
  * Mock AgentRegistry for testing
