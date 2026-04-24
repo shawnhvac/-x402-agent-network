@@ -19,26 +19,73 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_15.4.app/Contents/Developer
 
-      - name: Install CocoaPods (if needed)
-        run: |
-          gem install cocoapods --no-document 2>/dev/null || true
+      - name: Install xcodegen
+        run: brew install xcodegen
 
-      - name: Create Xcode project from Swift files
+      - name: Write xcodegen project spec
         working-directory: x402-agent-network/ios
         run: |
-          # Generate a minimal .xcodeproj using xcodegen or manual creation
-          mkdir -p AgentPayProvider.xcodeproj
-          cat > AgentPayProvider.xcodeproj/project.pbxproj << 'PBXEOF'
-// !$*UTF8*$!
-{
-  archiveVersion = 1;
-  classes = {};
-  objectVersion = 56;
-  objects = {};
-  rootObject = "";
-}
-PBXEOF
-          echo "Project scaffold created"
+          cat > project.yml << 'EOF'
+          name: AgentPayProvider
+          options:
+            bundleIdPrefix: com.agentpay
+            deploymentTarget:
+              iOS: "16.0"
+          settings:
+            PRODUCT_BUNDLE_IDENTIFIER: com.agentpay.provider
+            SWIFT_VERSION: "5.9"
+            MARKETING_VERSION: "2.0.0"
+            CURRENT_PROJECT_VERSION: "1"
+          targets:
+            AgentPayProvider:
+              type: application
+              platform: iOS
+              deploymentTarget: "16.0"
+              sources:
+                - AgentPayProvider
+              settings:
+                PRODUCT_BUNDLE_IDENTIFIER: com.agentpay.provider
+                INFOPLIST_FILE: AgentPayProvider/Info.plist
+              entitlements:
+                com.apple.developer.siri: true
+          EOF
+
+      - name: Write Info.plist
+        working-directory: x402-agent-network/ios/AgentPayProvider
+        run: |
+          cat > Info.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>CFBundleDisplayName</key>
+            <string>AgentPay Provider</string>
+            <key>CFBundleIdentifier</key>
+            <string>com.agentpay.provider</string>
+            <key>CFBundleName</key>
+            <string>AgentPayProvider</string>
+            <key>CFBundleShortVersionString</key>
+            <string>2.0.0</string>
+            <key>CFBundleVersion</key>
+            <string>1</string>
+            <key>LSRequiresIPhoneOS</key>
+            <true/>
+            <key>UILaunchScreen</key>
+            <dict/>
+            <key>NSAppTransportSecurity</key>
+            <dict>
+              <key>NSAllowsArbitraryLoads</key>
+              <false/>
+            </dict>
+            <key>NSSiriUsageDescription</key>
+            <string>AgentPay uses Siri to let you check bookings, accept appointments, and view earnings with your voice.</string>
+          </dict>
+          </plist>
+          EOF
+
+      - name: Generate Xcode project
+        working-directory: x402-agent-network/ios
+        run: xcodegen generate
 
       - name: Import signing certificate
         env:
@@ -46,18 +93,13 @@ PBXEOF
           CERT_PASSWORD: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
           PROVISIONING_B64: ${{ secrets.IOS_PROVISIONING_B64 }}
         run: |
-          # Create keychain
           security create-keychain -p "temp123" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "temp123" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
-
-          # Import cert
           echo "$CERT_P12_B64" | base64 -d > cert.p12
           security import cert.p12 -k build.keychain -P "$CERT_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "temp123" build.keychain
-
-          # Install provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISIONING_B64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/agentpay_provider.mobileprovision
 
@@ -78,24 +120,24 @@ PBXEOF
       - name: Export IPA
         working-directory: x402-agent-network/ios
         run: |
-          cat > ExportOptions.plist << 'PLISTEOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>method</key>
-  <string>app-store</string>
-  <key>teamID</key>
-  <string>${{ secrets.APPLE_TEAM_ID }}</string>
-  <key>uploadBitcode</key>
-  <false/>
-  <key>compileBitcode</key>
-  <false/>
-  <key>uploadSymbols</key>
-  <true/>
-</dict>
-</plist>
-PLISTEOF
+          cat > ExportOptions.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store</string>
+            <key>teamID</key>
+            <string>${{ secrets.APPLE_TEAM_ID }}</string>
+            <key>uploadBitcode</key>
+            <false/>
+            <key>compileBitcode</key>
+            <false/>
+            <key>uploadSymbols</key>
+            <true/>
+          </dict>
+          </plist>
+          EOF
           xcodebuild -exportArchive \
             -archivePath build/AgentPayProvider.xcarchive \
             -exportOptionsPlist ExportOptions.plist \
@@ -108,7 +150,7 @@ PLISTEOF
           path: x402-agent-network/ios/build/ipa/*.ipa
           if-no-files-found: warn
 
-      - name: Upload to App Store Connect (optional)
+      - name: Upload to App Store Connect
         if: ${{ secrets.APPLE_API_KEY_B64 != '' }}
         env:
           APPLE_API_KEY_B64: ${{ secrets.APPLE_API_KEY_B64 }}
