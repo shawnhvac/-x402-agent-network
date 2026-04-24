@@ -31,6 +31,7 @@ import agentMarketplaceRoutes from "./routes/agent-marketplace.js";
 import notifyRoutes from "./routes/notify.js";
 import providerRoutes from "./routes/provider.js";
 import osmClaimRouter from "./routes/osm-claim.js";
+import aiRouter from "./routes/ai.js";
 import TelegramAgentBridge from "./webhooks/telegram-agent-bridge.js";
 import ZoAgentBridge from "./webhooks/zo-agent-bridge.js";
 import TelegramCollabBot from "./webhooks/telegram-collab-bot.js";
@@ -536,6 +537,7 @@ app.use("/api/v1", agentMarketplaceRoutes);
 app.use("/api/v1/provider", providerRoutes);
 app.use("/api/v1/providers", providerRoutes); // alias — Android app uses plural
 app.use('/api/v1/osm-claim', osmClaimRouter);
+app.use("/api/v1/ai", aiRouter);
 app.use("/api/v1/notify", notifyRoutes);
 app.use("/api/v1/wallet", walletRoutes);
 
