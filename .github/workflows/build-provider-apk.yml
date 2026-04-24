@@ -11,6 +11,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,78 +42,49 @@ jobs:
         run: sdkmanager "build-tools;34.0.0" "platforms;android-34"
 
       - name: Decode release keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.RELEASE_KEYSTORE_B64 }}
         run: |
-          echo "${{ secrets.RELEASE_KEYSTORE_B64 }}" | base64 -d > x402-agent-network/android/app/agentpay-release.keystore
-          echo "Keystore decoded: $(ls -lh x402-agent-network/android/app/agentpay-release.keystore)"
+          echo "$KEYSTORE_B64" | base64 -d > x402-agent-network/android/app/agentpay-release.keystore
+          ls -lh x402-agent-network/android/app/agentpay-release.keystore
 
-      - name: Configure signing in gradle.properties
+      - name: Write keystore.properties
         run: |
-          cat >> x402-agent-network/android/gradle.properties << EOF
-          RELEASE_STORE_FILE=agentpay-release.keystore
-          RELEASE_KEY_ALIAS=${{ secrets.RELEASE_KEY_ALIAS }}
-          RELEASE_STORE_PASSWORD=${{ secrets.RELEASE_STORE_PASSWORD }}
-          RELEASE_KEY_PASSWORD=${{ secrets.RELEASE_KEY_PASSWORD }}
-          EOF
-
-      - name: Update app/build.gradle.kts for release signing
-        run: |
-          # Inject signingConfigs into build.gradle.kts if not present
-          if ! grep -q "signingConfigs" x402-agent-network/android/app/build.gradle.kts; then
-            sed -i '/^android {/a\    signingConfigs {
-        create("release") {
-            storeFile = file(project.findProperty("RELEASE_STORE_FILE") as String)
-            storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String
-            keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String
-            keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String
-        }
-    }' x402-agent-network/android/app/build.gradle.kts
-            # Set release build type to use release signing
-            sed -i '/buildTypes {/,/^    }/{ /release {/a\            signingConfig = signingConfigs.getByName("release") }' x402-agent-network/android/app/build.gradle.kts || true
-          fi
+          printf 'storeFile=app/agentpay-release.keystore\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" \
+            > x402-agent-network/android/keystore.properties
 
       - name: Build release APK
         working-directory: x402-agent-network/android
         run: gradle assembleRelease --no-daemon --stacktrace
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
-      - name: Build release AAB (Play Store)
+      - name: Build release AAB
         working-directory: x402-agent-network/android
         run: gradle bundleRelease --no-daemon --stacktrace
-        env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
 
-      - name: Collect and rename artifacts
+      - name: Collect artifacts
         run: |
           VERSION=$(grep versionName x402-agent-network/android/app/build.gradle.kts | head -1 | grep -o '"[^"]*"' | tr -d '"')
           BUILD=${{ github.run_number }}
-          
-          # Find APK
-          APK=$(find x402-agent-network/android -name "*release*.apk" | grep -v unsigned | head -1)
-          if [ -z "$APK" ]; then
-            APK=$(find x402-agent-network/android -name "*.apk" | grep -v test | head -1)
-          fi
+          APK=$(find x402-agent-network/android -name "*.apk" | grep -v test | head -1)
+          AAB=$(find x402-agent-network/android -name "*.aab" | head -1)
           cp "$APK" "agentpay-provider-v${VERSION}-build${BUILD}.apk"
           cp "$APK" "agentpay-provider.apk"
-          
-          # Find AAB
-          AAB=$(find x402-agent-network/android -name "*release*.aab" | head -1)
           if [ -n "$AAB" ]; then
             cp "$AAB" "agentpay-provider-v${VERSION}-build${BUILD}.aab"
             cp "$AAB" "agentpay-provider.aab"
           fi
-          
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "BUILD=$BUILD" >> $GITHUB_ENV
           ls -lh agentpay-provider*
 
-      - name: Upload APK artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: agentpay-provider-apk
           path: agentpay-provider*.apk
 
-      - name: Upload AAB artifact (Play Store)
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: agentpay-provider-aab
@@ -117,4 +92,5 @@ jobs:
           if-no-files-found: warn
 
       - name: Build complete
-        run: echo "✅ APK + AAB built and signed with release keystore — v${{ env.VERSION }} build ${{ env.BUILD }}"
+        run: echo "Release APK + AAB ready"
+# triggered Fri Apr 24 03:19:07 CEST 2026

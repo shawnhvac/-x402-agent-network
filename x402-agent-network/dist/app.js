@@ -23,7 +23,7 @@ import { createPrivateKey } from "crypto";
 import { SignJWT, importPKCS8 } from "jose";
 import { readFileSync } from "fs";
 import rateLimit from "express-rate-limit";
-var WALLET = process.env.AGENTPAY_WALLET || "0x52893C94B03B5c5732c5AE71728cD69E360645Ce";
+var WALLET = process.env.AGENTPAY_WALLET || "0x2a07182afDB346C84dFc5D116D84f34E1db4617d";
 if (!process.env.AGENTPAY_WALLET) console.warn("[SECURITY] AGENTPAY_WALLET not in .env \u2014 using fallback");
 if (!/^0x[0-9a-fA-F]{40}$/.test(WALLET)) throw new Error("[SECURITY] Invalid AGENTPAY_WALLET: " + WALLET);
 var BASE_MAINNET = "eip155:8453";
@@ -2598,7 +2598,7 @@ var solana_payments_default = router6;
 // src/routes/ethereum-payments.ts
 import { Router as Router6 } from "express";
 var router7 = Router6();
-var RECEIVER_WALLET2 = process.env.ETHEREUM_RECEIVER_WALLET || "0x52893C94B03B5c5732c5AE71728cD69E360645Ce";
+var RECEIVER_WALLET2 = process.env.ETHEREUM_RECEIVER_WALLET || "0x2a07182afDB346C84dFc5D116D84f34E1db4617d";
 var CHAINS = {
   ethereum: {
     name: "Ethereum",
@@ -3483,6 +3483,7 @@ var wallet_default = router10;
 
 // src/routes/products-osm.ts
 import { Router as Router10 } from "express";
+import Database3 from "better-sqlite3";
 var router11 = Router10();
 async function overpassOne(key, value, lat, lon, radius, limit) {
   const EPS = [
@@ -3603,46 +3604,70 @@ router11.get("/osm-search", async (req, res) => {
     };
   }).filter(Boolean).sort((a, b) => (a.distance_km ?? 99) - (b.distance_km ?? 99)).slice(0, maxN);
   try {
-    const Database4 = __require("better-sqlite3");
-    const pdb = new Database4("/var/lib/agentpay/providers.db");
     const catMap = {
       "hair-beauty": ["hair", "beauty", "barber", "salon", "nail"],
       "auto-service": ["auto", "car", "vehicle", "tyre", "mechanic"],
-      "home-services": ["hvac", "plumb", "electric", "handyman", "roof", "paint", "home"],
-      "health-fitness": ["fitness", "gym", "health", "sport"],
-      "medical": ["medical", "doctor", "dentist", "clinic", "pharmacy"],
-      "food-dining": ["food", "restaurant", "cafe", "catering"],
-      "tech-repair": ["tech", "repair", "computer", "phone", "electronic"],
-      "pets": ["pet", "vet", "grooming"],
-      "professional": ["lawyer", "accountant", "consult", "legal"],
-      "events": ["event", "entertainment", "party"]
+      "home-services": ["hvac", "plumb", "electric", "handyman", "roof", "paint", "home", "clean"],
+      "health-fitness": ["fitness", "gym", "health", "sport", "yoga", "pilates"],
+      "medical": ["medical", "doctor", "dentist", "clinic", "pharmacy", "chiro", "therapy"],
+      "food-dining": ["food", "restaurant", "cafe", "catering", "bakery"],
+      "tech-repair": ["tech", "repair", "computer", "phone", "electronic", "it"],
+      "pets": ["pet", "vet", "grooming", "dog", "cat", "animal"],
+      "professional": ["lawyer", "accountant", "consult", "legal", "financial"],
+      "events": ["event", "entertainment", "party", "wedding", "photo"],
+      "landscaping": ["lawn", "landscape", "garden", "tree", "sprinkler"],
+      "cleaning": ["clean", "maid", "janitor", "housekeep"]
     };
-    const keywords = catMap[category] || [category.replace("-", " ")];
+    const keywords = catMap[category] || [category.replace(/-/g, " ")];
+    const pdb = new Database3("/var/lib/agentpay/providers.db");
     const allProviders = pdb.prepare("SELECT * FROM providers WHERE status = ?").all("active");
-    const matched = allProviders.filter(
+    const apProviders = allProviders.filter(
       (p) => keywords.some((k) => (p.category || p.business_name || "").toLowerCase().includes(k))
-    ).map((p) => ({
-      id: "ap_" + p.id,
-      name: p.business_name,
-      category,
-      address: null,
-      city: null,
-      postcode: null,
-      phone: p.phone || null,
-      website: null,
-      opening_hours: null,
-      distance_km: null,
-      lat: null,
-      lon: null,
-      osm_id: null,
-      source: "agentpay",
-      bookable: true,
-      payment_x402: true,
-      verified: true,
-      email: p.email
-    }));
-    results.unshift(...matched);
-  } catch (_) {
+    ).map((p) => {
+      let services2 = [];
+      try {
+        services2 = pdb.prepare("SELECT name, price, duration FROM provider_services WHERE provider_id = ? AND available = 1").all(p.id);
+      } catch (_) {
+      }
+      const dist = p.lat && p.lon && sLat && sLon ? distKm(sLat, sLon, p.lat, p.lon) : null;
+      return {
+        id: "ap_" + p.id,
+        name: p.business_name,
+        category,
+        address: p.address || null,
+        city: p.city || null,
+        postcode: null,
+        phone: p.phone || null,
+        website: null,
+        opening_hours: null,
+        distance_km: dist,
+        lat: p.lat || null,
+        lon: p.lon || null,
+        osm_id: p.osm_id || null,
+        source: "agentpay",
+        bookable: true,
+        payment_x402: true,
+        verified: p.verified === 1,
+        osm_claimed: !!p.osm_id,
+        email: p.email,
+        services: services2.map((s) => ({ name: s.name, price: s.price, duration: s.duration }))
+      };
+    });
+    apProviders.sort((a, b) => {
+      if (a.osm_claimed && !b.osm_claimed) return -1;
+      if (!a.osm_claimed && b.osm_claimed) return 1;
+      return (a.distance_km ?? 999) - (b.distance_km ?? 999);
+    });
+    results.unshift(...apProviders);
+    const seen2 = /* @__PURE__ */ new Set();
+    results = results.filter((r) => {
+      const key = r.osm_id ? String(r.osm_id) : r.id;
+      if (seen2.has(key)) return false;
+      seen2.add(key);
+      return true;
+    });
+  } catch (blendErr) {
+    console.error("[OSM] Provider blend error:", blendErr.message);
   }
   res.json({
     success: true,
@@ -3745,10 +3770,10 @@ function loadDB() {
   }
   return { agents: {}, apiKeys: {} };
 }
-function saveDB(db4) {
+function saveDB(db5) {
   const dir = path6.dirname(DB_PATH2);
   if (!fs5.existsSync(dir)) fs5.mkdirSync(dir, { recursive: true });
-  fs5.writeFileSync(DB_PATH2, JSON.stringify(db4, null, 2));
+  fs5.writeFileSync(DB_PATH2, JSON.stringify(db5, null, 2));
 }
 function generateApiKey() {
   return "ap_" + crypto2.randomBytes(24).toString("hex");
@@ -3770,7 +3795,7 @@ router12.get("/marketplace/info", (_req, res) => {
     registration_fee: "free",
     listing_fee: "free",
     transaction_fee: "2% on Stripe bookings, $0.001 USDC flat on x402 calls",
-    receiver_wallet: "0x52893C94B03B5c5732c5AE71728cD69E360645Ce",
+    receiver_wallet: "0x2a07182afDB346C84dFc5D116D84f34E1db4617d",
     openapi_spec: "https://www.x402-agent-pay.com/openapi.json",
     llms_txt: "https://www.x402-agent-pay.com/llms.txt",
     bazaar_resource: "https://www.x402-agent-pay.com/api/v1/search",
@@ -3835,7 +3860,7 @@ router12.post("/marketplace/agent/register", async (req, res) => {
     if (!isEvm && !isSol) {
       return res.status(400).json({ success: false, error: "wallet_address must be a valid EVM (0x...) or Solana address" });
     }
-    const db4 = loadDB();
+    const db5 = loadDB();
     const agentId = generateAgentId(agent_name);
     const apiKey = generateApiKey();
     const now = (/* @__PURE__ */ new Date()).toISOString();
@@ -3860,9 +3885,9 @@ router12.post("/marketplace/agent/register", async (req, res) => {
       tx_count: 0,
       verified: false
     };
-    db4.agents[agentId] = agentRecord;
-    db4.apiKeys[apiKey] = { agent_id: agentId, created_at: now, active: true };
-    saveDB(db4);
+    db5.agents[agentId] = agentRecord;
+    db5.apiKeys[apiKey] = { agent_id: agentId, created_at: now, active: true };
+    saveDB(db5);
     console.log(`[AgentPay] New agent registered: ${agent_name} (${agentId}) wallet:${wallet_address}`);
     res.status(201).json({
       success: true,
@@ -3878,9 +3903,9 @@ router12.post("/marketplace/agent/register", async (req, res) => {
         full_docs: "https://www.x402-agent-pay.com/openapi.json"
       },
       marketplace_info: {
-        total_registered_agents: Object.keys(db4.agents).length,
-        your_position: Object.keys(db4.agents).length,
-        receiver_wallet: "0x52893C94B03B5c5732c5AE71728cD69E360645Ce"
+        total_registered_agents: Object.keys(db5.agents).length,
+        your_position: Object.keys(db5.agents).length,
+        receiver_wallet: "0x2a07182afDB346C84dFc5D116D84f34E1db4617d"
       }
     });
   } catch (err) {
@@ -3889,9 +3914,9 @@ router12.post("/marketplace/agent/register", async (req, res) => {
   }
 });
 router12.get("/marketplace/agents", (req, res) => {
-  const db4 = loadDB();
+  const db5 = loadDB();
   const { capability, chain, tag, limit = "50", offset = "0" } = req.query;
-  let agents = Object.values(db4.agents);
+  let agents = Object.values(db5.agents);
   if (capability) agents = agents.filter((a) => a.capabilities?.includes(capability));
   if (chain) agents = agents.filter((a) => a.supported_chains?.includes(chain));
   if (tag) agents = agents.filter((a) => a.tags?.includes(tag));
@@ -3922,18 +3947,18 @@ router12.get("/marketplace/agents", (req, res) => {
   });
 });
 router12.get("/marketplace/agent/:agentId", (req, res) => {
-  const db4 = loadDB();
-  const agent = db4.agents[req.params.agentId];
+  const db5 = loadDB();
+  const agent = db5.agents[req.params.agentId];
   if (!agent) return res.status(404).json({ success: false, error: "Agent not found" });
   res.json({ success: true, agent });
 });
 router12.post("/marketplace/agent/verify", async (req, res) => {
   const { agent_id, api_key } = req.body;
   if (!agent_id || !api_key) return res.status(400).json({ success: false, error: "agent_id and api_key required" });
-  const db4 = loadDB();
-  const keyData = db4.apiKeys[api_key];
+  const db5 = loadDB();
+  const keyData = db5.apiKeys[api_key];
   if (!keyData || keyData.agent_id !== agent_id) return res.status(401).json({ success: false, error: "Invalid api_key for this agent" });
-  const agent = db4.agents[agent_id];
+  const agent = db5.agents[agent_id];
   if (!agent) return res.status(404).json({ success: false, error: "Agent not found" });
   const challenge = crypto2.randomBytes(16).toString("hex");
   try {
@@ -3945,9 +3970,9 @@ router12.post("/marketplace/agent/verify", async (req, res) => {
     });
     const data = await r.json();
     if (data.challenge_response === challenge) {
-      db4.agents[agent_id].verified = true;
-      db4.agents[agent_id].verified_at = (/* @__PURE__ */ new Date()).toISOString();
-      saveDB(db4);
+      db5.agents[agent_id].verified = true;
+      db5.agents[agent_id].verified_at = (/* @__PURE__ */ new Date()).toISOString();
+      saveDB(db5);
       return res.json({ success: true, verified: true, message: "Agent endpoint verified \u2713" });
     }
     return res.json({ success: false, verified: false, message: "Challenge response mismatch" });
@@ -3958,179 +3983,368 @@ router12.post("/marketplace/agent/verify", async (req, res) => {
 router12.delete("/marketplace/agent/:agentId", (req, res) => {
   const { api_key } = req.body;
   if (!api_key) return res.status(400).json({ success: false, error: "api_key required in body" });
-  const db4 = loadDB();
-  const keyData = db4.apiKeys[api_key];
+  const db5 = loadDB();
+  const keyData = db5.apiKeys[api_key];
   if (!keyData || keyData.agent_id !== req.params.agentId) return res.status(401).json({ success: false, error: "Unauthorized" });
-  delete db4.agents[req.params.agentId];
-  delete db4.apiKeys[api_key];
-  saveDB(db4);
+  delete db5.agents[req.params.agentId];
+  delete db5.apiKeys[api_key];
+  saveDB(db5);
   res.json({ success: true, message: "Agent deregistered" });
 });
 var agent_marketplace_default = router12;
 
 // src/routes/provider.ts
 import { Router as Router12 } from "express";
-import Database3 from "better-sqlite3";
+import Database4 from "better-sqlite3";
 import path7 from "path";
 import fs6 from "fs";
 import crypto3 from "crypto";
 var DB_DIR2 = "/var/lib/agentpay";
 var DB_PATH3 = path7.join(DB_DIR2, "providers.db");
 if (!fs6.existsSync(DB_DIR2)) fs6.mkdirSync(DB_DIR2, { recursive: true });
-var db3 = new Database3(DB_PATH3);
+var db3 = new Database4(DB_PATH3);
 db3.exec(`
   CREATE TABLE IF NOT EXISTS providers (
-    id TEXT PRIMARY KEY,
+    id          TEXT PRIMARY KEY,
     business_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    phone TEXT,
-    password_hash TEXT NOT NULL,
-    category TEXT,
-    status TEXT DEFAULT 'active',
-    token TEXT,
-    created_at TEXT NOT NULL
+    email       TEXT UNIQUE NOT NULL,
+    phone       TEXT,
+    password_hash TEXT,
+    category    TEXT,
+    address     TEXT,
+    city        TEXT,
+    lat         REAL,
+    lon         REAL,
+    description TEXT,
+    status      TEXT DEFAULT 'active',
+    token       TEXT,
+    created_at  TEXT DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS provider_services (
+    id          TEXT PRIMARY KEY,
+    provider_id TEXT NOT NULL REFERENCES providers(id) ON DELETE CASCADE,
+    name        TEXT NOT NULL,
+    category    TEXT,
+    price       REAL DEFAULT 0,
+    duration    INTEGER DEFAULT 60,
+    available   INTEGER DEFAULT 1,
+    created_at  TEXT DEFAULT (datetime('now'))
   );
 `);
-try {
+var providerCols = db3.prepare("PRAGMA table_info(providers)").all().map((c) => c.name);
+if (!providerCols.includes("token")) try {
   db3.exec("ALTER TABLE providers ADD COLUMN token TEXT");
+} catch {
+}
+if (!providerCols.includes("address")) try {
+  db3.exec("ALTER TABLE providers ADD COLUMN address TEXT");
+} catch {
+}
+if (!providerCols.includes("city")) try {
+  db3.exec("ALTER TABLE providers ADD COLUMN city TEXT");
+} catch {
+}
+if (!providerCols.includes("lat")) try {
+  db3.exec("ALTER TABLE providers ADD COLUMN lat REAL");
+} catch {
+}
+if (!providerCols.includes("lon")) try {
+  db3.exec("ALTER TABLE providers ADD COLUMN lon REAL");
+} catch {
+}
+if (!providerCols.includes("description")) try {
+  db3.exec("ALTER TABLE providers ADD COLUMN description TEXT");
 } catch {
 }
 console.log("[ProviderDB] SQLite ready at", DB_PATH3);
 var router13 = Router12();
-function hashPassword(pw) {
-  return crypto3.createHash("sha256").update(pw + "agentpay-salt-2026").digest("hex");
-}
-router13.post("/register", (req, res) => {
-  try {
-    const { businessName, email, phone, password, category } = req.body;
-    if (!businessName || !email || !password) {
-      return res.status(400).json({ error: "Business name, email, and password are required." });
-    }
-    if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-      return res.status(400).json({ error: "Invalid email address." });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Password must be at least 6 characters." });
-    }
-    const existing = db3.prepare("SELECT id FROM providers WHERE email = ?").get(email.toLowerCase().trim());
-    if (existing) {
-      return res.status(409).json({ error: "An account with this email already exists." });
-    }
-    const id = crypto3.randomUUID();
-    db3.prepare(`
-      INSERT INTO providers (id, business_name, email, phone, password_hash, category, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(id, businessName.trim(), email.toLowerCase().trim(), phone ?? "", hashPassword(password), category ?? "", (/* @__PURE__ */ new Date()).toISOString());
-    console.log("[Provider] Registered:", email, businessName);
-    return res.json({ ok: true, id, message: "Account created successfully." });
-  } catch (err) {
-    console.error("[Provider] Register error:", err);
-    return res.status(500).json({ error: "Registration failed. Please try again." });
-  }
-});
-router13.post("/login", (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required." });
-    }
-    const provider = db3.prepare("SELECT * FROM providers WHERE email = ?").get(email.toLowerCase().trim());
-    if (!provider || provider.password_hash !== hashPassword(password)) {
-      return res.status(401).json({ error: "Invalid email or password." });
-    }
-    if (provider.status !== "active") {
-      return res.status(403).json({ error: "Account is inactive. Please contact support." });
-    }
-    const token = crypto3.randomBytes(32).toString("hex");
-    db3.prepare("UPDATE providers SET token = ? WHERE id = ?").run(token, provider.id);
-    console.log("[Provider] Login:", email);
-    return res.json({
-      ok: true,
-      token,
-      provider: {
-        id: provider.id,
-        businessName: provider.business_name,
-        email: provider.email,
-        phone: provider.phone,
-        category: provider.category
-      }
-    });
-  } catch (err) {
-    console.error("[Provider] Login error:", err);
-    return res.status(500).json({ error: "Login failed. Please try again." });
-  }
-});
+var hashPassword = (p) => crypto3.createHash("sha256").update(p + "agentpay_salt").digest("hex");
+var makeToken = () => crypto3.randomBytes(32).toString("hex");
 function requireAuth(req, res, next) {
-  const auth = req.headers["authorization"] || "";
-  const token = auth.replace("Bearer ", "").trim();
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
+  const token = req.headers["x-provider-token"];
+  if (!token) return res.status(401).json({ error: "Missing token" });
   const provider = db3.prepare("SELECT * FROM providers WHERE token = ?").get(token);
   if (!provider) return res.status(401).json({ error: "Invalid token" });
   req.provider = provider;
   next();
 }
+router13.post("/register", (req, res) => {
+  try {
+    const { businessName, email, phone, password, category, address, city, lat, lon, description } = req.body;
+    if (!businessName || !email || !password) return res.status(400).json({ error: "businessName, email and password required" });
+    const existing = db3.prepare("SELECT id FROM providers WHERE email = ?").get(email.toLowerCase().trim());
+    if (existing) return res.status(409).json({ error: "Email already registered" });
+    const id = "prov_" + Date.now();
+    const token = makeToken();
+    const now = (/* @__PURE__ */ new Date()).toISOString();
+    db3.prepare(`
+      INSERT INTO providers (id, business_name, email, phone, password_hash, category, address, city, lat, lon, description, token, status, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)
+    `).run(
+      id,
+      businessName,
+      email.toLowerCase().trim(),
+      phone || null,
+      hashPassword(password),
+      category || null,
+      address || null,
+      city || null,
+      lat || null,
+      lon || null,
+      description || null,
+      token,
+      now
+    );
+    console.log("[Provider] Registered:", email, businessName);
+    res.json({ success: true, token, providerId: id });
+  } catch (err) {
+    console.error("[Provider] Register error:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+router13.post("/login", (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const provider = db3.prepare("SELECT * FROM providers WHERE email = ?").get(email?.toLowerCase().trim());
+    if (!provider || provider.password_hash !== hashPassword(password))
+      return res.status(401).json({ error: "Invalid credentials" });
+    if (provider.status !== "active") return res.status(403).json({ error: "Account suspended" });
+    const token = makeToken();
+    db3.prepare("UPDATE providers SET token = ? WHERE id = ?").run(token, provider.id);
+    console.log("[Provider] Login:", email);
+    res.json({ success: true, token, provider: { id: provider.id, businessName: provider.business_name, email: provider.email, phone: provider.phone, category: provider.category, address: provider.address, city: provider.city } });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 router13.get("/profile", requireAuth, (req, res) => {
   const p = req.provider;
-  return res.json({
-    ok: true,
-    provider: {
-      id: p.id,
-      businessName: p.business_name,
-      email: p.email,
-      phone: p.phone,
-      category: p.category,
-      status: p.status,
-      createdAt: p.created_at
-    }
-  });
+  const services2 = db3.prepare("SELECT * FROM provider_services WHERE provider_id = ? AND available = 1").all(p.id);
+  res.json({ success: true, provider: { id: p.id, businessName: p.business_name, email: p.email, phone: p.phone, category: p.category, address: p.address, city: p.city, lat: p.lat, lon: p.lon, description: p.description }, services: services2 });
 });
 router13.put("/profile", requireAuth, (req, res) => {
-  const { businessName, phone, category } = req.body;
   try {
-    db3.prepare(
-      "UPDATE providers SET business_name = COALESCE(?, business_name), phone = COALESCE(?, phone), category = COALESCE(?, category) WHERE id = ?"
-    ).run(businessName || null, phone || null, category || null, req.provider.id);
-    return res.json({ ok: true, message: "Profile updated." });
+    const { businessName, phone, category, address, city, lat, lon, description } = req.body;
+    db3.prepare(`
+      UPDATE providers SET
+        business_name = COALESCE(?, business_name),
+        phone         = COALESCE(?, phone),
+        category      = COALESCE(?, category),
+        address       = COALESCE(?, address),
+        city          = COALESCE(?, city),
+        lat           = COALESCE(?, lat),
+        lon           = COALESCE(?, lon),
+        description   = COALESCE(?, description)
+      WHERE id = ?
+    `).run(businessName || null, phone || null, category || null, address || null, city || null, lat || null, lon || null, description || null, req.provider.id);
+    res.json({ success: true });
   } catch (err) {
-    return res.status(500).json({ error: "Update failed." });
+    res.status(500).json({ error: err.message });
   }
+});
+router13.get("/services", requireAuth, (req, res) => {
+  const services2 = db3.prepare("SELECT * FROM provider_services WHERE provider_id = ?").all(req.provider.id);
+  res.json({ success: true, services: services2 });
+});
+router13.post("/services", requireAuth, (req, res) => {
+  try {
+    const { services: services2 } = req.body;
+    if (!Array.isArray(services2)) return res.status(400).json({ error: "services must be an array" });
+    db3.prepare("DELETE FROM provider_services WHERE provider_id = ?").run(req.provider.id);
+    const insert = db3.prepare(`
+      INSERT INTO provider_services (id, provider_id, name, category, price, duration, available)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+    const insertMany = db3.transaction((svcs) => {
+      for (const s of svcs) {
+        insert.run(s.id || "svc_" + Date.now() + Math.random(), req.provider.id, s.name, s.category || req.provider.category, s.price || 0, s.duration || 60, s.available !== false ? 1 : 0);
+      }
+    });
+    insertMany(services2);
+    console.log(`[Provider] Synced ${services2.length} services for ${req.provider.email}`);
+    res.json({ success: true, count: services2.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+router13.delete("/services/:id", requireAuth, (req, res) => {
+  db3.prepare("DELETE FROM provider_services WHERE id = ? AND provider_id = ?").run(req.params.id, req.provider.id);
+  res.json({ success: true });
 });
 router13.get("/bookings", requireAuth, (req, res) => {
   try {
-    const bookingsDb = new Database3("/var/lib/agentpay/bookings.db");
-    const bookings2 = bookingsDb.prepare(
+    const bdb = new Database4("/var/lib/agentpay/bookings.db");
+    const bookings2 = bdb.prepare(
       "SELECT * FROM bookings WHERE provider_phone = ? OR provider_email = ? ORDER BY created_at DESC LIMIT 50"
     ).all(req.provider.phone, req.provider.email);
-    return res.json({ ok: true, bookings: bookings2 });
+    res.json({ success: true, bookings: bookings2 });
   } catch (err) {
-    console.error("[Provider] bookings error:", err);
-    return res.json({ ok: true, bookings: [] });
-  }
-});
-router13.post("/booking/:id/respond", requireAuth, (req, res) => {
-  const { id } = req.params;
-  const { action } = req.body;
-  if (!["confirm", "decline"].includes(action)) {
-    return res.status(400).json({ error: "action must be confirm or decline" });
-  }
-  try {
-    const bookingsDb = new Database3("/var/lib/agentpay/bookings.db");
-    const status = action === "confirm" ? "confirmed" : "declined";
-    bookingsDb.prepare("UPDATE bookings SET status = ? WHERE id = ?").run(status, id);
-    return res.json({ ok: true, status });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to respond." });
+    res.status(500).json({ error: err.message });
   }
 });
 router13.post("/logout", requireAuth, (req, res) => {
-  try {
-    db3.prepare("UPDATE providers SET token = NULL WHERE id = ?").run(req.provider.id);
-    return res.json({ ok: true });
-  } catch {
-    return res.json({ ok: true });
+  db3.prepare("UPDATE providers SET token = NULL WHERE id = ?").run(req.provider.id);
+  res.json({ success: true });
+});
+router13.get("/list", (req, res) => {
+  const { category, city, q } = req.query;
+  let sql = `
+    SELECT p.id, p.business_name, p.category, p.phone, p.address, p.city, p.lat, p.lon, p.description,
+           json_group_array(json_object('id', s.id, 'name', s.name, 'category', s.category, 'price', s.price, 'duration', s.duration)) as services
+    FROM providers p
+    LEFT JOIN provider_services s ON s.provider_id = p.id AND s.available = 1
+    WHERE p.status = 'active'
+  `;
+  const params = [];
+  if (category) {
+    sql += " AND (p.category LIKE ? OR s.category LIKE ?)";
+    params.push(`%${category}%`, `%${category}%`);
   }
+  if (city) {
+    sql += " AND p.city LIKE ?";
+    params.push(`%${city}%`);
+  }
+  if (q) {
+    sql += " AND (p.business_name LIKE ? OR p.description LIKE ?)";
+    params.push(`%${q}%`, `%${q}%`);
+  }
+  sql += " GROUP BY p.id LIMIT 50";
+  const providers = db3.prepare(sql).all(...params).map((p) => ({
+    ...p,
+    services: (() => {
+      try {
+        return JSON.parse(p.services).filter((s) => s.id);
+      } catch {
+        return [];
+      }
+    })()
+  }));
+  res.json({ success: true, count: providers.length, providers });
 });
 var provider_default = router13;
+
+// src/routes/osm-claim.ts
+import { Router as Router13 } from "express";
+import Database5 from "better-sqlite3";
+import twilio2 from "twilio";
+var router14 = Router13();
+var DB_PATH4 = "/var/lib/agentpay/providers.db";
+function getDb() {
+  return new Database5(DB_PATH4);
+}
+var db4 = getDb();
+db4.exec(`
+  CREATE TABLE IF NOT EXISTS osm_claims (
+    id          TEXT PRIMARY KEY,
+    osm_id      TEXT NOT NULL,
+    provider_id TEXT NOT NULL,
+    osm_phone   TEXT,
+    verify_code TEXT NOT NULL,
+    status      TEXT DEFAULT 'pending',
+    created_at  TEXT DEFAULT (datetime('now')),
+    expires_at  TEXT NOT NULL
+  );
+`);
+try {
+  db4.exec("ALTER TABLE providers ADD COLUMN osm_id TEXT");
+} catch {
+}
+try {
+  db4.exec("ALTER TABLE providers ADD COLUMN verified INTEGER DEFAULT 0");
+} catch {
+}
+var tw = twilio2(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+function requireAuth2(req, res, next) {
+  const token = req.headers["x-provider-token"];
+  if (!token) return res.status(401).json({ error: "Missing token" });
+  const provider = getDb().prepare("SELECT * FROM providers WHERE token = ?").get(token);
+  if (!provider) return res.status(401).json({ error: "Invalid token" });
+  req.provider = provider;
+  next();
+}
+router14.get("/lookup", requireAuth2, async (req, res) => {
+  const { q, lat, lon } = req.query;
+  if (!q) return res.status(400).json({ error: "q (business name) required" });
+  try {
+    const params = new URLSearchParams({ q, format: "json", limit: "5", addressdetails: "1", extratags: "1" });
+    if (lat && lon) {
+      params.set("lat", lat);
+      params.set("lon", lon);
+    }
+    const r = await fetch(
+      `https://nominatim.openstreetmap.org/search?${params}`,
+      { headers: { "User-Agent": "AgentPay/2.0" }, signal: AbortSignal.timeout(8e3) }
+    );
+    const results = await r.json();
+    const matches = results.map((item) => ({
+      osm_id: item.osm_type + "/" + item.osm_id,
+      name: item.display_name.split(",")[0],
+      address: item.display_name,
+      phone: item.extratags?.phone || item.extratags?.["contact:phone"] || null,
+      lat: parseFloat(item.lat),
+      lon: parseFloat(item.lon),
+      already_claimed: !!getDb().prepare("SELECT id FROM providers WHERE osm_id = ?").get(item.osm_type + "/" + item.osm_id)
+    }));
+    res.json({ success: true, matches });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+router14.post("/start", requireAuth2, async (req, res) => {
+  const { osm_id, osm_phone, osm_name } = req.body;
+  if (!osm_id) return res.status(400).json({ error: "osm_id required" });
+  const existing = getDb().prepare("SELECT id, business_name FROM providers WHERE osm_id = ?").get(osm_id);
+  if (existing && existing.id !== req.provider.id) {
+    return res.status(409).json({ error: "This business has already been claimed by another provider." });
+  }
+  const code = Math.floor(1e5 + Math.random() * 9e5).toString();
+  const claimId = "claim_" + Date.now();
+  const expires = new Date(Date.now() + 15 * 60 * 1e3).toISOString();
+  getDb().prepare("DELETE FROM osm_claims WHERE provider_id = ? AND osm_id = ?").run(req.provider.id, osm_id);
+  getDb().prepare(
+    "INSERT INTO osm_claims (id, osm_id, provider_id, osm_phone, verify_code, expires_at) VALUES (?, ?, ?, ?, ?, ?)"
+  ).run(claimId, osm_id, req.provider.id, osm_phone || null, code, expires);
+  let smsSent = false;
+  let verifyPhone = osm_phone || req.provider.phone;
+  if (verifyPhone) {
+    verifyPhone = verifyPhone.replace(/\D/g, "");
+    if (verifyPhone.length === 10) verifyPhone = "1" + verifyPhone;
+    verifyPhone = "+" + verifyPhone;
+    try {
+      await tw.messages.create({
+        to: verifyPhone,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        body: `AgentPay verification: Your code to claim "${osm_name || "your business"}" is ${code}. Expires in 15 minutes.`
+      });
+      smsSent = true;
+      console.log(`[Claim] Sent verification code to ${verifyPhone} for ${osm_id}`);
+    } catch (err) {
+      console.error("[Claim] SMS failed:", err.message);
+    }
+  }
+  res.json({
+    success: true,
+    claim_id: claimId,
+    sms_sent: smsSent,
+    verify_phone: smsSent ? verifyPhone.replace(/(\+1)(\d{3})(\d{3})(\d{4})/, "+1 ($2) $3-$4") : null,
+    message: smsSent ? `Verification code sent to ${verifyPhone.slice(-4).padStart(verifyPhone.length, "*")}. Enter it in the app.` : "No phone found on this OSM listing. Enter the code we'll send to your registered phone."
+  });
+});
+router14.post("/verify", requireAuth2, async (req, res) => {
+  const { claim_id, code, osm_id } = req.body;
+  if (!claim_id || !code) return res.status(400).json({ error: "claim_id and code required" });
+  const claim = getDb().prepare(
+    "SELECT * FROM osm_claims WHERE id = ? AND provider_id = ? AND status = 'pending'"
+  ).get(claim_id, req.provider.id);
+  if (!claim) return res.status(404).json({ error: "Claim not found or already used." });
+  if (new Date(claim.expires_at) < /* @__PURE__ */ new Date()) return res.status(410).json({ error: "Code expired. Please start again." });
+  if (claim.verify_code !== code.trim()) return res.status(401).json({ error: "Incorrect code. Try again." });
+  getDb().prepare("UPDATE osm_claims SET status = 'verified' WHERE id = ?").run(claim_id);
+  getDb().prepare("UPDATE providers SET osm_id = ?, verified = 1 WHERE id = ?").run(claim.osm_id, req.provider.id);
+  console.log(`[Claim] Provider ${req.provider.email} successfully claimed ${claim.osm_id}`);
+  res.json({ success: true, message: "Business claimed and verified! Your listing is now live for agents." });
+});
+var osm_claim_default = router14;
 
 // src/webhooks/telegram-agent-bridge.ts
 import express4 from "express";
@@ -5199,6 +5413,9 @@ app.get("/admin", (req, res) => {
 app.get("/register", (req, res) => {
   res.sendFile("public/register.html", { root: process.cwd() });
 });
+app.get("/register-agent", (req, res) => {
+  res.sendFile("public/register-agent.html", { root: process.cwd() });
+});
 app.get("/register-business", (req, res) => {
   res.sendFile("public/register.html", { root: process.cwd() });
 });
@@ -5304,8 +5521,8 @@ app.get("/api/admin/providers", (req, res) => {
     if (!token || !validateSessionToken(token)) {
       return res.status(401).json({ error: "Unauthorized - please login" });
     }
-    const Database4 = __require("better-sqlite3");
-    const providerDb = new Database4("/var/lib/agentpay/providers.db");
+    const Database6 = __require("better-sqlite3");
+    const providerDb = new Database6("/var/lib/agentpay/providers.db");
     const providers = providerDb.prepare("SELECT id, business_name, email, phone, category, status, created_at FROM providers ORDER BY created_at DESC").all();
     return res.json(providers);
   } catch (error) {
@@ -5416,6 +5633,7 @@ app.use("/api/v1", stripe_payments_default);
 app.use("/api/v1", business_portal_default);
 app.use("/api/v1", agent_marketplace_default);
 app.use("/api/v1/provider", provider_default);
+app.use("/api/v1/osm-claim", osm_claim_default);
 app.use("/api/v1/notify", notify_default);
 app.use("/api/v1/wallet", wallet_default);
 app.use("/api/apk", apk_default);

@@ -220,6 +220,10 @@ app.get("/register-business", (req: Request, res: Response) => {
   res.sendFile("public/register.html", { root: process.cwd() });
 });
 
+app.get("/register-agent", (req: Request, res: Response) => {
+  res.sendFile("public/register-agent.html", { root: process.cwd() });
+});
+
 app.get("/checkout", (req: Request, res: Response) => {
   res.sendFile("public/checkout.html", { root: process.cwd() });
 });
