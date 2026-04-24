@@ -132,6 +132,7 @@ try {
   app.get(path, (_req: Request, res: Response) => {
     res.redirect(302, "/downloads/agentpay-provider.apk");
   });
+});
 
 app.use(timeoutMiddleware(30000)); // 30 second timeout
 app.use(loggingMiddleware); // Log all requests
@@ -392,22 +393,8 @@ app.get("/api/admin/providers", (req: Request, res: Response) => {
 });
 
 // ── Dedicated HTML pages (override markdown versions) ──────────────────────
-app.get('/google-maps-setup', (req: Request, res: Response) => {
-  res.sendFile('public/google-maps-setup.html', { root: process.cwd() });
-});
 app.get('/android-app', (req: Request, res: Response) => {
   res.sendFile('public/android-app.html', { root: process.cwd() });
-});
-app.get('/pricing', (req: Request, res: Response) => {
-  res.sendFile('public/pricing.html', { root: process.cwd() });
-});
-app.get('/roadmap', (req: Request, res: Response) => {
-  res.sendFile('public/roadmap.html', { root: process.cwd() });
-});
-
-// ── All doc pages now served as proper HTML pages ──────────────────────────
-app.get('/investor-pitch', (req: Request, res: Response) => {
-  res.sendFile('public/investor-pitch.html', { root: process.cwd() });
 });
 app.get('/personal-agent-app', (req: Request, res: Response) => {
   res.sendFile('public/personal-agent-app.html', { root: process.cwd() });
@@ -417,6 +404,56 @@ app.get('/getting-started', (req: Request, res: Response) => {
 });
 app.get('/quick-reference', (req: Request, res: Response) => {
   res.sendFile('public/quick-reference.html', { root: process.cwd() });
+});
+app.get('/pricing', (req: Request, res: Response) => {
+  res.sendFile('public/pricing.html', { root: process.cwd() });
+});
+app.get('/roadmap', (req: Request, res: Response) => {
+  res.sendFile('public/roadmap.html', { root: process.cwd() });
+});
+
+// Documentation markdown files served as HTML
+
+const docFiles = {
+  '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
+};
+
+// Special: investor-pitch served as HTML, not markdown
+app.get('/investor-pitch', (req: Request, res: Response) => {
+  res.sendFile('public/investor-pitch.html', { root: process.cwd() });
+});
+
+Object.entries(docFiles).forEach(([route, filename]) => {
+  app.get(route, (req: Request, res: Response) => {
+    try {
+      const filePath = pathJoin(process.cwd(), filename);
+      const data = readFileSync(filePath, 'utf8');
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${filename} - AgentPay</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #e2e8f0; padding: 20px; max-width: 1000px; margin: 0 auto; line-height: 1.6; }
+    a { color: #60a5fa; }
+    code { background: #1e293b; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; }
+    pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #334155; }
+    h1, h2, h3 { color: #60a5fa; margin-top: 30px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    td, th { border: 1px solid #334155; padding: 10px; text-align: left; }
+  </style>
+</head>
+<body>
+  <a href="/docs">← Back to Docs</a>
+  <pre>${data.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+</body>
+</html>`;
+      res.send(html);
+    } catch (err) {
+      res.status(404).send(`<pre>Document not found: ${filename}</pre>`);
+    }
+  });
 });
 
 // Initialize database on startup
@@ -597,6 +634,7 @@ app.get("/health", (req: Request, res: Response) => {
     database: dbReady ? "ready" : "connecting",
     timestamp: new Date().toISOString()
   });
+});
 
 /**
  * App version check endpoint (for in-app updates)
@@ -627,6 +665,7 @@ app.get("/api/app-version", (req: Request, res: Response) => {
       ]
     }
   });
+});
 
 /**
  * Metrics endpoint - Performance monitoring
@@ -637,6 +676,7 @@ app.get("/metrics", (req: Request, res: Response) => {
     performance: getMetrics(),
     recentRequests: getRequestLogs(10),
   });
+});
 
 /**
  * Status endpoint - Full system status
