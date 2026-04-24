@@ -100,6 +100,7 @@ fun AgentPayProviderApp() {
     var currentScreen by remember { mutableStateOf("login") }
     var businessProfile by remember { mutableStateOf<BusinessProfile?>(null) }
     var authToken by remember { mutableStateOf("") }
+    val context = LocalContext.current
     
     when (currentScreen) {
         "login" -> LoginScreen(
@@ -135,8 +136,7 @@ fun AgentPayProviderApp() {
         "claim-osm" -> ClaimOsmScreen(
             onBack = { currentScreen = "services" },
             onVerified = {
-                val ctx = context
-                ctx.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
+                context.getSharedPreferences("agentpay_prefs", android.content.Context.MODE_PRIVATE)
                     .edit().putBoolean("provider_osm_verified", true).apply()
                 currentScreen = "services"
             }
