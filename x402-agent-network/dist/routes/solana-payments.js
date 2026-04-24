@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import SolanaPaymentProcessor from '../services/solana-payment';
+import SolanaPaymentProcessor from '../services/solana-payment.js';
 const router = Router();
 // Initialize Solana payment processor
 const solanaProcessor = new SolanaPaymentProcessor({

@@ -1,23 +1,29 @@
-/**
- * x402 Payment Middleware — AgentPay
- * Updated: Added Bazaar discovery extension for CDP indexing
- */
-import { paymentMiddleware, x402ResourceServer } from "@x402/express";
-import { HTTPFacilitatorClient } from "@x402/core/server";
+import { paymentMiddleware } from "@x402/express";
+import { x402ResourceServer } from "@x402/core/server";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { createPrivateKey } from "crypto";
 import { SignJWT, importPKCS8 } from "jose";
 import { readFileSync } from "fs";
-const WALLET = (process.env.AGENTPAY_WALLET ||
-    "0x52893C94B03B5c5732c5AE71728cD69E360645Ce");
+import rateLimit from "express-rate-limit";
+// ── Wallet ────────────────────────────────────────────────────────────────────
+const WALLET = (process.env.AGENTPAY_WALLET || "0x2a07182afDB346C84dFc5D116D84f34E1db4617d");
+// SECURITY FIX 3: Wallet validation at startup
+if (!process.env.AGENTPAY_WALLET)
+    console.warn("[SECURITY] AGENTPAY_WALLET not in .env — using fallback");
+if (!/^0x[0-9a-fA-F]{40}$/.test(WALLET))
+    throw new Error("[SECURITY] Invalid AGENTPAY_WALLET: " + WALLET);
+// ── Chain IDs ─────────────────────────────────────────────────────────────────
 const BASE_MAINNET = "eip155:8453";
-const CDP_FACILITATOR_URL = "https://api.cdp.coinbase.com/platform/v2/x402";
+const POLYGON_MAINNET = "eip155:137";
+const POLYGON_USDC = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359";
+// ── CDP auth helpers ──────────────────────────────────────────────────────────
+const CDP_URL = process.env.X402_FACILITATOR_URL || "https://api.cdp.coinbase.com/platform/v2/x402";
 const CDP_KEY_PATH = process.env.CDP_KEY_PATH || "/root/.openclaw/workspace/cdp_key.json";
 async function buildCDPToken(action) {
     const cdpKey = JSON.parse(readFileSync(CDP_KEY_PATH, "utf8"));
     const keyObj = createPrivateKey({ key: cdpKey.privateKey, format: "pem" });
     const pkcs8 = keyObj.export({ type: "pkcs8", format: "pem" }).toString();
-    const privateKey = await importPKCS8(pkcs8, "ES256");
+    const pk = await importPKCS8(pkcs8, "ES256");
     const now = Math.floor(Date.now() / 1000);
     const nonce = Math.random().toString().slice(2, 18);
     const method = action === "supported" ? "GET" : "POST";
@@ -27,127 +33,112 @@ async function buildCDPToken(action) {
         nbf: now,
     })
         .setProtectedHeader({ alg: "ES256", kid: cdpKey.name, nonce })
-        .setIssuedAt(now)
-        .setExpirationTime(now + 120)
-        .sign(privateKey);
+        .setIssuedAt(now).setExpirationTime(now + 120)
+        .sign(pk);
 }
-async function createAuthHeaders() {
-    const [verifyToken, settleToken, supportedToken] = await Promise.all([
-        buildCDPToken("verify"),
-        buildCDPToken("settle"),
-        buildCDPToken("supported"),
-    ]);
-    return {
-        verify: { Authorization: `Bearer ${verifyToken}` },
-        settle: { Authorization: `Bearer ${settleToken}` },
-        supported: { Authorization: `Bearer ${supportedToken}` },
-    };
+// ── Custom facilitator: hardcoded getSupported + live CDP verify/settle ───────
+// This avoids the startup HTTP call that was failing with 401/unsupported-network
+class AgentPayFacilitator {
+    // Called once at init — returns our supported chains/schemes directly (no HTTP)
+    async getSupported() {
+        return {
+            kinds: [
+                { x402Version: 2, scheme: "exact", network: BASE_MAINNET },
+                { x402Version: 2, scheme: "exact", network: POLYGON_MAINNET },
+            ],
+        };
+    }
+    async verify(paymentPayload, requirements) {
+        try {
+            const token = await buildCDPToken("verify");
+            const res = await fetch(`${CDP_URL}/verify`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ x402Version: paymentPayload.x402Version, paymentPayload, paymentRequirements: requirements }),
+            });
+            if (!res.ok)
+                throw new Error(`CDP verify ${res.status}`);
+            return await res.json();
+        }
+        catch (err) {
+            console.error("[x402] verify error:", err.message);
+            throw err;
+        }
+    }
+    async settle(paymentPayload, requirements) {
+        try {
+            const token = await buildCDPToken("settle");
+            const res = await fetch(`${CDP_URL}/settle`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ x402Version: paymentPayload.x402Version, paymentPayload, paymentRequirements: requirements }),
+            });
+            if (!res.ok)
+                throw new Error(`CDP settle ${res.status}`);
+            return await res.json();
+        }
+        catch (err) {
+            console.error("[x402] settle error:", err.message);
+            throw err;
+        }
+    }
 }
+// ── SECURITY FIX 1: Nonce replay prevention ───────────────────────────────────
+const usedPaymentNonces = new Set();
+export function checkAndStoreNonce(nonce) {
+    if (usedPaymentNonces.has(nonce)) {
+        console.warn("[SECURITY] Duplicate payment nonce rejected:", nonce);
+        return false;
+    }
+    usedPaymentNonces.add(nonce);
+    if (usedPaymentNonces.size > 10000) {
+        const iter = usedPaymentNonces.values();
+        for (let i = 0; i < 1000; i++)
+            usedPaymentNonces.delete(iter.next().value);
+    }
+    return true;
+}
+// ── SECURITY FIX 2: Rate limiter ─────────────────────────────────────────────
+const paymentRateLimiter = rateLimit({
+    windowMs: 60 * 1000, max: 30,
+    standardHeaders: true, legacyHeaders: false,
+    message: { error: "Too many requests. Please slow down." },
+    skip: (req) => req.method === "OPTIONS",
+});
+// ── Multi-chain accepts ───────────────────────────────────────────────────────
+function multiChainAccepts(price, wallet) {
+    return [
+        { scheme: "exact", price, network: BASE_MAINNET, payTo: wallet },
+        { scheme: "exact", price, network: POLYGON_MAINNET, payTo: wallet },
+    ];
+}
+// ── Paid routes ───────────────────────────────────────────────────────────────
 const PAID_ROUTES = {
-    "POST /api/v1/search": {
-        accepts: [{ scheme: "exact", price: "$0.001", network: BASE_MAINNET, payTo: WALLET }],
-        description: "Search for local service providers (HVAC, plumbing, hair salons, restaurants, etc.) by query, category, and location. Returns a ranked list of providers with pricing and availability.",
-        extensions: {
-            bazaar: {
-                input: { query: "hvac repair", location: "Phoenix, AZ", category: "hvac" },
-                inputSchema: {
-                    properties: {
-                        query: { type: "string", description: "Search term e.g. 'hvac repair' or 'hair salon'" },
-                        location: { type: "string", description: "City and state e.g. 'Phoenix, AZ'" },
-                        category: { type: "string", description: "Service category: hvac, plumbing, hair-beauty, food-dining, etc." },
-                    },
-                    required: ["query"],
-                },
-                bodyType: "json",
-                output: {
-                    example: { success: true, count: 5, results: [{ id: "hvac-phx-001", name: "Desert Air HVAC", price: 99, rating: 4.8 }] },
-                },
-            },
-        },
-    },
-    "POST /api/v1/book": {
-        accepts: [{ scheme: "exact", price: "$0.002", network: BASE_MAINNET, payTo: WALLET }],
-        description: "Book a service appointment with a provider. Supply the service ID (from /search), service type, date, time, and customer details. Returns a booking confirmation with ID.",
-        extensions: {
-            bazaar: {
-                input: { service_id: "salon-ny-001", service_type: "haircut", date: "2026-04-25", time: "10:00", customer_name: "Alice", customer_email: "alice@example.com" },
-                inputSchema: {
-                    properties: {
-                        service_id: { type: "string", description: "Provider ID from /search results" },
-                        service_type: { type: "string", description: "Type of service to book e.g. haircut, hvac-repair" },
-                        date: { type: "string", description: "Appointment date in YYYY-MM-DD format" },
-                        time: { type: "string", description: "Appointment time in HH:MM format" },
-                        customer_name: { type: "string", description: "Customer full name" },
-                        customer_email: { type: "string", description: "Customer email address" },
-                    },
-                    required: ["service_id", "service_type", "date", "time"],
-                },
-                bodyType: "json",
-                output: {
-                    example: { success: true, booking: { id: "BK-1234567890", service_name: "Manhattan Hair Studio", status: "pending_confirmation", price: 65 } },
-                },
-            },
-        },
-    },
-    "POST /api/v1/pay": {
-        accepts: [{ scheme: "exact", price: "$0.001", network: BASE_MAINNET, payTo: WALLET }],
-        description: "Confirm payment for a completed service booking. Supply the booking ID and on-chain payment transaction hash to finalise the service transaction.",
-        extensions: {
-            bazaar: {
-                input: { booking_id: "BK-1234567890", payment_tx: "0xabc123..." },
-                inputSchema: {
-                    properties: {
-                        booking_id: { type: "string", description: "Booking ID returned from /book" },
-                        payment_tx: { type: "string", description: "On-chain transaction hash for the service payment" },
-                    },
-                    required: ["booking_id", "payment_tx"],
-                },
-                bodyType: "json",
-                output: {
-                    example: { success: true, payment: { booking_id: "BK-1234567890", status: "confirmed" } },
-                },
-            },
-        },
-    },
+    "POST /api/v1/search": { accepts: multiChainAccepts("$0.001", WALLET), description: "Search local service providers." },
+    "POST /api/v1/book": { accepts: multiChainAccepts("$0.002", WALLET), description: "Book a service appointment." },
+    "POST /api/v1/ai/search": { accepts: multiChainAccepts("$0.002", WALLET), description: "AI-powered natural language search via NVIDIA NIM." },
+    "POST /api/v1/llm": { accepts: multiChainAccepts("$0.001", WALLET), description: "AI inference — Llama 3.3 70B, Mistral, Gemma, 80+ models." },
+    "POST /api/v1/pay": { accepts: multiChainAccepts("$0.001", WALLET), description: "Process a service payment." },
 };
-function seedResourceServerSync(server, facilitatorClient) {
-    const supportedResponse = {
-        kinds: [{ x402Version: 2, scheme: "exact", network: BASE_MAINNET }],
-    };
-    if (!server.supportedResponsesMap.has(2))
-        server.supportedResponsesMap.set(2, new Map());
-    const respVersionMap = server.supportedResponsesMap.get(2);
-    if (!respVersionMap.has(BASE_MAINNET))
-        respVersionMap.set(BASE_MAINNET, new Map());
-    respVersionMap.get(BASE_MAINNET).set("exact", supportedResponse);
-    if (!server.facilitatorClientsMap.has(2))
-        server.facilitatorClientsMap.set(2, new Map());
-    const clientVersionMap = server.facilitatorClientsMap.get(2);
-    if (!clientVersionMap.has(BASE_MAINNET))
-        clientVersionMap.set(BASE_MAINNET, new Map());
-    clientVersionMap.get(BASE_MAINNET).set("exact", facilitatorClient);
+// ── Setup ─────────────────────────────────────────────────────────────────────
+export async function setupX402Middleware(app) {
+    const paidPaths = ["/api/v1/search", "/api/v1/book", "/api/v1/ai/search", "/api/v1/llm", "/api/v1/pay"];
+    // Rate limit before payment check
+    for (const path of paidPaths)
+        app.use(path, paymentRateLimiter);
+    // Build ResourceServer with our custom facilitator
+    const facilitator = new AgentPayFacilitator();
+    const ResourceServer = new x402ResourceServer(facilitator);
+    // Register EVM scheme for both networks
+    ResourceServer.register(BASE_MAINNET, new ExactEvmScheme());
+    ResourceServer.register(POLYGON_MAINNET, new ExactEvmScheme());
+    app.use(paymentMiddleware(PAID_ROUTES, ResourceServer));
+    console.log("[x402] Payment middleware ready — Base + Polygon");
+    console.log("[x402] Payee wallet:", WALLET);
+    console.log("[x402] Paid routes:", Object.keys(PAID_ROUTES).join(", "));
 }
-export function setupX402Middleware(app) {
-    const facilitatorClient = new HTTPFacilitatorClient({
-        url: CDP_FACILITATOR_URL,
-        createAuthHeaders,
-    });
-    const evmScheme = new ExactEvmScheme();
-    const server = new x402ResourceServer(facilitatorClient)
-        .register(BASE_MAINNET, evmScheme);
-    seedResourceServerSync(server, facilitatorClient);
-    app.use(paymentMiddleware(PAID_ROUTES, server, undefined, undefined, false));
-    console.log("\u2705 x402 middleware live — Base mainnet seeded, CDP facilitator per-request");
-    console.log(`\u{1F4B3} Wallet: ${WALLET} | ${BASE_MAINNET}`);
-    console.log("\u{1F310} POST /api/v1/search ($0.001) | /api/v1/book ($0.002) | /api/v1/pay ($0.001)");
-    console.log("\u{1F50D} Bazaar extensions declared on all 3 routes");
-}
+// ── Info ──────────────────────────────────────────────────────────────────────
 export function getX402PaymentInfo() {
-    return {
-        wallet: WALLET,
-        network: BASE_MAINNET,
-        facilitator: CDP_FACILITATOR_URL,
-        endpoints: Object.keys(PAID_ROUTES),
-    };
+    return { wallet: WALLET, networks: [BASE_MAINNET, POLYGON_MAINNET], polygon_usdc: POLYGON_USDC, routes: PAID_ROUTES };
 }
 //# sourceMappingURL=x402-payment.js.map

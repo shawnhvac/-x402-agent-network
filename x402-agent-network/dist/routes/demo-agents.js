@@ -150,7 +150,7 @@ router.post("/llm-inference", async (req, res) => {
                 reason: "quota_exceeded",
                 estimatedCost: costAmount,
                 costBreakdown: {
-                    baseCostPerKTokens: llmInference.baseCostPerKTokens,
+                    baseCost: llmInference.baseCost,
                     estimatedTokens: "depends on input",
                 },
             });
@@ -275,7 +275,7 @@ router.get("/agents-info", (req, res) => {
                 id: llmInference.agentId,
                 name: llmInference.name,
                 endpoint: llmInference.endpoint,
-                baseCostPer1KTokens: llmInference.baseCostPerKTokens,
+                baseCost: llmInference.baseCost,
                 currency: "USDC",
                 status: llmInference.getStatus(),
                 supportedChains: llmInference.supportedChains,

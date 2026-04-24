@@ -3,7 +3,7 @@
  * Integrates Google Maps with AgentRegistry for local commerce
  * Enables worldwide agent-to-business discovery with distance weighting
  */
-import GoogleMapsService from '../services/google-maps-service';
+import GoogleMapsService from '../services/google-maps-service.js';
 export class LocationDiscoveryService {
     constructor(googleMapsApiKey, agentRegistry) {
         this.GOOGLE_MAPS_API_KEY = googleMapsApiKey;
