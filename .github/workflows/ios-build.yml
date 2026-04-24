@@ -25,7 +25,7 @@ jobs:
       - name: Write xcodegen project spec
         working-directory: x402-agent-network/ios
         run: |
-          cat > project.yml << 'EOF'
+          cat > project.yml << EOF
           name: AgentPayProvider
           options:
             bundleIdPrefix: com.agentpay
@@ -53,7 +53,7 @@ jobs:
       - name: Write Info.plist
         working-directory: x402-agent-network/ios/AgentPayProvider
         run: |
-          cat > Info.plist << 'EOF'
+          cat > Info.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -72,11 +72,6 @@ jobs:
             <true/>
             <key>UILaunchScreen</key>
             <dict/>
-            <key>NSAppTransportSecurity</key>
-            <dict>
-              <key>NSAllowsArbitraryLoads</key>
-              <false/>
-            </dict>
             <key>NSSiriUsageDescription</key>
             <string>AgentPay uses Siri to let you check bookings, accept appointments, and view earnings with your voice.</string>
           </dict>
@@ -103,7 +98,7 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "$PROVISIONING_B64" | base64 -d > ~/Library/MobileDevice/Provisioning\ Profiles/agentpay_provider.mobileprovision
 
-      - name: Build & Archive
+      - name: Build and Archive
         working-directory: x402-agent-network/ios
         run: |
           xcodebuild \
@@ -120,7 +115,7 @@ jobs:
       - name: Export IPA
         working-directory: x402-agent-network/ios
         run: |
-          cat > ExportOptions.plist << 'EOF'
+          cat > ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -151,16 +146,19 @@ jobs:
           if-no-files-found: warn
 
       - name: Upload to App Store Connect
-        if: ${{ secrets.APPLE_API_KEY_B64 != '' }}
         env:
           APPLE_API_KEY_B64: ${{ secrets.APPLE_API_KEY_B64 }}
           APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
           APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: |
-          echo "$APPLE_API_KEY_B64" | base64 -d > AuthKey.p8
-          xcrun altool --upload-app \
-            -f x402-agent-network/ios/build/ipa/AgentPayProvider.ipa \
-            --apiKey "$APPLE_API_KEY_ID" \
-            --apiIssuer "$APPLE_API_ISSUER_ID" \
-            --private-key AuthKey.p8 \
-            --type ios
+          if [ -n "$APPLE_API_KEY_B64" ]; then
+            echo "$APPLE_API_KEY_B64" | base64 -d > AuthKey.p8
+            xcrun altool --upload-app \
+              -f x402-agent-network/ios/build/ipa/AgentPayProvider.ipa \
+              --apiKey "$APPLE_API_KEY_ID" \
+              --apiIssuer "$APPLE_API_ISSUER_ID" \
+              --private-key AuthKey.p8 \
+              --type ios
+          else
+            echo "No Apple API key set — skipping App Store upload"
+          fi
