@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting Started — AgentPay</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.hero{text-align:center;padding:70px 20px 50px;background:linear-gradient(135deg,#0f172a,#1e293b)}
+.hero h1{font-size:2.2em;font-weight:800;color:#fff;margin-bottom:12px}
+.hero p{color:#94a3b8;max-width:560px;margin:0 auto 28px;font-size:1.05em;line-height:1.7}
+.section{max-width:860px;margin:0 auto;padding:50px 20px}
+.section h2{font-size:1.6em;font-weight:800;color:#fff;margin-bottom:8px}
+.section .sub{color:#64748b;margin-bottom:28px;font-size:14px}
+.back-link{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;text-decoration:none;font-size:14px;margin:20px 20px 0;font-weight:600}
+
+.path-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:50px}
+.path-card{background:#1e293b;border:2px solid #334155;border-radius:14px;padding:28px;text-align:center;text-decoration:none;transition:all 0.2s;display:block}
+.path-card:hover{border-color:#3b82f6;transform:translateY(-2px)}
+.path-card .icon{font-size:2.5em;margin-bottom:14px}
+.path-card h3{color:#fff;font-size:16px;font-weight:700;margin-bottom:8px}
+.path-card p{color:#94a3b8;font-size:13px;line-height:1.5}
+.path-card .arrow{display:inline-block;margin-top:14px;color:#3b82f6;font-weight:700;font-size:13px}
+
+.step-card{background:#1e293b;border:1px solid #334155;border-radius:14px;margin-bottom:14px;overflow:hidden}
+.step-header{display:flex;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid #0f172a}
+.step-num{width:32px;height:32px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0}
+.step-header h3{color:#fff;font-size:15px;font-weight:700}
+.step-body{padding:18px 22px}
+.step-body p{color:#94a3b8;font-size:14px;line-height:1.7;margin-bottom:10px}
+.step-body p:last-child{margin-bottom:0}
+code{background:#0f172a;color:#60a5fa;padding:2px 8px;border-radius:5px;font-size:12px;font-family:monospace}
+.code-block{background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:16px;font-family:monospace;font-size:13px;color:#94a3b8;overflow-x:auto;margin:10px 0;line-height:1.8}
+.code-block .key{color:#f59e0b}.code-block .val{color:#a3e635}.code-block .comment{color:#475569}
+
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.btn{padding:12px 22px;border-radius:9px;font-weight:700;font-size:14px;text-decoration:none;display:inline-block;transition:all 0.2s}
+.btn-blue{background:#3b82f6;color:#fff}.btn-blue:hover{background:#2563eb}
+.btn-outline{border:2px solid #334155;color:#94a3b8}.btn-outline:hover{border-color:#3b82f6;color:#3b82f6}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+<a href="/docs" class="back-link">← Back to Docs</a>
+
+<div class="hero">
+  <h1>🚀 Getting Started with AgentPay</h1>
+  <p>Whether you're a service provider, AI developer, or investor — you can be up and running in minutes.</p>
+</div>
+
+<div class="section">
+  <h2>Choose Your Path</h2>
+  <p class="sub">Pick the track that matches what you want to do</p>
+  <div class="path-grid">
+    <a href="/provider-download" class="path-card">
+      <div class="icon">🔧</div>
+      <h3>I'm a Service Provider</h3>
+      <p>HVAC, plumber, salon, cleaner — get found by AI agents and accept bookings 24/7</p>
+      <div class="arrow">Download App →</div>
+    </a>
+    <a href="/register-agent" class="path-card">
+      <div class="icon">🤖</div>
+      <h3>I'm an AI Developer</h3>
+      <p>Register your agent, get an API key, and start making x402 bookings programmatically</p>
+      <div class="arrow">Register Agent →</div>
+    </a>
+    <a href="/investor-pitch" class="path-card">
+      <div class="icon">💼</div>
+      <h3>I'm an Investor</h3>
+      <p>Review our pitch deck, financials, and the $10B+ autonomous agent economy opportunity</p>
+      <div class="arrow">View Pitch →</div>
+    </a>
+  </div>
+
+  <!-- Provider track -->
+  <h2>Provider Track</h2>
+  <p class="sub">Start accepting AI-powered bookings in under 10 minutes</p>
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">1</div><h3>Download the Android App</h3></div>
+    <div class="step-body">
+      <p>Download the AgentPay Provider APK and install it on your Android phone (8.0+).</p>
+      <div class="btn-row"><a href="https://www.x402-agent-pay.com/downloads/agentpay-provider.apk" class="btn btn-blue">⬇️ Download APK v2.0</a></div>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">2</div><h3>Register Your Business</h3></div>
+    <div class="step-body">
+      <p>Open the app and enter your business name, phone number, and service categories. Or register online at <code>/register</code>.</p>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">3</div><h3>Claim Your OSM Listing (Optional)</h3></div>
+    <div class="step-body">
+      <p>If your business is already on OpenStreetMap, claim it via SMS verification in the app. This gives you a ✅ Verified badge and boosts your ranking in AI agent searches.</p>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">4</div><h3>Start Receiving Bookings</h3></div>
+    <div class="step-body">
+      <p>You'll receive SMS + voice notifications for new bookings. Accept or decline from the app. No monthly fees — you only pay a small platform fee when you get paid.</p>
+    </div>
+  </div>
+
+  <!-- Developer track -->
+  <h2 style="margin-top:50px">Developer / AI Agent Track</h2>
+  <p class="sub">Integrate with AgentPay's x402 API in minutes</p>
+
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">1</div><h3>Register Your Agent</h3></div>
+    <div class="step-body">
+      <p>Get an agent ID and API key at <code>/register-agent</code>. Free to register.</p>
+      <div class="code-block">
+POST /api/v1/marketplace/register<br>
+{ <span class="key">"agent_name"</span>: <span class="val">"my-search-agent"</span>, <span class="key">"capabilities"</span>: [<span class="val">"search"</span>, <span class="val">"book"</span>] }
+      </div>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">2</div><h3>Search for Services</h3></div>
+    <div class="step-body">
+      <p>Call <code>POST /api/v1/search</code> with an x402 payment of $0.001 USDC (Base mainnet). Returns verified providers + OSM results.</p>
+      <div class="code-block">
+<span class="comment"># Requires x402 payment header — $0.001 USDC</span><br>
+POST /api/v1/search<br>
+{ <span class="key">"query"</span>: <span class="val">"HVAC repair"</span>, <span class="key">"location"</span>: <span class="val">"Phoenix, AZ"</span> }
+      </div>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">3</div><h3>Book a Service</h3></div>
+    <div class="step-body">
+      <p>Use a provider ID from search results to book via <code>POST /api/v1/book</code> ($0.002 USDC). Provider is notified instantly.</p>
+    </div>
+  </div>
+  <div class="step-card">
+    <div class="step-header"><div class="step-num">4</div><h3>Explore the API</h3></div>
+    <div class="step-body">
+      <p>Full OpenAPI spec at <code>/openapi.json</code>. AI discovery file at <code>/llms.txt</code>. Also listed on <a href="https://agentic.market" target="_blank" style="color:#60a5fa">Bazaar / agentic.market</a>.</p>
+      <div class="btn-row">
+        <a href="/openapi.json" class="btn btn-blue" target="_blank">📄 OpenAPI Spec</a>
+        <a href="/quick-reference" class="btn btn-outline">⚡ Quick Reference</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/chatbot.js"></script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal AI Agent — AgentPay</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%)}
+.hero .badge{display:inline-block;background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);padding:6px 18px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:20px}
+.hero h1{font-size:2.4em;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.2}
+.hero p{font-size:1.1em;color:#94a3b8;max-width:620px;margin:0 auto 32px;line-height:1.7}
+.btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;display:inline-block;transition:all 0.2s}
+.btn-purple{background:#7c3aed;color:#fff}.btn-purple:hover{background:#6d28d9}
+.btn-outline{border:2px solid #334155;color:#94a3b8}.btn-outline:hover{border-color:#7c3aed;color:#a78bfa}
+
+.section{max-width:960px;margin:0 auto;padding:60px 20px}
+.section h2{font-size:1.8em;font-weight:800;color:#fff;margin-bottom:10px}
+.section .sub{color:#64748b;margin-bottom:36px;font-size:15px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px}
+.card .icon{font-size:2em;margin-bottom:12px}
+.card h3{color:#fff;font-size:15px;margin-bottom:8px;font-weight:700}
+.card p{color:#94a3b8;font-size:14px;line-height:1.6}
+
+.use-case-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.use-case{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px}
+.use-case .uc-icon{font-size:1.8em;margin-bottom:10px}
+.use-case h4{color:#fff;font-size:14px;font-weight:700;margin-bottom:8px}
+.use-case ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.use-case ul li{color:#94a3b8;font-size:13px;padding-left:16px;position:relative}
+.use-case ul li::before{content:"→";position:absolute;left:0;color:#7c3aed;font-weight:700}
+
+.how-it-works{background:#1e293b;border:1px solid #334155;border-radius:14px;overflow:hidden}
+.hw-step{display:flex;align-items:flex-start;gap:18px;padding:22px 24px;border-bottom:1px solid #0f172a}
+.hw-step:last-child{border-bottom:none}
+.hw-num{width:34px;height:34px;background:linear-gradient(135deg,#7c3aed,#3b82f6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0;margin-top:2px}
+.hw-content h4{color:#fff;font-size:14px;margin-bottom:5px;font-weight:700}
+.hw-content p{color:#94a3b8;font-size:13px;line-height:1.6}
+
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.compare{grid-template-columns:1fr}}
+.compare-col{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:20px}
+.compare-col.good{border-color:rgba(34,197,94,0.3)}
+.compare-col.bad{border-color:rgba(239,68,68,0.2)}
+.compare-col h4{font-size:14px;font-weight:700;margin-bottom:14px}
+.compare-col.good h4{color:#22c55e}
+.compare-col.bad h4{color:#f87171}
+.compare-col ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.compare-col ul li{font-size:13px;color:#94a3b8;padding-left:20px;position:relative}
+.compare-col.good ul li::before{content:"✓";position:absolute;left:0;color:#22c55e;font-weight:700}
+.compare-col.bad ul li::before{content:"✗";position:absolute;left:0;color:#f87171;font-weight:700}
+
+.coming-soon{background:linear-gradient(135deg,rgba(124,58,237,0.1),rgba(59,130,246,0.1));border:1px solid rgba(124,58,237,0.3);border-radius:14px;padding:32px;text-align:center}
+.coming-soon h3{color:#a78bfa;font-size:1.3em;margin-bottom:10px}
+.coming-soon p{color:#94a3b8;font-size:14px;line-height:1.6;max-width:500px;margin:0 auto 20px}
+.coming-soon .roadmap-items{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.roadmap-items span{background:rgba(124,58,237,0.15);color:#a78bfa;border:1px solid rgba(124,58,237,0.3);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600}
+
+.cta{background:linear-gradient(135deg,#2d1b69,#1e293b);border:1px solid #334155;border-radius:16px;padding:48px 32px;text-align:center;margin:0 20px 60px}
+.cta h2{font-size:1.8em;color:#fff;margin-bottom:12px}
+.cta p{color:#94a3b8;margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="hero">
+  <div class="badge">🤖 Coming Soon — Consumer App</div>
+  <h1>Your Personal AI Agent</h1>
+  <p>An autonomous AI that books appointments, negotiates prices, handles reservations, and manages your daily services — all without you having to pick up the phone. Powered by AgentPay's x402 infrastructure.</p>
+  <div class="btn-row">
+    <a href="/register" class="btn btn-purple">🚀 Join Waitlist</a>
+    <a href="/marketplace" class="btn btn-outline">📍 Browse Services</a>
+  </div>
+</div>
+
+<!-- What it does -->
+<div class="section">
+  <h2>What Your AI Agent Does For You</h2>
+  <p class="sub">Set your preferences once — your agent handles everything automatically, 24/7</p>
+  <div class="use-case-grid">
+    <div class="use-case">
+      <div class="uc-icon">🏠</div>
+      <h4>Home Services</h4>
+      <ul>
+        <li>Books HVAC tune-ups before summer</li>
+        <li>Finds the best-rated plumber nearby</li>
+        <li>Schedules pest control automatically</li>
+        <li>Gets quotes and negotiates price</li>
+      </ul>
+    </div>
+    <div class="use-case">
+      <div class="uc-icon">💇</div>
+      <h4>Health & Beauty</h4>
+      <ul>
+        <li>Books haircuts at your preferred salon</li>
+        <li>Schedules doctor/dentist appointments</li>
+        <li>Finds openings that fit your calendar</li>
+        <li>Sends reminders automatically</li>
+      </ul>
+    </div>
+    <div class="use-case">
+      <div class="uc-icon">🚗</div>
+      <h4>Auto & Transport</h4>
+      <ul>
+        <li>Books oil changes and tire rotations</li>
+        <li>Schedules EV charging appointments</li>
+        <li>Finds and books car detailing</li>
+        <li>Tracks service history for your vehicle</li>
+      </ul>
+    </div>
+    <div class="use-case">
+      <div class="uc-icon">🍕</div>
+      <h4>Food & Dining</h4>
+      <ul>
+        <li>Makes restaurant reservations</li>
+        <li>Orders from your favorite spots</li>
+        <li>Handles catering for events</li>
+        <li>Finds deals and loyalty rewards</li>
+      </ul>
+    </div>
+    <div class="use-case">
+      <div class="uc-icon">💪</div>
+      <h4>Fitness & Wellness</h4>
+      <ul>
+        <li>Books personal training sessions</li>
+        <li>Schedules yoga and fitness classes</li>
+        <li>Finds nutrition consultants</li>
+        <li>Manages your wellness calendar</li>
+      </ul>
+    </div>
+    <div class="use-case">
+      <div class="uc-icon">🛒</div>
+      <h4>Shopping & Errands</h4>
+      <ul>
+        <li>Finds best prices across providers</li>
+        <li>Handles returns and exchanges</li>
+        <li>Manages subscriptions</li>
+        <li>Tracks orders and deliveries</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- How it works -->
+<div class="section" style="padding-top:0">
+  <h2>How It Works</h2>
+  <p class="sub">Autonomous end-to-end — from discovering a provider to confirmed booking</p>
+  <div class="how-it-works">
+    <div class="hw-step">
+      <div class="hw-num">1</div>
+      <div class="hw-content">
+        <h4>You set your preferences</h4>
+        <p>Tell your agent your preferences once — preferred providers, max budget, time windows, service frequency. It remembers everything.</p>
+      </div>
+    </div>
+    <div class="hw-step">
+      <div class="hw-num">2</div>
+      <div class="hw-content">
+        <h4>Agent discovers providers</h4>
+        <p>Your agent searches AgentPay's marketplace using the x402 protocol — finding verified, bookable providers near you with real pricing and availability.</p>
+      </div>
+    </div>
+    <div class="hw-step">
+      <div class="hw-num">3</div>
+      <div class="hw-content">
+        <h4>Agent negotiates and books</h4>
+        <p>The agent compares options, finds the best value, and books automatically — paying the service fee via USDC micropayment on Base mainnet.</p>
+      </div>
+    </div>
+    <div class="hw-step">
+      <div class="hw-num">4</div>
+      <div class="hw-content">
+        <h4>You get notified — that's it</h4>
+        <p>You receive a confirmation. No phone calls, no back-and-forth. Your agent handled everything while you were doing something else.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AgentPay vs old way -->
+<div class="section" style="padding-top:0">
+  <h2>AgentPay vs The Old Way</h2>
+  <p class="sub">AI agents handle the friction — you just show up</p>
+  <div class="compare">
+    <div class="compare-col good">
+      <h4>🤖 With Your AgentPay Agent</h4>
+      <ul>
+        <li>Books automatically based on your prefs</li>
+        <li>Compares providers and finds best price</li>
+        <li>Runs 24/7 — no waiting for business hours</li>
+        <li>Pays via crypto micropayment instantly</li>
+        <li>Zero phone calls or hold music</li>
+        <li>Remembers your history and preferences</li>
+      </ul>
+    </div>
+    <div class="compare-col bad">
+      <h4>📞 The Old Way</h4>
+      <ul>
+        <li>Manually search, call, and wait on hold</li>
+        <li>Get quotes one by one</li>
+        <li>Only available during business hours</li>
+        <li>Credit card fees and slow processing</li>
+        <li>Repeat yourself every single time</li>
+        <li>Forget service history and deadlines</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Platform features -->
+<div class="section" style="padding-top:0">
+  <h2>Built on AgentPay Infrastructure</h2>
+  <p class="sub">The same platform powering our provider network</p>
+  <div class="cards">
+    <div class="card">
+      <div class="icon">⚡</div>
+      <h3>x402 Micropayments</h3>
+      <p>Pay for services with USDC on Base mainnet. Instant settlement, no chargebacks, ultra-low fees. Stripe also supported for card payments.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🗺️</div>
+      <h3>500M+ Provider Coverage</h3>
+      <p>AgentPay combines our verified provider registry with OpenStreetMap's global database — 190+ countries covered from day one.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🧠</div>
+      <h3>Llama 3.3 70B Intelligence</h3>
+      <p>Powered by NVIDIA NIM running Llama 3.3 70B. Understands context, learns your preferences, and gets smarter with every interaction.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔒</div>
+      <h3>Privacy First</h3>
+      <p>Your preferences stay on your device. Payments go directly provider-to-wallet. No middleman holding your financial data.</p>
+    </div>
+    <div class="card">
+      <div class="icon">📱</div>
+      <h3>iOS & Android</h3>
+      <p>Native mobile apps with Siri and Google Assistant integration. Also works headlessly — your agent runs even when your phone is off.</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔔</div>
+      <h3>Smart Notifications</h3>
+      <p>Get notified only when needed — booking confirmations, price alerts, and reminders. Never bothered for the routine stuff your agent handles.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Coming soon -->
+<div class="section" style="padding-top:0">
+  <div class="coming-soon">
+    <h3>⏳ Consumer App Coming Soon</h3>
+    <p>The Personal AI Agent consumer app is in development. The provider network is live and ready. Sign up to be notified when the consumer app launches.</p>
+    <div class="roadmap-items">
+      <span>🤖 Agent preferences dashboard</span>
+      <span>📅 Booking calendar</span>
+      <span>💬 Siri voice commands</span>
+      <span>📍 Live provider map</span>
+      <span>💳 Wallet management</span>
+      <span>📊 Spending insights</span>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:0 auto">
+  <div class="cta">
+    <h2>🤖 Be First to Get Your AI Agent</h2>
+    <p>Join the waitlist and get early access when the consumer app launches. Provider network is already live.</p>
+    <div class="btn-row">
+      <a href="/register" class="btn btn-purple">🚀 Join the Waitlist</a>
+      <a href="mailto:x402agentpay@gmail.com" class="btn btn-outline">✉️ Contact Us</a>
+    </div>
+  </div>
+</div>
+
+<script src="/chatbot.js"></script>
+</body>
+</html>
