@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key>
+  <string>AgentPay Provider</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.agentpay.provider</string>
+  <key>CFBundleName</key>
+  <string>AgentPayProvider</string>
+  <key>CFBundleShortVersionString</key>
+  <string>2.0.0</string>
+  <key>CFBundleVersion</key>
+  <string>1</string>
+  <key>LSRequiresIPhoneOS</key>
+  <true/>
+  <key>UILaunchScreen</key>
+  <dict/>
+  <key>NSSiriUsageDescription</key>
+  <string>AgentPay uses Siri to let you check bookings, accept appointments, and view earnings with your voice.</string>
+</dict>
+</plist>

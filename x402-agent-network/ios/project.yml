@@ -1,0 +1,22 @@
+name: AgentPayProvider
+options:
+  bundleIdPrefix: com.agentpay
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  PRODUCT_BUNDLE_IDENTIFIER: com.agentpay.provider
+  SWIFT_VERSION: "5.9"
+  MARKETING_VERSION: "2.0.0"
+  CURRENT_PROJECT_VERSION: "1"
+targets:
+  AgentPayProvider:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: AgentPayProvider
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.agentpay.provider
+      INFOPLIST_FILE: AgentPayProvider/Info.plist
+    entitlements:
+      com.apple.developer.siri: true
