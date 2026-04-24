@@ -3531,13 +3531,16 @@ function distKm(lat1, lon1, lat2, lon2) {
 var OSM_TAGS = {
   "hair-beauty": { key: "shop", values: ["hairdresser", "beauty", "barber", "nail_salon"] },
   "food-dining": { key: "amenity", values: ["restaurant", "cafe", "bar", "fast_food"] },
-  "auto-service": { key: "shop", values: ["car_repair", "tyres", "car_wash"] },
+  "auto-service": { key: "shop", values: ["car_repair", "tyres", "car_wash", "car_parts", "motorcycle_repair"] },
+  "oil-change": { key: "shop", values: ["car_repair", "tyres"] },
+  "car-dealership": { key: "shop", values: ["car", "motorcycle"] },
   "home-services": { key: "shop", values: ["hardware", "doityourself"] },
   "health-fitness": { key: "leisure", values: ["fitness_centre", "sports_centre"] },
   "medical": { key: "amenity", values: ["doctors", "dentist", "clinic", "pharmacy"] },
-  "pets": { key: "shop", values: ["pet"] },
+  "pets": { key: "shop", values: ["pet", "veterinary"] },
   "tech-repair": { key: "shop", values: ["mobile_phone", "electronics", "computer"] },
-  "travel-transport": { key: "amenity", values: ["taxi", "car_rental"] },
+  "travel-transport": { key: "amenity", values: ["taxi", "car_rental", "bus_station"] },
+  "lodging": { key: "tourism", values: ["hotel", "motel", "hostel", "guest_house"] },
   "financial": { key: "amenity", values: ["bank", "atm"] },
   "real-estate": { key: "office", values: ["estate_agent"] },
   "fashion-retail": { key: "shop", values: ["clothes", "shoes", "department_store"] },
@@ -5670,6 +5673,9 @@ app.get("/roadmap", (req, res) => {
 var docFiles = {};
 app.get("/investor-pitch", (req, res) => {
   res.sendFile("public/investor-pitch.html", { root: process.cwd() });
+});
+app.get("/claim-osm", (req, res) => {
+  res.sendFile("public/claim-osm.html", { root: process.cwd() });
 });
 Object.entries(docFiles).forEach(([route, filename]) => {
   app.get(route, (req, res) => {
