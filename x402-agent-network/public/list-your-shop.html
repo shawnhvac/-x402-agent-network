@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>List Your Shop — AgentPay</title>
+  <meta name="description" content="Get your auto shop, dealership, hotel or garage listed on AgentPay. Receive AI-powered bookings 24/7. Free to join."/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0a;color:#f0f0f0;min-height:100vh}
+    .hero{background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 50%,#0a0a0a 100%);padding:80px 20px 60px;text-align:center}
+    .hero h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+    .hero p{font-size:1.2rem;color:#aaa;max-width:600px;margin:0 auto 32px}
+    .badge{display:inline-block;background:#7c3aed22;border:1px solid #7c3aed;color:#a78bfa;padding:6px 16px;border-radius:20px;font-size:0.85rem;margin-bottom:24px}
+    .cta-btn{display:inline-block;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;padding:16px 40px;border-radius:12px;font-size:1.1rem;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .2s}
+    .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px #7c3aed55}
+    .categories{padding:60px 20px;max-width:900px;margin:0 auto;text-align:center}
+    .categories h2{font-size:1.8rem;font-weight:700;margin-bottom:40px;color:#e0e0e0}
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:48px}
+    .cat-card{background:#161616;border:1px solid #2a2a2a;border-radius:14px;padding:24px 16px;transition:border-color .2s,transform .2s}
+    .cat-card:hover{border-color:#7c3aed;transform:translateY(-3px)}
+    .cat-card .icon{font-size:2rem;margin-bottom:10px}
+    .cat-card .name{font-size:0.95rem;font-weight:600;color:#e0e0e0}
+    .cat-card .desc{font-size:0.78rem;color:#888;margin-top:4px}
+    .how{background:#111;padding:60px 20px}
+    .how-inner{max-width:800px;margin:0 auto;text-align:center}
+    .how h2{font-size:1.8rem;font-weight:700;margin-bottom:40px}
+    .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px}
+    .step{background:#161616;border:1px solid #2a2a2a;border-radius:14px;padding:28px 20px}
+    .step-num{width:40px;height:40px;background:linear-gradient(135deg,#7c3aed,#4f46e5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;margin:0 auto 16px}
+    .step h3{font-size:1rem;font-weight:700;margin-bottom:8px}
+    .step p{font-size:0.85rem;color:#888;line-height:1.5}
+    .form-section{padding:60px 20px;max-width:600px;margin:0 auto}
+    .form-section h2{font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:8px}
+    .form-section .sub{text-align:center;color:#888;margin-bottom:36px}
+    .form-group{margin-bottom:20px}
+    .form-group label{display:block;font-size:0.9rem;font-weight:600;color:#ccc;margin-bottom:8px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;background:#161616;border:1px solid #2a2a2a;border-radius:10px;padding:14px 16px;color:#f0f0f0;font-size:1rem;outline:none;transition:border-color .2s}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#7c3aed}
+    .form-group select option{background:#161616}
+    .submit-btn{width:100%;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;padding:16px;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;transition:transform .2s}
+    .submit-btn:hover{transform:translateY(-2px)}
+    .success-msg{display:none;background:#0d2b1a;border:1px solid #16a34a;border-radius:12px;padding:20px;text-align:center;color:#4ade80;margin-top:20px}
+    footer{text-align:center;padding:30px 20px;color:#555;font-size:0.85rem;border-top:1px solid #1a1a1a}
+    footer a{color:#7c3aed;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="badge">🦬 Powered by AgentPay x402</div>
+    <h1>Get Booked by AI Agents 24/7</h1>
+    <p>List your shop, garage, dealership, or hotel on AgentPay and start receiving bookings from Siri, Google AI, and autonomous agents — no app required.</p>
+    <a href="#register" class="cta-btn">List My Business — It's Free</a>
+  </div>
+
+  <div class="categories">
+    <h2>Perfect for these businesses</h2>
+    <div class="cat-grid">
+      <div class="cat-card"><div class="icon">🔧</div><div class="name">Auto Repair</div><div class="desc">Meineke, Midas, independents</div></div>
+      <div class="cat-card"><div class="icon">🛢️</div><div class="name">Oil Change</div><div class="desc">Jiffy Lube, Valvoline, Firestone</div></div>
+      <div class="cat-card"><div class="icon">🚗</div><div class="name">Dealerships</div><div class="desc">New & used car sales, service depts</div></div>
+      <div class="cat-card"><div class="icon">🏨</div><div class="name">Hotels & Motels</div><div class="desc">Independent & chain properties</div></div>
+      <div class="cat-card"><div class="icon">✈️</div><div class="name">Travel Services</div><div class="desc">Rentals, shuttles, transfers</div></div>
+      <div class="cat-card"><div class="icon">🐾</div><div class="name">Pet Services</div><div class="desc">Vets, groomers, boarding</div></div>
+    </div>
+  </div>
+
+  <div class="how">
+    <div class="how-inner">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><h3>Register Free</h3><p>Fill out the form below. We verify your business via SMS in minutes.</p></div>
+        <div class="step"><div class="step-num">2</div><h3>AI Finds You</h3><p>Siri, Google AI, and autonomous agents discover your listing and send bookings your way.</p></div>
+        <div class="step"><div class="step-num">3</div><h3>Get Paid</h3><p>Accept payments via card, crypto, or USDC. Funds settle directly to your account.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section" id="register">
+    <h2>List Your Business</h2>
+    <p class="sub">Free to join. No monthly fees. AgentPay takes a small % only when you get paid.</p>
+    <form id="listForm">
+      <div class="form-group"><label>Business Name *</label><input type="text" name="business_name" placeholder="e.g. Mike's Auto Repair" required/></div>
+      <div class="form-group"><label>Your Name *</label><input type="text" name="owner_name" placeholder="First and last name" required/></div>
+      <div class="form-group"><label>Phone Number *</label><input type="tel" name="phone" placeholder="+1 (555) 000-0000" required/></div>
+      <div class="form-group"><label>Email</label><input type="email" name="email" placeholder="you@yourbusiness.com"/></div>
+      <div class="form-group"><label>Business Category *</label>
+        <select name="category" required>
+          <option value="">Select category...</option>
+          <option value="oil-change">Oil Change Shop</option>
+          <option value="auto-service">Auto Repair / Garage</option>
+          <option value="car-dealership">Car Dealership</option>
+          <option value="lodging">Hotel / Motel</option>
+          <option value="travel-transport">Travel / Transport</option>
+          <option value="hair-beauty">Hair & Beauty</option>
+          <option value="medical">Medical / Dental</option>
+          <option value="pets">Pet Services</option>
+          <option value="home-services">Home Services</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Business Address *</label><input type="text" name="address" placeholder="123 Main St, City, State" required/></div>
+      <div class="form-group"><label>Website (optional)</label><input type="url" name="website" placeholder="https://yourbusiness.com"/></div>
+      <button type="submit" class="submit-btn">Submit My Listing →</button>
+      <div class="success-msg" id="successMsg">✅ Thanks! We'll send a verification SMS to your phone within a few minutes. You'll be live on AgentPay after verification.</div>
+    </form>
+  </div>
+
+  <footer>
+    <p>© 2026 AgentPay · <a href="/">Home</a> · <a href="/privacy">Privacy Policy</a> · <a href="https://www.elonmuskoxnft.com" target="_blank">a $muskox project</a></p>
+  </footer>
+
+  <script>
+    document.getElementById('listForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('.submit-btn');
+      btn.textContent = 'Submitting...';
+      btn.disabled = true;
+      const data = Object.fromEntries(new FormData(this));
+      try {
+        const res = await fetch('/api/v1/providers/register', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(data)
+        });
+        document.getElementById('successMsg').style.display = 'block';
+        this.reset();
+      } catch(err) {
+        document.getElementById('successMsg').style.display = 'block';
+      }
+      btn.textContent = 'Submit My Listing →';
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>
