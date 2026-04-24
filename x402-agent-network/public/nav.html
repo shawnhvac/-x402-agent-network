@@ -1,59 +1,262 @@
-<nav style="background:rgba(15,23,42,0.97);padding:15px 24px;border-bottom:2px solid #3b82f6;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;position:sticky;top:0;z-index:999;">
-  <a href="/" style="font-weight:800;color:#60a5fa;font-size:1.2em;text-decoration:none;">🤖 AgentPay</a>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+<style>
+.agentpay-nav {
+  background: rgba(15,23,42,0.97);
+  padding: 14px 20px;
+  border-bottom: 2px solid #3b82f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 9990;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.nav-brand {
+  font-weight: 800;
+  color: #60a5fa;
+  font-size: 1.15em;
+  text-decoration: none;
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.nav-dropdown {
+  position: relative;
+}
+.nav-dropdown > button {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.nav-dropdown > button:hover {
+  background: rgba(255,255,255,0.08);
+}
+.nav-menu {
+  display: none;
+  position: absolute;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  min-width: 185px;
+  top: 110%;
+  left: 0;
+  z-index: 10000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.nav-menu.right { left: auto; right: 0; }
+.nav-menu a {
+  display: block;
+  padding: 11px 16px;
+  color: #e2e8f0;
+  text-decoration: none;
+  font-size: 13px;
+  border-bottom: 1px solid #334155;
+  transition: background 0.15s;
+}
+.nav-menu a:last-child { border-bottom: none; }
+.nav-menu a:hover { background: rgba(59,130,246,0.15); color: #60a5fa; }
 
-    <div style="position:relative;display:inline-block;" class="nav-group">
-      <button onclick="toggleNav('product-menu')" style="background:none;border:none;color:#e2e8f0;cursor:pointer;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;">🛒 Product ▾</button>
-      <div id="product-menu" style="display:none;position:absolute;background:#1e293b;border:1px solid #334155;border-radius:10px;min-width:190px;top:110%;left:0;z-index:1000;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-        <a href="/" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">🏠 Home</a>
-        <a href="/marketplace" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">📍 Marketplace</a>
-        <a href="/agent-dashboard" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">🤖 Agent Dashboard</a>
-        <a href="/pricing" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;">💰 Pricing</a>
+/* Hamburger */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 6px;
+  border: none;
+  background: none;
+}
+.nav-hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+/* Mobile drawer */
+.nav-mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 0; right: 0; bottom: 0;
+  width: 260px;
+  background: #0f172a;
+  border-left: 1px solid #334155;
+  z-index: 99999;
+  padding: 20px 0;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.6);
+}
+.nav-mobile-drawer.open { transform: translateX(0); }
+.nav-mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 99998;
+}
+.nav-mobile-overlay.open { display: block; }
+.nav-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 16px;
+  border-bottom: 1px solid #1e293b;
+  margin-bottom: 8px;
+}
+.nav-drawer-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+}
+.nav-drawer-section {
+  padding: 4px 0;
+  border-bottom: 1px solid #1e293b;
+}
+.nav-drawer-section-title {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 8px 20px 4px;
+}
+.nav-drawer-section a {
+  display: block;
+  padding: 10px 20px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  transition: background 0.15s, color 0.15s;
+}
+.nav-drawer-section a:hover { background: rgba(59,130,246,0.1); color: #60a5fa; }
+
+@media (max-width: 700px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+}
+</style>
+
+<nav class="agentpay-nav">
+  <a href="/" class="nav-brand">🤖 AgentPay</a>
+
+  <div class="nav-links">
+    <div class="nav-dropdown">
+      <button onclick="navToggle('m-product')">🛒 Product ▾</button>
+      <div class="nav-menu" id="m-product">
+        <a href="/">🏠 Home</a>
+        <a href="/marketplace">📍 Marketplace</a>
+        <a href="/agent-dashboard">🤖 Agent Dashboard</a>
+        <a href="/pricing">💰 Pricing</a>
       </div>
     </div>
-
-    <div style="position:relative;display:inline-block;" class="nav-group">
-      <button onclick="toggleNav('resources-menu')" style="background:none;border:none;color:#e2e8f0;cursor:pointer;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;">📚 Resources ▾</button>
-      <div id="resources-menu" style="display:none;position:absolute;background:#1e293b;border:1px solid #334155;border-radius:10px;min-width:200px;top:110%;left:0;z-index:1000;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-        <a href="/docs" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">📖 Documentation</a>
-        <a href="/getting-started" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">🚀 Getting Started</a>
-        <a href="/quick-reference" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">⚡ Quick Reference</a>
-        <a href="/roadmap" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;">🗺️ Roadmap</a>
+    <div class="nav-dropdown">
+      <button onclick="navToggle('m-resources')">📚 Resources ▾</button>
+      <div class="nav-menu" id="m-resources">
+        <a href="/docs">📖 Documentation</a>
+        <a href="/getting-started">🚀 Getting Started</a>
+        <a href="/quick-reference">⚡ Quick Reference</a>
+        <a href="/roadmap">🗺️ Roadmap</a>
       </div>
     </div>
-
-    <div style="position:relative;display:inline-block;" class="nav-group">
-      <button onclick="toggleNav('investors-menu')" style="background:none;border:none;color:#e2e8f0;cursor:pointer;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;">💼 Investors ▾</button>
-      <div id="investors-menu" style="display:none;position:absolute;background:#1e293b;border:1px solid #334155;border-radius:10px;min-width:200px;top:110%;left:0;z-index:1000;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-        <a href="/investor-pitch" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">📊 Pitch Deck</a>
-        <a href="/register-agent" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">🤖 Agent Portal</a>
-        <a href="/provider-download" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">📱 Android App</a>
-        <a href="/contact" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;">✉️ Contact Us</a>
+    <div class="nav-dropdown">
+      <button onclick="navToggle('m-investors')">💼 Investors ▾</button>
+      <div class="nav-menu" id="m-investors">
+        <a href="/investor-pitch">📊 Pitch Deck</a>
+        <a href="/register-agent">🤖 Agent Portal</a>
+        <a href="/provider-download">📱 Android App</a>
+        <a href="/contact">✉️ Contact</a>
       </div>
     </div>
-
-    <div style="position:relative;display:inline-block;" class="nav-group">
-      <button onclick="toggleNav('tech-menu')" style="background:none;border:none;color:#e2e8f0;cursor:pointer;font-weight:600;font-size:14px;padding:8px 12px;border-radius:8px;">🔧 Technical ▾</button>
-      <div id="tech-menu" style="display:none;position:absolute;background:#1e293b;border:1px solid #334155;border-radius:10px;min-width:190px;top:110%;right:0;z-index:1000;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-        <a href="/location-services" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;border-bottom:1px solid #334155;">📍 Location Services</a>
-        <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank" style="display:block;padding:12px 16px;color:#e2e8f0;text-decoration:none;font-size:14px;">💻 GitHub Repo</a>
+    <div class="nav-dropdown">
+      <button onclick="navToggle('m-tech')">🔧 Technical ▾</button>
+      <div class="nav-menu right" id="m-tech">
+        <a href="/location-services">📍 Location Services</a>
+        <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank">💻 GitHub</a>
       </div>
     </div>
-
   </div>
+
+  <!-- Hamburger for mobile -->
+  <button class="nav-hamburger" onclick="navOpenDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
 
+<!-- Mobile overlay -->
+<div class="nav-mobile-overlay" id="nav-overlay" onclick="navCloseDrawer()"></div>
+
+<!-- Mobile drawer -->
+<div class="nav-mobile-drawer" id="nav-drawer">
+  <div class="nav-drawer-header">
+    <a href="/" class="nav-brand">🤖 AgentPay</a>
+    <button class="nav-drawer-close" onclick="navCloseDrawer()">×</button>
+  </div>
+  <div class="nav-drawer-section">
+    <div class="nav-drawer-section-title">Product</div>
+    <a href="/">🏠 Home</a>
+    <a href="/marketplace">📍 Marketplace</a>
+    <a href="/agent-dashboard">🤖 Agent Dashboard</a>
+    <a href="/pricing">💰 Pricing</a>
+  </div>
+  <div class="nav-drawer-section">
+    <div class="nav-drawer-section-title">Resources</div>
+    <a href="/docs">📖 Documentation</a>
+    <a href="/getting-started">🚀 Getting Started</a>
+    <a href="/quick-reference">⚡ Quick Reference</a>
+    <a href="/roadmap">🗺️ Roadmap</a>
+  </div>
+  <div class="nav-drawer-section">
+    <div class="nav-drawer-section-title">Investors</div>
+    <a href="/investor-pitch">📊 Pitch Deck</a>
+    <a href="/register-agent">🤖 Agent Portal</a>
+    <a href="/provider-download">📱 Android App</a>
+    <a href="/contact">✉️ Contact</a>
+  </div>
+  <div class="nav-drawer-section">
+    <div class="nav-drawer-section-title">Technical</div>
+    <a href="/location-services">📍 Location Services</a>
+    <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank">💻 GitHub</a>
+  </div>
+</div>
+
 <script>
-function toggleNav(id) {
-  document.querySelectorAll('[id$="-menu"]').forEach(m => {
+function navToggle(id) {
+  document.querySelectorAll('.nav-menu').forEach(m => {
     if (m.id !== id) m.style.display = 'none';
   });
   const el = document.getElementById(id);
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
 }
 document.addEventListener('click', function(e) {
-  if (!e.target.closest('.nav-group')) {
-    document.querySelectorAll('[id$="-menu"]').forEach(m => m.style.display = 'none');
+  if (!e.target.closest('.nav-dropdown')) {
+    document.querySelectorAll('.nav-menu').forEach(m => m.style.display = 'none');
   }
 });
+function navOpenDrawer() {
+  document.getElementById('nav-drawer').classList.add('open');
+  document.getElementById('nav-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function navCloseDrawer() {
+  document.getElementById('nav-drawer').classList.remove('open');
+  document.getElementById('nav-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 </script>
