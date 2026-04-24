@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Android Provider App — AgentPay</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f172a;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+  .hero{background:linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%);padding:70px 20px 50px;text-align:center}
+  .hero .badge{display:inline-block;background:rgba(34,197,94,0.15);color:#22c55e;border:1px solid rgba(34,197,94,0.3);padding:6px 18px;border-radius:20px;font-size:13px;font-weight:700;margin-bottom:20px;letter-spacing:0.05em}
+  .hero h1{font-size:2.4em;font-weight:800;color:#fff;margin-bottom:16px;line-height:1.2}
+  .hero p{font-size:1.1em;color:#94a3b8;max-width:580px;margin:0 auto 32px}
+  .btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:14px 28px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;display:inline-block;transition:all 0.2s}
+  .btn-green{background:#22c55e;color:#000}
+  .btn-green:hover{background:#16a34a}
+  .btn-outline{border:2px solid #334155;color:#94a3b8}
+  .btn-outline:hover{border-color:#3b82f6;color:#3b82f6}
+  .version-tag{margin-top:20px;color:#475569;font-size:13px}
+  .version-tag span{color:#22c55e;font-weight:700}
+
+  .section{max-width:960px;margin:0 auto;padding:60px 20px}
+  .section h2{font-size:1.8em;font-weight:800;color:#fff;margin-bottom:10px}
+  .section .sub{color:#64748b;margin-bottom:36px;font-size:15px}
+
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+  .feature{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px}
+  .feature .icon{font-size:2em;margin-bottom:14px}
+  .feature h3{color:#fff;font-size:16px;margin-bottom:8px}
+  .feature p{color:#94a3b8;font-size:14px;line-height:1.6}
+
+  .steps{display:flex;flex-direction:column;gap:0}
+  .step{display:flex;gap:20px;align-items:flex-start;padding:24px 0;border-bottom:1px solid #1e293b}
+  .step:last-child{border-bottom:none}
+  .step-num{width:36px;height:36px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0;margin-top:2px}
+  .step-content h4{color:#fff;font-size:15px;margin-bottom:6px}
+  .step-content p{color:#94a3b8;font-size:14px;line-height:1.6}
+
+  .stack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+  .stack-item{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 20px}
+  .stack-item .label{color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+  .stack-item ul{list-style:none}
+  .stack-item ul li{color:#cbd5e1;font-size:13px;padding:3px 0;border-bottom:1px solid #0f172a}
+  .stack-item ul li:last-child{border:none}
+
+  .status-bar{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;text-align:center;margin-top:0}
+  .stat .val{font-size:2em;font-weight:800;color:#22c55e}
+  .stat .lbl{color:#64748b;font-size:13px;margin-top:4px}
+
+  .cta{background:linear-gradient(135deg,#1e3a5f,#1e293b);border:1px solid #334155;border-radius:16px;padding:48px 32px;text-align:center;margin:0 20px 60px}
+  .cta h2{font-size:1.8em;color:#fff;margin-bottom:12px}
+  .cta p{color:#94a3b8;margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto}
+
+  .requirements{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:24px;margin-top:0}
+  .requirements h4{color:#fff;margin-bottom:14px;font-size:15px}
+  .requirements ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .requirements ul li{color:#94a3b8;font-size:14px;padding-left:20px;position:relative}
+  .requirements ul li::before{content:"✓";position:absolute;left:0;color:#22c55e;font-weight:700}
+</style>
+</head>
+<body>
+<div id="nav-placeholder"></div>
+
+<div class="hero">
+  <div class="badge">✅ LIVE — Version 2.0</div>
+  <h1>📱 AgentPay Provider App</h1>
+  <p>Manage your bookings, get paid instantly, and let AI agents find your business 24/7. All from your Android phone.</p>
+  <div class="btn-row">
+    <a href="https://www.x402-agent-pay.com/downloads/agentpay-provider.apk" class="btn btn-green">⬇️ Download APK v2.0</a>
+    <a href="/provider-download" class="btn btn-outline">📖 Setup Guide</a>
+  </div>
+  <div class="version-tag">Current: <span>v2.0.0</span> · Android 8.0+ · Min SDK 26 · Google Play submission in progress</div>
+</div>
+
+<!-- Status stats -->
+<div class="section" style="padding-top:40px;padding-bottom:0">
+  <div class="status-bar">
+    <div class="stat"><div class="val">v2.0</div><div class="lbl">Current Version</div></div>
+    <div class="stat"><div class="val">✅</div><div class="lbl">Build Passing</div></div>
+    <div class="stat"><div class="val">Android 8+</div><div class="lbl">Min Requirement</div></div>
+    <div class="stat"><div class="val">AI Chat</div><div class="lbl">Llama 3.3 70B</div></div>
+    <div class="stat"><div class="val">🔜</div><div class="lbl">Google Play</div></div>
+  </div>
+</div>
+
+<!-- Features -->
+<div class="section">
+  <h2>What's in v2.0</h2>
+  <p class="sub">Everything a service provider needs to run their business with AI</p>
+  <div class="features">
+    <div class="feature">
+      <div class="icon">📅</div>
+      <h3>Booking Management</h3>
+      <p>Accept, decline, or reschedule bookings with one tap. See full customer details, service type, and payment amount before confirming.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🤖</div>
+      <h3>AI Assistant</h3>
+      <p>Built-in Llama 3.3 70B chat assistant. Ask anything about your bookings, pricing, availability, or how to use the platform.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📍</div>
+      <h3>OSM Business Claiming</h3>
+      <p>Claim your OpenStreetMap business listing via SMS verification. Get a Verified badge so AI agents prioritize your listing in search results.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔔</div>
+      <h3>Smart Notifications</h3>
+      <p>3-tier escalation: push notification → SMS → voice call. Never miss a booking. Twilio-powered with your phone number: +1 866-401-6083.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">💰</div>
+      <h3>Transparent Fees</h3>
+      <p>Tiered platform fee: 3% under $50, 2% on $50–$200, 1% over $200. See exactly what you earn before accepting every booking.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔍</div>
+      <h3>Service Autocomplete</h3>
+      <p>Set your service categories with smart autocomplete. AI agents use these categories to find and match you with the right customers.</p>
+    </div>
+  </div>
+</div>
+
+<!-- How to install -->
+<div class="section" style="padding-top:0">
+  <h2>Get Started in 3 Steps</h2>
+  <p class="sub">Sideload the APK — no app store needed right now</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Enable Unknown Sources</h4>
+        <p>Go to <strong>Settings → Security → Install Unknown Apps</strong> and allow your browser to install APKs. This is a one-time setting.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Download & Install the APK</h4>
+        <p>Tap the Download button above or visit <strong>x402-agent-pay.com/downloads/agentpay-provider.apk</strong>. Open the downloaded file and tap Install.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Register Your Business</h4>
+        <p>Open the app, enter your business name, phone number, and service categories. Claim your OSM listing to get Verified and start receiving bookings.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="requirements" style="margin-top:24px">
+    <h4>Requirements</h4>
+    <ul>
+      <li>Android 8.0 (Oreo) or newer — SDK 26+</li>
+      <li>Active internet connection for booking sync</li>
+      <li>Phone number for SMS verification and booking notifications</li>
+      <li>Business registered at x402-agent-pay.com/register (optional but recommended)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Tech Stack -->
+<div class="section" style="padding-top:0">
+  <h2>Tech Stack</h2>
+  <p class="sub">Built with modern Android technologies</p>
+  <div class="stack-grid">
+    <div class="stack-item">
+      <div class="label">Frontend</div>
+      <ul>
+        <li>Kotlin</li>
+        <li>Jetpack Compose</li>
+        <li>Material 3</li>
+        <li>OkHttp (networking)</li>
+      </ul>
+    </div>
+    <div class="stack-item">
+      <div class="label">AI / Intelligence</div>
+      <ul>
+        <li>Llama 3.3 70B</li>
+        <li>NVIDIA NIM API</li>
+        <li>On-device inference ready</li>
+      </ul>
+    </div>
+    <div class="stack-item">
+      <div class="label">Backend</div>
+      <ul>
+        <li>Node.js / TypeScript</li>
+        <li>x402 payment protocol</li>
+        <li>SQLite (bookings DB)</li>
+        <li>Twilio SMS/Voice</li>
+      </ul>
+    </div>
+    <div class="stack-item">
+      <div class="label">Payments</div>
+      <ul>
+        <li>USDC on Base mainnet</li>
+        <li>Stripe (cards)</li>
+        <li>7 EVM chains</li>
+        <li>Solana</li>
+      </ul>
+    </div>
+    <div class="stack-item">
+      <div class="label">Build & Deploy</div>
+      <ul>
+        <li>GitHub Actions CI/CD</li>
+        <li>Signed APK + AAB</li>
+        <li>Google Play (soon)</li>
+        <li>Direct APK download</li>
+      </ul>
+    </div>
+    <div class="stack-item">
+      <div class="label">Discovery</div>
+      <ul>
+        <li>OpenStreetMap</li>
+        <li>x402 API search</li>
+        <li>Bazaar / agentic.market</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Roadmap -->
+<div class="section" style="padding-top:0">
+  <h2>What's Coming Next</h2>
+  <p class="sub">Android roadmap — actively building</p>
+  <div class="features">
+    <div class="feature" style="border-color:#22c55e22">
+      <div class="icon">✅</div>
+      <h3>Shipped in v2.0</h3>
+      <p>Booking management · AI chat · OSM claiming · SMS/voice notifications · Service autocomplete · Verified badge · GitHub Actions CI/CD</p>
+    </div>
+    <div class="feature" style="border-color:#3b82f622">
+      <div class="icon">🔵</div>
+      <h3>In Progress</h3>
+      <p>Google Play Store listing · Push notifications (Firebase) · Real-time booking calendar · Provider profile photos</p>
+    </div>
+    <div class="feature" style="border-color:#47456822">
+      <div class="icon">⏳</div>
+      <h3>Planned</h3>
+      <p>Earnings dashboard · Multi-language support · Repeat customer management · In-app payment history · Dark/light theme toggle</p>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div style="max-width:960px;margin:0 auto">
+  <div class="cta">
+    <h2>📱 Ready to Start Accepting Bookings?</h2>
+    <p>Download the app, claim your business, and let AI agents send you customers 24/7 — no monthly fees.</p>
+    <div class="btn-row">
+      <a href="https://www.x402-agent-pay.com/downloads/agentpay-provider.apk" class="btn btn-green">⬇️ Download APK v2.0</a>
+      <a href="mailto:x402agentpay@gmail.com" class="btn btn-outline">✉️ Questions? Email Us</a>
+    </div>
+  </div>
+</div>
+
+<script src="/chatbot.js"></script>
+</body>
+</html>

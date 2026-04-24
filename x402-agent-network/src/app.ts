@@ -393,6 +393,9 @@ app.get("/api/admin/providers", (req: Request, res: Response) => {
 });
 
 // ── Dedicated HTML pages (override markdown versions) ──────────────────────
+app.get('/android-app', (req: Request, res: Response) => {
+  res.sendFile('public/android-app.html', { root: process.cwd() });
+});
 app.get('/pricing', (req: Request, res: Response) => {
   res.sendFile('public/pricing.html', { root: process.cwd() });
 });
@@ -406,7 +409,6 @@ const docFiles = {
   '/getting-started': 'GETTING_STARTED.md',
   '/quick-reference': 'QUICK_REFERENCE.md',
   '/personal-agent-app': 'PERSONAL_AGENT_APP.md',
-  '/android-app': 'ANDROID_APP_BUILD.md',
   '/google-maps-setup': 'GOOGLE_MAPS_SETUP.md'
 };
 
