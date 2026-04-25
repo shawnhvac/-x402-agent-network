@@ -21,3 +21,5 @@ frontend/dist/
 .env
 frontend/.env
 *.env
+*.log
+**/*.log
