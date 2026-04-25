@@ -121,6 +121,7 @@ fun AgentPayProviderApp() {
         )
         "services" -> ServicesManagementScreen(
             onBack = { currentScreen = "dashboard" },
+            onNavigate = { screen -> currentScreen = screen },
             businessId = businessProfile?.id ?: ""
         )
         "bookings" -> BookingsScreen(
