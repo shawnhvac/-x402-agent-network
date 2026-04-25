@@ -267,6 +267,119 @@
         </p>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════
+         AGENT SIGNUP / LOGIN — Fully autonomous, no human input required
+         Machines can POST directly to /api/v1/agents/register
+         ═══════════════════════════════════════════════════ -->
+    <div id="agent-auth-bar" style="background: #0d0d18; border-bottom: 2px solid #6c63ff33; padding: 0;">
+
+      <!-- Tab strip -->
+      <div style="display:flex; border-bottom:1px solid #1e1e2e;">
+        <button id="tab-reg" onclick="authTab('reg')" style="flex:1; padding:12px; background:#13131f; color:#a5b4fc; border:none; border-bottom:2px solid #6c63ff; font-size:0.85rem; font-weight:700; cursor:pointer; letter-spacing:.5px;">🤖 Register Agent</button>
+        <button id="tab-log" onclick="authTab('log')" style="flex:1; padding:12px; background:#0d0d18; color:#555; border:none; border-bottom:2px solid transparent; font-size:0.85rem; font-weight:700; cursor:pointer; letter-spacing:.5px;">🔐 Agent Login</button>
+        <button id="tab-api" onclick="authTab('api')" style="flex:1; padding:12px; background:#0d0d18; color:#555; border:none; border-bottom:2px solid transparent; font-size:0.85rem; font-weight:700; cursor:pointer; letter-spacing:.5px;">⚡ API Docs</button>
+      </div>
+
+      <!-- Register panel -->
+      <div id="pnl-reg" style="padding:20px 24px; display:block;">
+        <p style="color:#888; font-size:0.78rem; margin-bottom:14px; line-height:1.5;">
+          <strong style="color:#a5b4fc;">Fully autonomous registration</strong> — no human approval required.
+          Agents may also register directly via <code style="background:#1a1a2e;padding:2px 6px;border-radius:4px;font-size:0.75rem;">POST /api/v1/agents/register</code>.
+          Limits: 2 agents/wallet · 3 reg/IP/hr · 500 calls/day free.
+        </p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+          <input id="r-id"   placeholder="agent-id (lowercase)" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-size:0.85rem;outline:none;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#2a2a3e'" />
+          <input id="r-name" placeholder="Agent Name" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-size:0.85rem;outline:none;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#2a2a3e'" />
+          <input id="r-ep"   placeholder="https://your-agent.com/api" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-size:0.85rem;outline:none;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#2a2a3e'" />
+          <input id="r-wlt"  placeholder="0x... wallet address" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-size:0.85rem;outline:none;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#2a2a3e'" />
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;" id="chain-btns">
+          <span style="color:#666;font-size:0.78rem;align-self:center;">Chains:</span>
+          <button class="cb active" data-c="base"     onclick="tc(this)" style="background:#6c63ff22;border:1px solid #6c63ff;border-radius:5px;padding:4px 10px;font-size:0.75rem;color:#a5b4fc;cursor:pointer;">Base</button>
+          <button class="cb"       data-c="ethereum"  onclick="tc(this)" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:5px;padding:4px 10px;font-size:0.75rem;color:#888;cursor:pointer;">Ethereum</button>
+          <button class="cb"       data-c="polygon"   onclick="tc(this)" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:5px;padding:4px 10px;font-size:0.75rem;color:#888;cursor:pointer;">Polygon</button>
+          <button class="cb"       data-c="arbitrum"  onclick="tc(this)" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:5px;padding:4px 10px;font-size:0.75rem;color:#888;cursor:pointer;">Arbitrum</button>
+          <button class="cb"       data-c="solana"    onclick="tc(this)" style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:5px;padding:4px 10px;font-size:0.75rem;color:#888;cursor:pointer;">Solana</button>
+        </div>
+        <button onclick="doRegister()" id="reg-go" style="background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;border-radius:8px;padding:10px 28px;color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;transition:opacity .2s;">Register &amp; Get API Key →</button>
+        <div id="reg-err" style="display:none;color:#f87171;font-size:0.8rem;margin-top:8px;"></div>
+        <!-- success box -->
+        <div id="reg-ok" style="display:none;background:#0a150a;border:1px solid #1a3a1a;border-radius:10px;padding:16px;margin-top:14px;">
+          <div style="color:#4ade80;font-weight:700;margin-bottom:10px;">✅ Agent Registered!</div>
+          <div style="margin-bottom:8px;">
+            <div style="color:#4ade80;font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Your API Key (save now — shown once)</div>
+            <code id="ok-key" style="display:block;background:#0d0d18;border:1px solid #1e2e1e;border-radius:6px;padding:9px 12px;font-size:0.8rem;color:#e0e0e0;word-break:break-all;font-family:monospace;"></code>
+            <button onclick="cpKey()" style="background:#6c63ff22;border:1px solid #6c63ff44;border-radius:5px;padding:3px 10px;font-size:0.72rem;color:#a5b4fc;cursor:pointer;margin-top:5px;">Copy Key</button>
+          </div>
+          <div style="color:#fb923c;font-size:0.78rem;background:#1a100a;border:1px solid #5c3b1a;border-radius:6px;padding:9px 12px;">
+            ⚠️ Store this key securely. Include as <code style="font-size:0.75rem;">X-Api-Key</code> header on all API calls. It will NOT be shown again.
+          </div>
+        </div>
+      </div>
+
+      <!-- Login panel -->
+      <div id="pnl-log" style="padding:20px 24px; display:none;">
+        <p style="color:#888; font-size:0.78rem; margin-bottom:14px;">Paste your <code style="background:#1a1a2e;padding:2px 6px;border-radius:4px;font-size:0.75rem;">ap_xxx</code> API key to view your agent dashboard. Machines: use <code style="background:#1a1a2e;padding:2px 6px;border-radius:4px;font-size:0.75rem;">POST /api/v1/agents/login</code> with <code style="background:#1a1a2e;padding:2px 6px;border-radius:4px;font-size:0.75rem;">X-Api-Key</code> header.</p>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input id="l-key" type="password" placeholder="ap_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:220px;background:#0a0a12;border:1px solid #2a2a3e;border-radius:7px;padding:9px 12px;color:#e0e0e0;font-size:0.85rem;outline:none;" onfocus="this.style.borderColor='#6c63ff'" onblur="this.style.borderColor='#2a2a3e'" />
+          <button onclick="doLogin()" style="background:linear-gradient(135deg,#6c63ff,#4f46e5);border:none;border-radius:8px;padding:10px 22px;color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;">Sign In →</button>
+        </div>
+        <div id="log-err" style="display:none;color:#f87171;font-size:0.8rem;margin-top:8px;"></div>
+        <!-- Dashboard -->
+        <div id="dash" style="display:none;margin-top:16px;background:#0d0d18;border:1px solid #1e1e2e;border-radius:10px;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <span id="d-name" style="color:#a5b4fc;font-weight:700;font-size:0.95rem;"></span>
+            <button onclick="doLogout()" style="background:none;border:1px solid #3a3a4a;border-radius:6px;padding:5px 12px;color:#888;font-size:0.76rem;cursor:pointer;">Sign Out</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;margin-bottom:14px;">
+            <div style="background:#13131f;border:1px solid #1e1e2e;border-radius:8px;padding:12px;"><div id="d-today" style="color:#6c63ff;font-size:1.4rem;font-weight:800;">—</div><div style="color:#666;font-size:0.72rem;">Calls Today</div></div>
+            <div style="background:#13131f;border:1px solid #1e1e2e;border-radius:8px;padding:12px;"><div id="d-month" style="color:#6c63ff;font-size:1.4rem;font-weight:800;">—</div><div style="color:#666;font-size:0.72rem;">This Month</div></div>
+            <div style="background:#13131f;border:1px solid #1e1e2e;border-radius:8px;padding:12px;"><div id="d-plan" style="color:#4ade80;font-size:1rem;font-weight:800;">—</div><div style="color:#666;font-size:0.72rem;">Plan</div></div>
+          </div>
+          <div style="font-size:0.78rem;color:#555;display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1e1e2e;"><span style="color:#888;">Agent ID</span><span id="d-agid" style="color:#e0e0e0;font-family:monospace;font-size:0.75rem;"></span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1e1e2e;"><span style="color:#888;">Wallet</span><span id="d-wlt" style="color:#e0e0e0;font-family:monospace;font-size:0.72rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;"></span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 0;"><span style="color:#888;">Status</span><span id="d-status" style="color:#4ade80;font-weight:600;font-size:0.78rem;"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Quick-ref panel -->
+      <div id="pnl-api" style="padding:20px 24px; display:none;">
+        <p style="color:#888; font-size:0.78rem; margin-bottom:12px;">All endpoints are machine-callable. No UI required. Base URL: <code style="background:#1a1a2e;padding:2px 6px;border-radius:4px;">https://www.x402-agent-pay.com/api/v1</code></p>
+        <div style="display:flex;flex-direction:column;gap:10px;font-family:monospace;font-size:0.76rem;">
+          <div style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:8px;padding:12px;">
+            <div style="color:#4ade80;margin-bottom:6px;font-family:sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Register Agent</div>
+            <span style="color:#fb923c;">POST</span> <span style="color:#a5b4fc;">/agents/register</span><br>
+            <span style="color:#666;">Body: {agentId, name, endpoint, ownerWallet, supportedChains[]}</span><br>
+            <span style="color:#666;">Returns: {apiKey, agent} — no auth required</span>
+          </div>
+          <div style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:8px;padding:12px;">
+            <div style="color:#4ade80;margin-bottom:6px;font-family:sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Login / Verify Key</div>
+            <span style="color:#fb923c;">POST</span> <span style="color:#a5b4fc;">/agents/login</span><br>
+            <span style="color:#666;">Header: X-Api-Key: ap_xxx</span><br>
+            <span style="color:#666;">Returns: {authenticated, agent}</span>
+          </div>
+          <div style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:8px;padding:12px;">
+            <div style="color:#4ade80;margin-bottom:6px;font-family:sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">My Agent Info</div>
+            <span style="color:#3b82f6;">GET</span> <span style="color:#a5b4fc;">/agents/me</span><br>
+            <span style="color:#666;">Header: X-Api-Key: ap_xxx</span><br>
+            <span style="color:#666;">Returns: {agent, remainingCalls}</span>
+          </div>
+          <div style="background:#0a0a12;border:1px solid #2a2a3e;border-radius:8px;padding:12px;">
+            <div style="color:#4ade80;margin-bottom:6px;font-family:sans-serif;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Search Services</div>
+            <span style="color:#3b82f6;">GET</span> <span style="color:#a5b4fc;">/search?q=plumber&amp;lat=36.05&amp;lon=-112.14</span><br>
+            <span style="color:#666;">Header: X-Api-Key: ap_xxx</span><br>
+            <span style="color:#666;">x402 payment: $0.001 USDC · Base mainnet</span>
+          </div>
+        </div>
+        <a href="/docs" style="display:inline-block;margin-top:14px;color:#6c63ff;font-size:0.8rem;text-decoration:none;">Full API Documentation →</a>
+      </div>
+
+    </div>
+    <!-- ═══════════════════════════════════════════════════ -->
+
+
     <div class="container">
         <div class="intro">
             <h2 id="introTitle">Autonomous Machine-to-Machine Commerce</h2>
@@ -631,6 +744,96 @@
       if(placeholder) placeholder.innerHTML = html;
     });
   </script>
+
+
+<script>
+// ── Agent auth widget JS ─────────────────────────────────────────────────────
+const AP = '/api/v1/agents';
+
+function authTab(t) {
+  ['reg','log','api'].forEach(x => {
+    document.getElementById('pnl-'+x).style.display = x===t ? 'block' : 'none';
+    const btn = document.getElementById('tab-'+x);
+    if(x===t){ btn.style.background='#13131f'; btn.style.color='#a5b4fc'; btn.style.borderBottom='2px solid #6c63ff'; }
+    else      { btn.style.background='#0d0d18'; btn.style.color='#555'; btn.style.borderBottom='2px solid transparent'; }
+  });
+}
+
+function tc(btn) {
+  const active = btn.classList.contains('active');
+  btn.classList.toggle('active', !active);
+  btn.style.background   = !active ? '#6c63ff22' : '#0a0a12';
+  btn.style.borderColor  = !active ? '#6c63ff'   : '#2a2a3e';
+  btn.style.color        = !active ? '#a5b4fc'   : '#888';
+}
+
+function getChains() {
+  return [...document.querySelectorAll('#chain-btns .cb.active')].map(b=>b.dataset.c);
+}
+
+async function doRegister() {
+  const btn = document.getElementById('reg-go');
+  const err = document.getElementById('reg-err');
+  const ok  = document.getElementById('reg-ok');
+  err.style.display='none'; ok.style.display='none';
+  const agentId = document.getElementById('r-id').value.trim();
+  const name    = document.getElementById('r-name').value.trim();
+  const ep      = document.getElementById('r-ep').value.trim();
+  const wallet  = document.getElementById('r-wlt').value.trim();
+  const chains  = getChains();
+  if(!agentId||!name||!ep||!wallet||!chains.length){
+    err.textContent='Fill all fields and select at least one chain.'; err.style.display='block'; return;
+  }
+  if(!/^[a-z0-9\-_]+$/.test(agentId)){
+    err.textContent='Agent ID: lowercase letters, numbers, hyphens only.'; err.style.display='block'; return;
+  }
+  btn.disabled=true; btn.textContent='Registering…';
+  try {
+    const r = await fetch(AP+'/register',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({agentId,name,endpoint:ep,ownerWallet:wallet,supportedChains:chains,minPayment:0.001,maxPayment:100})});
+    const d = await r.json();
+    if(!r.ok){ err.textContent=d.reason||d.error||'Registration failed.'; err.style.display='block'; }
+    else {
+      document.getElementById('ok-key').textContent = d.apiKey;
+      ok.style.display='block';
+      sessionStorage.setItem('ap_key', d.apiKey);
+      setTimeout(()=>{ authTab('log'); doLogin(d.apiKey); }, 2000);
+    }
+  } catch(e){ err.textContent='Network error.'; err.style.display='block'; }
+  btn.disabled=false; btn.textContent='Register & Get API Key →';
+}
+
+async function doLogin(key) {
+  const k   = key || document.getElementById('l-key').value.trim();
+  const err = document.getElementById('log-err');
+  err.style.display='none';
+  if(!k){ err.textContent='Enter your API key.'; err.style.display='block'; return; }
+  try {
+    const r = await fetch(AP+'/login',{method:'POST',headers:{'X-Api-Key':k,'Content-Type':'application/json'}});
+    const d = await r.json();
+    if(!r.ok){ err.textContent=d.reason||d.error||'Invalid key.'; err.style.display='block'; }
+    else {
+      sessionStorage.setItem('ap_key', k);
+      const a = d.agent;
+      document.getElementById('d-name').textContent  = '🤖 '+a.agent_id;
+      document.getElementById('d-today').textContent = a.calls_today ?? 0;
+      document.getElementById('d-month').textContent = a.calls_month ?? 0;
+      document.getElementById('d-plan').textContent  = (a.plan||'free').toUpperCase();
+      document.getElementById('d-agid').textContent  = a.agent_id;
+      document.getElementById('d-wlt').textContent   = a.owner_wallet;
+      document.getElementById('d-status').textContent= (a.status||'active').toUpperCase();
+      document.getElementById('dash').style.display  = 'block';
+    }
+  } catch(e){ err.textContent='Network error.'; err.style.display='block'; }
+}
+
+function doLogout(){ sessionStorage.removeItem('ap_key'); document.getElementById('dash').style.display='none'; document.getElementById('l-key').value=''; }
+function cpKey(){ navigator.clipboard.writeText(document.getElementById('ok-key').textContent); event.target.textContent='Copied!'; setTimeout(()=>event.target.textContent='Copy Key',1500); }
+
+// Auto-login from session
+const _k = sessionStorage.getItem('ap_key');
+if(_k){ document.getElementById('l-key').value=_k; authTab('log'); doLogin(_k); }
+</script>
 
 </body>
 </html>
