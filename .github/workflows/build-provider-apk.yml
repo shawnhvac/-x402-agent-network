@@ -54,6 +54,9 @@ jobs:
             "$STORE_PASSWORD" "$KEY_ALIAS" "$KEY_PASSWORD" \
             > x402-agent-network/android/keystore.properties
 
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > x402-agent-network/android/local.properties
+
       - name: Build release APK
         working-directory: x402-agent-network/android
         run: gradle assembleRelease --no-daemon --stacktrace
