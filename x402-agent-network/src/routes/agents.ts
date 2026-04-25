@@ -13,6 +13,13 @@ import {
   updateAgent,
   deleteAgent
 } from "../db-sqlite.js";
+import {
+  checkRegistrationSpam,
+  logRegistrationAttempt,
+  issueAgentApiKey,
+  requireAgentAuth,
+  agentLogin
+} from "../agent-auth.js";
 
 const router = Router();
 
@@ -82,6 +89,13 @@ router.post("/register", async (req: Request, res: Response): Promise<any> => {
       ownerWallet,
       version
     } = req.body;
+
+    // Anti-spam check
+    const ip = (req.headers[x-forwarded-for] as string || req.socket.remoteAddress || unknown).split(,)[0].trim();
+    const spamCheck = checkRegistrationSpam(ip, ownerWallet);
+    if (spamCheck.blocked) {
+      return res.status(429).json({ error: Registration blocked, reason: spamCheck.reason });
+    }
 
     // Validation
     if (!agentId || !name || !endpoint || !ownerWallet || !supportedChains) {
@@ -178,6 +192,29 @@ router.delete("/:agentId", async (req: Request, res: Response): Promise<any> => 
   } catch (err) {
     console.error("Error deleting agent:", err);
     res.status(500).json({ error: "Failed to delete agent" });
+  }
+});
+
+// POST /agents/login - Retrieve agent session info by API key
+router.post(/login, async (req: Request, res: Response): Promise<any> => {
+  try {
+    const apiKey = req.headers[x-api-key] as string || req.body?.apiKey;
+    if (!apiKey) return res.status(400).json({ error: API key required in X-Api-Key header or body });
+    const result = agentLogin(apiKey);
+    if (!result.success) return res.status(401).json({ error: Invalid API key, reason: result.reason });
+    return res.json({ authenticated: true, agent: result.agent });
+  } catch (err) {
+    return res.status(500).json({ error: Login failed });
+  }
+});
+
+// GET /agents/me - Get current agent info (requires auth)
+router.get(/me, requireAgentAuth, async (req: Request, res: Response): Promise<any> => {
+  try {
+    const agent = getAgent((req as any).agentId);
+    return res.json({ agent, remainingCalls: (req as any).remainingCalls });
+  } catch (err) {
+    return res.status(500).json({ error: Failed to fetch agent });
   }
 });
 
