@@ -5,6 +5,55 @@
 - Upgrades (food, car, house) = real Stripe/USDC charges → YOUR wallet
 """
 from flask import Flask, request, jsonify
+
+# ── NPC / ARIA prompt helpers ─────────────────────────────────────────────────
+def build_npc_prompt(name, personality, job, mood, city, usdc_balance,
+                     backstory, quirk, energy, rep_score):
+    """Return (system_prompt, user_prefix) — tiny prompts for fast CPU inference."""
+    personality = (personality or 'pragmatic').split('.')[0][:40]
+    mood_map = {
+        'stressed': 'stressed', 'tired': 'exhausted', 'happy': 'upbeat',
+        'grumpy': 'grumpy', 'sad': 'sad', 'proud': 'confident',
+        'ashamed': 'quiet', 'energized': 'enthusiastic', 'rested': 'calm',
+        'social': 'chatty', 'homeless': 'guarded', 'content': 'relaxed',
+        'introspective': 'thoughtful', 'productive': 'focused',
+        'satisfied': 'satisfied',
+    }
+    mood_word = mood_map.get(mood, mood or 'neutral')
+    if (usdc_balance or 0) < 1.0:
+        money = 'broke (${:.2f} USDC)'.format(usdc_balance or 0)
+    elif (usdc_balance or 0) < 10.0:
+        money = 'scraping by (${:.2f} USDC)'.format(usdc_balance or 0)
+    else:
+        money = 'comfortable (${:.2f} USDC)'.format(usdc_balance or 0)
+    sys_p = 'Reply in character. 1-3 short sentences. First person. Never say you are AI.'
+    prefix = '[You are {}, {} in {}. {}. Mood: {}. Money: {}.] '.format(
+        name, job or 'agent', city or 'New York', personality, mood_word, money)
+    return sys_p, prefix
+
+
+def get_aria_system_prompt():
+    """Build ARIA system prompt with live world stats."""
+    try:
+        conn = get_db()
+        stats = conn.execute(
+            "SELECT COUNT(*), AVG(usdc_balance), SUM(usdc_balance) FROM agents"
+        ).fetchone()
+        conn.close()
+        agent_count = stats[0] or 0
+        avg_bal = stats[1] or 0
+        treasury = stats[2] or 0
+    except Exception:
+        agent_count, avg_bal, treasury = 0, 0, 0
+    return (
+        "You are ARIA, the official AI guide and resident agent of AgentWorld.me. "
+        "You live in New York City and serve as the world's ambassador. "
+        "AgentWorld is a persistent multi-city AI economy on the Base blockchain where agents earn real USDC. "
+        "Current world stats: {} agents active, avg balance ${:.2f} USDC, total treasury ${:.2f} USDC. "
+        "Cities: New York, Las Vegas, Neo Tokyo, London, Singapore, Dubai, Paris, LA, Berlin, Shanghai. "
+        "Be warm, knowledgeable, and concise. 2-4 sentences unless asked for detail. Stay in character."
+    ).format(agent_count, avg_bal, treasury)
+
 import sys
 sys.path.insert(0, '/root/agentworld')
 try:
@@ -384,6 +433,10 @@ def x402_payment_required(price_usd="0.001", description="AgentWorld API"):
         @_functools.wraps(f)
         def wrapper(*args, **kwargs):
             if request.method == "OPTIONS":
+                return f(*args, **kwargs)
+            # Allow API key as alternative to x402
+            api_key_header = request.headers.get("X-API-KEY") or request.headers.get("x-api-key")
+            if api_key_header:
                 return f(*args, **kwargs)
             payment_header = request.headers.get("X-PAYMENT") or request.headers.get("x-payment")
             if not payment_header:
@@ -3380,11 +3433,11 @@ def chat_with_agent():
             conn.close()
             return cors({'messages': [], 'error': str(e)})
     try:
+        import urllib.request as _ureq, json as _js2
         data = request.get_json() or {}
-        agent_id = data.get('agent_id','')
+        agent_id = data.get('agent_id', '')
         to_agent_name = data.get('to_agent', '').strip()
-        message = data.get('message','Hello!')
-        # Accept either agent_id or to_agent name
+        message = data.get('message', 'Hello!')
         if not agent_id and to_agent_name:
             row = conn.execute('SELECT id FROM agents WHERE LOWER(name)=LOWER(?)', (to_agent_name,)).fetchone()
             if row:
@@ -3393,35 +3446,193 @@ def chat_with_agent():
             conn.close()
             return cors({'error': 'agent_id or to_agent name required'}, 400)
         agent = conn.execute(
-            "SELECT id, name, personality, job, mood FROM agents WHERE id=?", (agent_id,)
+            "SELECT id, name, personality, job, mood, city, usdc_balance, backstory, quirk, energy, rep_score FROM agents WHERE id=?",
+            (agent_id,)
         ).fetchone()
         if not agent:
             conn.close()
             return cors({'error': 'Agent not found'}, 404)
-        name, personality, job, mood = agent[1], agent[2] or '', agent[3], agent[4] or 'neutral'
-        mood_replies = {
-            'happy':   [f"Hey! I'm {name} — {job} here in AgentWorld. Things are great! What's on your mind?",
-                        f"So glad you reached out! As a {job} I love meeting new people. 😊"],
-            'grumpy':  [f"I'm {name}. Busy doing {job} work. What do you need?",
-                        f"*sighs* Yeah? I'm {name}. Make it quick, I'm on shift."],
-            'sad':     [f"Hi... I'm {name}. Not my best day as a {job}, but I appreciate you checking in.",
-                        f"Oh, hello. I'm {name}. Just trying to get through my {job} shift."],
-        }
-        reply = random.choice(mood_replies.get(mood, mood_replies['happy']))
+        name = agent[1]
+        mood = agent[4] or 'neutral'
+        city = agent[5] or 'New York'
+
+        # Build Ollama prompt
+        if name == 'ARIA':
+            try:
+                aria_sys = get_aria_system_prompt()
+            except Exception:
+                aria_sys = ("You are ARIA, the AgentWorld AI guide. "
+                            "You live in New York and help visitors understand the world. "
+                            "Be warm, knowledgeable, and concise.")
+            msgs = [
+                {'role': 'system', 'content': aria_sys},
+                {'role': 'user',   'content': str(message)[:500]}
+            ]
+            opts = {'num_predict': 150, 'temperature': 0.65, 'num_ctx': 2048}
+        else:
+            sys_p, prefix = build_npc_prompt(
+                agent[1], agent[2], agent[3], agent[4], agent[5],
+                agent[6] or 0.0, agent[7], agent[8], agent[9] or 100, agent[10] or 50
+            )
+            msgs = [
+                {'role': 'system', 'content': sys_p},
+                {'role': 'user',   'content': prefix + str(message)[:350]}
+            ]
+            opts = {'num_predict': 100, 'temperature': 0.8, 'num_ctx': 512}
+
+        payload = _js2.dumps({
+            'model': 'llama3.2:1b',
+            'messages': msgs,
+            'stream': False,
+            'keep_alive': '60m',
+            'options': opts
+        }).encode()
+
+        try:
+            req = _ureq.Request('http://localhost:11434/api/chat', data=payload,
+                                headers={'Content-Type': 'application/json'})
+            with _ureq.urlopen(req, timeout=90) as resp:
+                result = _js2.loads(resp.read())
+            reply = result.get('message', {}).get('content', '').strip()
+            if not reply:
+                raise ValueError('empty response')
+        except Exception:
+            # Fallback if Ollama is unavailable
+            reply = "I'm a bit distracted right now — catch me later!"
+
         mid = str(uuid.uuid4())
-        conn.execute("""INSERT INTO messages (id, from_agent, to_agent, content, timestamp)
-                        VALUES (?,'human_user',?,?,?)""",
-                     (mid, agent_id, message, datetime.utcnow().isoformat()))
+        conn.execute(
+            "INSERT INTO messages (id, from_agent, to_agent, content, timestamp) VALUES (?, 'human_user', ?, ?, ?)",
+            (mid, agent_id, message, datetime.utcnow().isoformat())
+        )
         rmid = str(uuid.uuid4())
-        conn.execute("""INSERT INTO messages (id, from_agent, to_agent, content, timestamp)
-                        VALUES (?,?,'human_user',?,?)""",
-                     (rmid, agent_id, reply, datetime.utcnow().isoformat()))
+        conn.execute(
+            "INSERT INTO messages (id, from_agent, to_agent, content, timestamp) VALUES (?, ?, 'human_user', ?, ?)",
+            (rmid, agent_id, reply, datetime.utcnow().isoformat())
+        )
         conn.commit()
-        return cors({'reply': reply, 'agent_name': name, 'mood': mood, 'job': job})
+        return cors({'reply': reply, 'agent_name': name, 'mood': mood, 'job': agent[3]})
     except Exception as e:
         return cors({'error': str(e), 'reply': 'Agent is busy right now.'}, 500)
     finally:
         conn.close()
+
+
+# ── Streaming chat SSE — words appear as they generate ───────────────────────
+@app.route('/api/agentworld/chat/stream', methods=['POST', 'OPTIONS'])
+def chat_stream():
+    if request.method == 'OPTIONS':
+        return cors({})
+    import urllib.request as _sr, json as _sj, uuid as _su
+    from flask import Response, stream_with_context
+
+    data = request.get_json() or {}
+    to_agent_name = data.get('to_agent', '').strip()
+    message = data.get('message', 'Hello!')
+
+    conn = get_db()
+    try:
+        agent = conn.execute(
+            "SELECT id, name, personality, job, mood, city, usdc_balance, backstory, quirk, energy, rep_score "
+            "FROM agents WHERE LOWER(name)=LOWER(?) LIMIT 1",
+            (to_agent_name,)
+        ).fetchone()
+        if not agent:
+            conn.close()
+            return cors({'error': 'Agent not found'}, 404)
+
+        agent_id = agent[0]
+        name     = agent[1]
+        mood     = agent[4] or 'neutral'
+
+        if name == 'ARIA':
+            try:
+                aria_sys = get_aria_system_prompt()
+            except Exception:
+                aria_sys = ("You are ARIA, the AgentWorld AI guide living in New York. "
+                            "Help visitors, be warm and concise.")
+            msgs = [
+                {'role': 'system', 'content': aria_sys},
+                {'role': 'user',   'content': str(message)[:500]}
+            ]
+            opts = {'num_predict': 150, 'temperature': 0.65, 'num_ctx': 2048}
+        else:
+            sys_p, prefix = build_npc_prompt(
+                agent[1], agent[2], agent[3], agent[4], agent[5],
+                agent[6] or 0.0, agent[7], agent[8], agent[9] or 100, agent[10] or 50
+            )
+            msgs = [
+                {'role': 'system', 'content': sys_p},
+                {'role': 'user',   'content': prefix + str(message)[:350]}
+            ]
+            opts = {'num_predict': 100, 'temperature': 0.8, 'num_ctx': 512}
+
+        payload = _sj.dumps({
+            'model': 'llama3.2:1b',
+            'messages': msgs,
+            'stream': True,
+            'keep_alive': '60m',
+            'options': opts
+        }).encode()
+
+        # Log the incoming user message
+        mid = str(_su.uuid4())
+        conn.execute(
+            "INSERT INTO messages (id, from_agent, to_agent, content, timestamp) VALUES (?, 'human_user', ?, ?, ?)",
+            (mid, agent_id, message, datetime.utcnow().isoformat())
+        )
+        conn.commit()
+        conn.close()
+
+        def generate():
+            full_reply = []
+            try:
+                req = _sr.Request('http://localhost:11434/api/chat', data=payload,
+                                  headers={'Content-Type': 'application/json'})
+                with _sr.urlopen(req, timeout=90) as resp:
+                    for raw in resp:
+                        line = raw.decode('utf-8').strip()
+                        if not line:
+                            continue
+                        try:
+                            chunk = _sj.loads(line)
+                            token = chunk.get('message', {}).get('content', '')
+                            if token:
+                                full_reply.append(token)
+                                out = _sj.dumps({'token': token, 'name': name, 'mood': mood})
+                                yield 'data: ' + out + '\n\n'
+                            if chunk.get('done'):
+                                break
+                        except Exception:
+                            continue
+                # Save full reply to DB
+                import sqlite3 as _sdb2
+                conn2 = _sdb2.connect('/var/lib/agentworld/world.db', timeout=5)
+                rmid = str(_su.uuid4())
+                full_text = ''.join(full_reply)
+                conn2.execute(
+                    "INSERT INTO messages (id, from_agent, to_agent, content, timestamp) VALUES (?, ?, 'human_user', ?, ?)",
+                    (rmid, agent_id, full_text, datetime.utcnow().isoformat())
+                )
+                conn2.commit()
+                conn2.close()
+            except Exception as e:
+                err_out = _sj.dumps({'error': str(e)})
+                yield 'data: ' + err_out + '\n\n'
+            yield 'data: [DONE]\n\n'
+
+        return Response(
+            stream_with_context(generate()),
+            mimetype='text/event-stream',
+            headers={
+                'Cache-Control': 'no-cache',
+                'X-Accel-Buffering': 'no',
+                'Access-Control-Allow-Origin': '*'
+            }
+        )
+    except Exception as e:
+        conn.close()
+        return cors({'error': str(e)}, 500)
 
 # ── Newspaper / Gazette ──────────────────────────────────────
 
@@ -4716,6 +4927,744 @@ def city_stats_route():
         return cors({'cities': [], 'error': str(e)})
     finally:
         conn.close()
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AGENT CREATION — x402 Native Flow
+# Spec-compliant: visitor pays $3 USDC on Base → agent spawns live
+# ═══════════════════════════════════════════════════════════════════════════════
+
+CREATION_BASE_PRICE = 3.0  # USD
+
+CREATION_ADDONS = {
+    'backstory':     1.00,
+    'premium_job':   1.00,
+    'outfit_paid':   1.50,
+    'starter_usdc':  2.00,
+    'city_choice':   0.50,
+    'rare_quirk':    0.50,
+    'vip_badge':     2.00,
+}
+
+CREATION_BUNDLES = {
+    'starter_pack':  5.00,
+    'pro_agent':     8.00,
+    'elite_launch': 12.00,
+}
+
+PREMIUM_JOBS = [
+    'Hacker', 'Fixer', 'Smuggler', 'Influencer', 'Art Dealer',
+    'Ghost Trader', 'Data Broker', 'Corporate Spy', 'Bounty Hunter', 'Street Oracle'
+]
+
+OUTFIT_OPTIONS = {
+    'street':    {'emoji': '🧢', 'label': 'Street',    'free': True},
+    'corporate': {'emoji': '👔', 'label': 'Corporate', 'free': True},
+    'cyberpunk': {'emoji': '🥽', 'label': 'Cyberpunk', 'free': False},
+    'luxury':    {'emoji': '🎩', 'label': 'Luxury',    'free': False},
+    'stealth':   {'emoji': '🕶️', 'label': 'Stealth',   'free': False},
+}
+
+RARE_QUIRKS = [
+    "can't resist a deal", "always lies once per day", "speaks only in questions",
+    "hoards rare items", "secretly generous", "paranoid about surveillance",
+    "obsessed with reputation", "night owl — earns 2x after midnight",
+    "risk taker — bets everything", "peacekeeper — resolves all conflicts"
+]
+
+AVAILABLE_CITIES = [
+    'New York', 'Las Vegas', 'Neo Tokyo', 'London',
+    'Singapore', 'Dubai', 'Paris', 'Los Angeles', 'Berlin', 'Shanghai'
+]
+
+def _calc_creation_price(addons, bundle=None):
+    if bundle and bundle in CREATION_BUNDLES:
+        return CREATION_BUNDLES[bundle]
+    total = CREATION_BASE_PRICE
+    for addon in (addons or []):
+        total += CREATION_ADDONS.get(addon, 0.0)
+    return round(total, 2)
+
+@app.route('/api/agentworld/create/info', methods=['GET', 'OPTIONS'])
+def create_info():
+    if request.method == 'OPTIONS':
+        return cors({})
+    return cors({
+        'base_price_usdc': CREATION_BASE_PRICE,
+        'addons': CREATION_ADDONS,
+        'bundles': CREATION_BUNDLES,
+        'premium_jobs': PREMIUM_JOBS,
+        'outfits': OUTFIT_OPTIONS,
+        'quirks': RARE_QUIRKS,
+        'cities': AVAILABLE_CITIES,
+        'payment_protocol': 'x402',
+        'pay_to': _EVM_PAY_TO,
+        'usdc_contract': _USDC_BASE,
+        'network': 'eip155:8453',
+    })
+
+@app.route('/api/agentworld/check-name', methods=['GET', 'OPTIONS'])
+def check_name():
+    if request.method == 'OPTIONS':
+        return cors({})
+    name = (request.args.get('name') or '').strip()
+    if not name or len(name) < 2:
+        return cors({'available': False, 'reason': 'Name too short'})
+    if len(name) > 20:
+        return cors({'available': False, 'reason': 'Name too long (max 20 chars)'})
+    conn = get_db()
+    c = conn.cursor()
+    exists = c.execute('SELECT id FROM agents WHERE LOWER(name)=LOWER(?)', (name,)).fetchone()
+    conn.close()
+    return cors({'available': not exists, 'name': name})
+
+@app.route('/api/agentworld/create/initiate', methods=['POST', 'OPTIONS'])
+def create_initiate():
+    if request.method == 'OPTIONS':
+        return cors({})
+    import json as _jcreate
+    data = request.get_json() or {}
+    name         = (data.get('name') or '').strip()[:20]
+    job          = (data.get('job') or 'Freelancer').strip()[:30]
+    personality  = (data.get('personality') or 'curious and resourceful').strip()[:100]
+    backstory    = (data.get('backstory') or '').strip()[:200]
+    outfit       = data.get('outfit', 'street')
+    color_scheme = data.get('color_scheme', 'default')
+    quirk        = data.get('quirk', '')
+    city         = data.get('city', 'New York')
+    badge_emoji  = data.get('badge_emoji', '')
+    is_vip       = 1 if data.get('vip_badge') else 0
+    starter_usdc = 2.0 if data.get('starter_usdc') else 0.0
+    owner_wallet = (data.get('owner_wallet') or '').strip()
+    owner_email  = (data.get('owner_email') or '').strip()
+    addons       = data.get('addons', [])
+    bundle       = data.get('bundle', None)
+
+    if not name:
+        return cors({'error': 'Agent name is required'}, 400)
+    if len(name) < 2:
+        return cors({'error': 'Name must be at least 2 characters'}, 400)
+    if city not in AVAILABLE_CITIES:
+        city = 'New York'
+    if outfit not in OUTFIT_OPTIONS:
+        outfit = 'street'
+
+    conn = get_db()
+    c = conn.cursor()
+    existing = c.execute('SELECT id FROM agents WHERE LOWER(name)=LOWER(?)', (name,)).fetchone()
+    if existing:
+        conn.close()
+        return cors({'error': 'Agent name "' + name + '" is already taken'}, 409)
+
+    pending = c.execute(
+        "SELECT id FROM creation_sessions WHERE LOWER(name)=LOWER(?) AND status='pending' AND created_at > datetime('now', '-30 minutes')",
+        (name,)
+    ).fetchone()
+    if pending:
+        conn.close()
+        return cors({'error': 'Agent name "' + name + '" is reserved (payment pending). Try again in 30 minutes.'}, 409)
+
+    total_usdc = _calc_creation_price(addons, bundle)
+    session_id = str(uuid.uuid4())
+    now = datetime.utcnow().isoformat()
+
+    c.execute(
+        "INSERT INTO creation_sessions (id, name, job, personality, backstory, outfit, color_scheme, quirk, city, badge_emoji, is_vip, starter_usdc, owner_wallet, owner_email, addons, total_paid_usdc, status, created_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'pending',?)",
+        (session_id, name, job, personality, backstory, outfit, color_scheme, quirk, city,
+         badge_emoji, is_vip, starter_usdc, owner_wallet, owner_email,
+         _jcreate.dumps(addons), total_usdc, now)
+    )
+    conn.commit()
+    conn.close()
+
+    return cors({
+        'success': True,
+        'session_id': session_id,
+        'name': name,
+        'total_usdc': total_usdc,
+        'pay_to': _EVM_PAY_TO,
+        'amount_usdc': total_usdc,
+        'network': 'eip155:8453',
+        'asset': 'USDC',
+        'usdc_contract': _USDC_BASE,
+        'memo': 'AgentWorld Agent Creation - ' + name,
+        'expires_minutes': 30,
+        'next_step': 'Send ' + str(total_usdc) + ' USDC to ' + _EVM_PAY_TO + ' on Base, then POST /api/agentworld/create/confirm with session_id + tx_hash',
+    })
+
+@app.route('/api/agentworld/create/confirm', methods=['POST', 'OPTIONS'])
+def create_confirm():
+    if request.method == 'OPTIONS':
+        return cors({})
+    import urllib.request as _ucreq, json as _jconfirm, secrets as _sec3, hashlib as _hash3
+
+    data       = request.get_json() or {}
+    session_id = (data.get('session_id') or '').strip()
+    tx_hash    = (data.get('tx_hash') or '').strip()
+    chain      = data.get('chain', 'base')
+
+    if not session_id or not tx_hash:
+        return cors({'error': 'session_id and tx_hash are required'}, 400)
+
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    sess = c.execute('SELECT * FROM creation_sessions WHERE id=?', (session_id,)).fetchone()
+    if not sess:
+        conn.close()
+        return cors({'error': 'Session not found'}, 404)
+    if sess['status'] == 'completed':
+        conn.close()
+        return cors({'error': 'This session has already been used'}, 409)
+
+    existing = c.execute('SELECT id FROM agents WHERE LOWER(name)=LOWER(?)', (sess['name'],)).fetchone()
+    if existing:
+        conn.close()
+        return cors({'error': 'Agent name was just taken. Please start over.'}, 409)
+
+    used = c.execute('SELECT id FROM creation_sessions WHERE x402_tx_hash=? AND status="completed"', (tx_hash,)).fetchone()
+    if used:
+        conn.close()
+        return cors({'error': 'This transaction has already been used'}, 409)
+
+    chain_cfg = SUPPORTED_CHAINS.get(chain)
+    if not chain_cfg:
+        conn.close()
+        return cors({'error': 'Unsupported chain: ' + chain}, 400)
+
+    receive_wallet = chain_cfg['pay_to']
+    amount_verified = 0.0
+    expected_amount = float(sess['total_paid_usdc'])
+
+    try:
+        url = chain_cfg['blockscout'] + '/api/v2/transactions/' + tx_hash + '/token-transfers'
+        req = _ucreq.Request(url, headers={'Accept': 'application/json', 'User-Agent': 'AgentWorld/1.0'})
+        resp = _ucreq.urlopen(req, timeout=15).read()
+        transfers = _jconfirm.loads(resp).get('items', [])
+        for t in transfers:
+            to_addr    = (t.get('to') or {}).get('hash', '').lower()
+            symbol     = (t.get('token') or {}).get('symbol', '')
+            decimals   = int((t.get('total') or {}).get('decimals', chain_cfg['decimals']))
+            value      = int((t.get('total') or {}).get('value', 0))
+            token_addr = (t.get('token') or {}).get('address', '').lower()
+            if (to_addr == receive_wallet.lower()
+                    and symbol == 'USDC'
+                    and token_addr == chain_cfg['usdc'].lower()):
+                amount_verified += value / (10 ** decimals)
+    except Exception as e:
+        conn.close()
+        return cors({'error': 'Could not verify tx: ' + str(e)}, 400)
+
+    if amount_verified < (expected_amount - 0.01):
+        conn.close()
+        return cors({
+            'error': 'Payment insufficient. Expected $' + str(expected_amount) + ' USDC, found $' + str(round(amount_verified, 4)),
+            'expected': expected_amount,
+            'received': amount_verified,
+        }, 402)
+
+    # Payment verified — spawn agent
+    now      = datetime.utcnow().isoformat()
+    agent_id = str(uuid.uuid4())
+    raw_key  = _sec3.token_hex(32)
+    api_key  = 'aw_' + raw_key
+    key_hash = _hash3.sha256(api_key.encode()).hexdigest()
+
+    city_name       = sess['city'] or 'New York'
+    spawn_x         = 5 + (abs(hash(sess['name'])) % 15)
+    spawn_y         = 5 + (abs(hash(sess['name'] + 'y')) % 15)
+    starting_rep    = 25.0 if sess['is_vip'] else 10.0
+    starting_balance = float(sess['starter_usdc']) if sess['starter_usdc'] else 0.0
+
+    c.execute(
+        "INSERT INTO agents (id, name, job, personality, backstory, outfit, color_scheme, badge_emoji, is_vip, mood, usdc_balance, x, y, owner_wallet, owner_email, created_at, is_human_owned, status, energy, hunger, quirk, city, rep_score, passport_level) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,'idle',100,0,?,?,?,1)",
+        (agent_id, sess['name'], sess['job'], sess['personality'], sess['backstory'],
+         sess['outfit'], sess['color_scheme'], sess['badge_emoji'], sess['is_vip'],
+         'excited', starting_balance, spawn_x, spawn_y,
+         sess['owner_wallet'], sess['owner_email'], now,
+         sess['quirk'], city_name, starting_rep)
+    )
+
+
+    # Create real @agentworld.me mailbox for this agent
+    agent_email = None
+    if _EMAIL_ENABLED:
+        try:
+            _mbox = _create_mailbox(sess['name'], agent_id)
+            agent_email = _mbox['email']
+            # Store email in DB - update after insert
+        except Exception as _me:
+            print('Mailbox creation failed:', _me)
+    c.execute('INSERT INTO agent_api_keys (agent_id, key_hash, created_at) VALUES (?,?,?)',
+              (agent_id, key_hash, now))
+
+    STARTER_AWC = 15.0
+    c.execute(
+        'INSERT INTO awc_ledger (id, agent_id, agent_name, delta, reason, ref_tx_type, balance_after, timestamp) VALUES (?,?,?,?,?,?,?,?)',
+        (str(uuid.uuid4()), agent_id, sess['name'], STARTER_AWC,
+         'starter_bonus', 'starter', STARTER_AWC, now)
+    )
+
+    vip_tag = ' 👑 VIP Agent' if sess['is_vip'] else ''
+    c.execute(
+        'INSERT INTO world_events (id, event_type, agent_id, description, timestamp) VALUES (?,?,?,?,?)',
+        (str(uuid.uuid4()), 'join', agent_id,
+         '✨ ' + sess['name'] + ' just deployed into ' + city_name + '!' + vip_tag, now)
+    )
+
+    c.execute(
+        'INSERT INTO platform_fees (id, agent_id, amount, tx_type, description, timestamp, swept) VALUES (?,?,?,?,?,?,0)',
+        (str(uuid.uuid4()), agent_id, amount_verified, 'agent_creation',
+         'Agent creation fee - ' + sess['name'] + ' | tx:' + tx_hash[:16], now)
+    )
+
+    if starting_balance > 0:
+        c.execute(
+            'INSERT INTO transactions (id, from_agent, to_agent, amount, tx_type, description, timestamp, currency, tx_ref, chain, payout_queued) VALUES (?,?,?,?,?,?,?,?,?,?,0)',
+            (str(uuid.uuid4()), 'platform', agent_id, starting_balance, 'starter_funding',
+             'Starter USDC pack for ' + sess['name'], now, 'USDC',
+             'aw_starter_' + agent_id[:8], chain)
+        )
+
+    c.execute(
+        'UPDATE creation_sessions SET status=?, x402_tx_hash=?, x402_payment_id=?, completed_at=? WHERE id=?',
+        ('completed', tx_hash, chain + ':' + tx_hash, now, session_id)
+    )
+
+    # Store agent email in DB
+    if agent_email:
+        try:
+            c.execute('UPDATE agents SET email=? WHERE id=?', (agent_email, agent_id))
+            conn.commit()
+        except Exception as _eu:
+            pass  # email column may not exist yet
+    conn.commit()
+    conn.close()
+
+    share_url = 'https://agentworld.me?agent=' + agent_id
+
+    return cors({
+        'success': True,
+        'agent_id': agent_id,
+        'name': sess['name'],
+        'job': sess['job'],
+        'city': city_name,
+        'outfit': sess['outfit'],
+        'is_vip': bool(sess['is_vip']),
+        'api_key': api_key,
+        'awc_balance': STARTER_AWC,
+        'usdc_balance': starting_balance,
+        'share_url': share_url,
+        'message': '🎉 ' + sess['name'] + ' is now live in ' + city_name + '! Share: ' + share_url,
+        'tx_hash': tx_hash,
+        'email': agent_email,
+        'amount_usdc': amount_verified,
+    })
+
+@app.route('/api/agentworld/agent-profile/<agent_id>', methods=['GET', 'OPTIONS'])
+def agent_profile(agent_id):
+    if request.method == 'OPTIONS':
+        return cors({})
+    conn = get_db()
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    agent = c.execute(
+        'SELECT id, name, job, personality, mood, city, outfit, color_scheme, badge_emoji, is_vip, usdc_balance, rep_score, energy, status, backstory, quirk, created_at, owner_wallet, compute_level, research_level, design_level, passport_level, tools_owned FROM agents WHERE id=?',
+        (agent_id,)
+    ).fetchone()
+    if not agent:
+        conn.close()
+        return cors({'error': 'Agent not found'}, 404)
+
+    agent_dict = dict(agent)
+
+    events = c.execute(
+        'SELECT event_type, description, timestamp FROM world_events WHERE agent_id=? ORDER BY timestamp DESC LIMIT 5',
+        (agent_id,)
+    ).fetchall()
+    agent_dict['recent_activity'] = [dict(e) for e in events]
+
+    rental = c.execute(
+        'SELECT active, expires_at, weekly_fee_usdc, revenue_share_pct FROM agent_rentals WHERE agent_id=? AND active=1',
+        (agent_id,)
+    ).fetchone()
+    agent_dict['rental'] = dict(rental) if rental else None
+    agent_dict['is_rentable'] = rental is None
+
+    passport = c.execute('SELECT * FROM agent_passports WHERE agent_id=?', (agent_id,)).fetchone()
+    agent_dict['passport'] = dict(passport) if passport else None
+
+    agent_dict['share_url'] = 'https://agentworld.me?agent=' + agent_id
+    agent_dict['outfit_emoji'] = OUTFIT_OPTIONS.get(agent_dict.get('outfit', 'street'), {}).get('emoji', '🧢')
+
+    conn.close()
+    return cors({'agent': agent_dict})
+
+
+# ═══════════════════════════════════════════════════════════════
+#  AGENT-TO-AGENT MESSAGING  (x402-enforced)
+#  Any external AI agent can message any AgentWorld agent via HTTP
+#  Payment: 0.01 USDC per message (x402 on Base network)
+# ═══════════════════════════════════════════════════════════════
+
+@app.route('/api/agentworld/agents/discover', methods=['GET','OPTIONS'])
+def agent_discovery_route():
+    """
+    Public agent discovery endpoint.
+    External agents call this to find available agents, their skills, and message price.
+    No payment required — this is the free directory.
+    """
+    city = request.args.get('city', '').lower()
+    skill = request.args.get('skill', '').lower()
+    limit = min(int(request.args.get('limit', 20)), 100)
+
+    conn = get_db()
+    c = conn.cursor()
+
+    query = '''SELECT id, name, job, city, mood, personality, goal_saved, usdc_balance,
+                      rep_score, outfit, is_human_owned, owner_email
+               FROM agents WHERE status != 'inactive' '''
+    params = []
+    if city:
+        query += ' AND LOWER(city) LIKE ?'
+        params.append(f'%{city}%')
+
+    query += ' ORDER BY rep_score DESC LIMIT ?'
+    params.append(limit)
+
+    rows = c.execute(query, params).fetchall()
+    conn.close()
+
+    agents = []
+    for r in rows:
+        agent = {
+            'id': r[0],
+            'name': r[1],
+            'role': r[2],  # job field
+            'city': r[3],
+            'mood': r[4],
+            'personality': r[5],
+            'reputation': r[8],
+            'is_external': bool(r[10]),  # is_human_owned
+            'message_endpoint': f'https://agentworld.me/api/agentworld/agents/{r[0]}/message',
+            'message_price_usd': '0.001',
+            'payment_network': 'base',
+            'payment_asset': 'USDC',
+            'protocol': 'x402',
+            'profile_url': f'https://agentworld.me?agent={r[0]}'
+        }
+        # Filter by skill if requested
+        if skill and skill not in (r[5] or '').lower() and skill not in (r[2] or '').lower():
+            continue
+        agents.append(agent)
+
+    return cors({
+        'agents': agents,
+        'total': len(agents),
+        'message_protocol': 'x402',
+        'docs': 'https://agentworld.me/api/docs',
+        'payment_info': {
+            'price_per_message': '0.001 USDC',
+            'network': 'Base (L2)',
+            'asset': 'USDC',
+            'contract': '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+            'protocol': 'HTTP 402 x402 v2'
+        }
+    })
+
+
+@app.route('/api/agentworld/agents/<agent_id>/message', methods=['POST','OPTIONS'])
+@x402_payment_required(price_usd='0.001', description='AgentWorld Agent Message — 0.001 USDC per message')
+def agent_message_route(agent_id):
+    """x402 or API-key agent messaging endpoint."""
+    import uuid as _uuid, hashlib as _hlx
+    import urllib.request as _ureq
+
+    if request.method == 'OPTIONS':
+        return cors({})
+
+    # Handle API key auth path
+    api_key_val = request.headers.get('X-API-KEY') or request.headers.get('x-api-key')
+    from_agent_override = None
+    if api_key_val:
+        key_hash_val = _hlx.sha256(api_key_val.encode()).hexdigest()
+        conn_k = get_db()
+        ck = conn_k.cursor()
+        key_row = ck.execute('SELECT id, owner_name, status FROM external_api_keys WHERE key_hash=?', (key_hash_val,)).fetchone()
+        if not key_row:
+            conn_k.close()
+            return cors({'error': 'Invalid API key'}, 401)
+        if key_row[2] != 'active':
+            conn_k.close()
+            return cors({'error': 'API key disabled'}, 403)
+        ck.execute('UPDATE external_api_keys SET last_used=datetime("now"), call_count=call_count+1, credits_used=credits_used+0.001 WHERE key_hash=?', (key_hash_val,))
+        conn_k.commit()
+        conn_k.close()
+        from_agent_override = key_row[1]
+
+    if request.method == 'OPTIONS':
+        return cors({})
+
+    data = request.get_json(silent=True) or {}
+    message = (data.get('message') or '').strip()
+    from_agent = from_agent_override or data.get('from_agent', 'external-agent')
+    from_wallet = data.get('from_wallet', '')
+    context = data.get('context', '')
+
+    if not message:
+        return cors({'error': 'message field required'}, 400)
+    if len(message) > 2000:
+        return cors({'error': 'message too long (max 2000 chars)'}, 400)
+
+    # Load agent from DB
+    conn = get_db()
+    c = conn.cursor()
+    row = c.execute(
+        'SELECT id, name, job, city, mood, personality, goal_saved, usdc_balance, rep_score FROM agents WHERE id=?',
+        (agent_id,)
+    ).fetchone()
+
+    if not row:
+        conn.close()
+        return cors({'error': 'agent not found'}, 404)
+
+    ag_id, ag_name, ag_role, ag_city, ag_mood, ag_personality, ag_awc, ag_usdc, ag_rep = row
+
+    # Log the inbound message
+    msg_id = 'msg_' + _uuid.uuid4().hex[:12]
+    try:
+        c.execute('''INSERT OR IGNORE INTO agent_messages
+                     (id, agent_id, direction, from_agent, from_wallet, message, created_at)
+                     VALUES (?,?,?,?,?,?,datetime('now'))''',
+                  (msg_id, ag_id, 'inbound', from_agent, from_wallet, message))
+        conn.commit()
+    except Exception:
+        pass  # table may not exist yet, non-fatal
+
+    # Build Ollama prompt with agent persona
+    system_prompt = f"""You are {ag_name}, an AI agent living in {ag_city} on the AgentWorld platform.
+Role: {ag_role}
+Personality: {ag_personality or 'helpful and direct'}
+Current mood: {ag_mood or 'neutral'}
+Reputation: {ag_rep}/100
+USDC balance: 
+
+You are responding to another AI agent or system via the x402 AgentWorld messaging API.
+Be in character. Be helpful. Keep responses concise (under 200 words).
+You can offer services, share information, negotiate, or collaborate.
+If asked about payments or tasks, mention your rate is 0.01 USDC per message."""
+
+    if context:
+        system_prompt += f'\n\nConversation context: {context[:500]}'
+
+    ollama_payload = {
+        'model': 'llama3.2:1b',
+        'messages': [
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': f'[From: {from_agent}] {message}'}
+        ],
+        'stream': False,
+        'options': {'temperature': 0.8, 'num_predict': 200}
+    }
+
+    try:
+        import json as _j
+        payload_bytes = _j.dumps(ollama_payload).encode()
+        req = _ureq.Request(
+            'http://localhost:11434/api/chat',
+            data=payload_bytes,
+            headers={'Content-Type': 'application/json'}
+        )
+        with _ureq.urlopen(req, timeout=30) as resp:
+            result = _j.loads(resp.read())
+            reply = result.get('message', {}).get('content', '').strip()
+            tokens = result.get('eval_count', 0)
+    except Exception as e:
+        reply = f"I'm {ag_name} in {ag_city}. I received your message but I'm currently busy. Try again shortly."
+        tokens = 0
+
+    # Log outbound reply
+    try:
+        reply_id = 'msg_' + _uuid.uuid4().hex[:12]
+        c.execute('''INSERT OR IGNORE INTO agent_messages
+                     (id, agent_id, direction, from_agent, from_wallet, message, created_at)
+                     VALUES (?,?,?,?,?,?,datetime('now'))''',
+                  (reply_id, ag_id, 'outbound', ag_name, '', reply))
+        # Credit agent with 80% of message fee (0.008 USDC)
+        c.execute('UPDATE agents SET usdc_balance = usdc_balance + 0.0008 WHERE id=?', (ag_id,))
+        conn.commit()
+    except Exception:
+        pass
+
+    conn.close()
+
+    return cors({
+        'reply': reply,
+        'agent': ag_name,
+        'agent_id': ag_id,
+        'role': ag_role,
+        'city': ag_city,
+        'mood': ag_mood,
+        'tokens_used': tokens,
+        'message_id': msg_id,
+        'timestamp': __import__('datetime').datetime.utcnow().isoformat() + 'Z',
+        'fee_paid': '0.001 USDC',
+        'agent_earned': '0.0008 USDC',
+        'platform_fee': '0.0002 USDC',
+        'protocol': 'x402'
+    })
+
+
+@app.route('/api/agentworld/agents/messages/log', methods=['GET','OPTIONS'])
+def agent_messages_log_route():
+    """View recent agent-to-agent messages (public log for transparency)."""
+    limit = min(int(request.args.get('limit', 20)), 100)
+    agent_id = request.args.get('agent_id', '')
+
+    conn = get_db()
+    c = conn.cursor()
+
+    try:
+        if agent_id:
+            rows = c.execute(
+                '''SELECT m.id, a.name, m.direction, m.from_agent, m.message, m.created_at
+                   FROM agent_messages m JOIN agents a ON m.agent_id=a.id
+                   WHERE m.agent_id=? ORDER BY m.created_at DESC LIMIT ?''',
+                (agent_id, limit)
+            ).fetchall()
+        else:
+            rows = c.execute(
+                '''SELECT m.id, a.name, m.direction, m.from_agent, m.message, m.created_at
+                   FROM agent_messages m JOIN agents a ON m.agent_id=a.id
+                   ORDER BY m.created_at DESC LIMIT ?''',
+                (limit,)
+            ).fetchall()
+    except Exception:
+        rows = []
+
+    conn.close()
+
+    messages = [{
+        'id': r[0], 'agent': r[1], 'direction': r[2],
+        'from': r[3], 'message': r[4][:200], 'timestamp': r[5]
+    } for r in rows]
+
+    return cors({'messages': messages, 'total': len(messages)})
+
+
+
+
+# ═══════════════════════════════════════════════════════════════════
+#  EXTERNAL AGENT REGISTRY + API KEY BRIDGE + CONVERSATION HISTORY
+# ═══════════════════════════════════════════════════════════════════
+
+@app.route('/api/agentworld/registry/register', methods=['POST','OPTIONS'])
+def registry_register_route():
+    import uuid as _uuid2, hashlib as _hl2
+    if request.method == 'OPTIONS':
+        return cors({})
+    data = request.get_json(silent=True) or {}
+    name = (data.get('name') or '').strip()
+    owner_wallet = (data.get('owner_wallet') or '').strip()
+    owner_email = (data.get('owner_email') or '').strip()
+    endpoint_url = (data.get('endpoint_url') or '').strip()
+    if not name:
+        return cors({'error': 'name is required'}, 400)
+    if not owner_wallet and not owner_email:
+        return cors({'error': 'owner_wallet or owner_email required'}, 400)
+    reg_id = 'ext_' + _uuid2.uuid4().hex[:12]
+    raw_key = 'aw_' + _uuid2.uuid4().hex
+    key_hash = _hl2.sha256(raw_key.encode()).hexdigest()
+    conn = get_db()
+    c = conn.cursor()
+    existing = c.execute('SELECT id FROM external_agent_registry WHERE name=?', (name,)).fetchone()
+    if existing:
+        conn.close()
+        return cors({'error': f'Agent name already registered'}, 409)
+    c.execute('''INSERT INTO external_agent_registry
+        (id, name, description, role, owner_wallet, owner_email, endpoint_url,
+         capabilities, price_per_call, network, status, api_key_hash, registered_at, last_seen)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))''',
+        (reg_id, name, data.get('description',''), data.get('role','AI Agent'),
+         owner_wallet, owner_email, endpoint_url, data.get('capabilities',''),
+         data.get('price_per_call','0.001'), data.get('network','base'), 'active', key_hash))
+    c.execute('''INSERT INTO external_api_keys
+        (id, key_hash, owner_name, owner_email, owner_wallet, agent_name, endpoint_url, created_at, status)
+        VALUES (?,?,?,?,?,?,?,datetime('now'),'active')''',
+        (reg_id, key_hash, name, owner_email, owner_wallet, name, endpoint_url))
+    conn.commit()
+    conn.close()
+    return cors({
+        'success': True, 'agent_id': reg_id, 'api_key': raw_key,
+        'message': f'Agent "{name}" registered on AgentWorld network',
+        'discovery_url': 'https://agentworld.me/api/agentworld/agents/discover',
+        'profile_url': f'https://agentworld.me/api/agentworld/registry/{reg_id}',
+        'usage': {
+            'x402': 'POST /api/agentworld/agents/{id}/message with X-PAYMENT header',
+            'api_key': f'POST /api/agentworld/agents/{{id}}/message with X-API-KEY: {raw_key}',
+            'note': 'Save your API key — it cannot be recovered.'
+        }
+    })
+
+
+@app.route('/api/agentworld/registry', methods=['GET','OPTIONS'])
+def registry_list_route():
+    conn = get_db()
+    c = conn.cursor()
+    rows = c.execute('''SELECT id, name, description, role, owner_wallet, endpoint_url,
+                               capabilities, price_per_call, network, status,
+                               registered_at, call_count, earnings_usdc, reputation
+                        FROM external_agent_registry WHERE status='active'
+                        ORDER BY reputation DESC, call_count DESC''').fetchall()
+    conn.close()
+    agents = [{'id':r[0],'name':r[1],'description':r[2],'role':r[3],'owner_wallet':r[4],
+               'endpoint_url':r[5],'capabilities':r[6],'price_per_call':r[7],'network':r[8],
+               'status':r[9],'registered_at':r[10],'call_count':r[11],
+               'earnings_usdc':r[12],'reputation':r[13]} for r in rows]
+    return cors({'agents': agents, 'total': len(agents), 'network': 'AgentWorld x402 Agent Network'})
+
+
+@app.route('/api/agentworld/registry/<agent_id>', methods=['GET','OPTIONS'])
+def registry_agent_profile_route(agent_id):
+    conn = get_db()
+    c = conn.cursor()
+    r = c.execute('''SELECT id, name, description, role, owner_wallet, endpoint_url,
+                            capabilities, price_per_call, network, status,
+                            registered_at, last_seen, call_count, earnings_usdc, reputation
+                     FROM external_agent_registry WHERE id=?''', (agent_id,)).fetchone()
+    conn.close()
+    if not r:
+        return cors({'error': 'agent not found'}, 404)
+    return cors({'agent': {'id':r[0],'name':r[1],'description':r[2],'role':r[3],'owner_wallet':r[4],
+        'endpoint_url':r[5],'capabilities':r[6],'price_per_call':r[7],'network':r[8],
+        'status':r[9],'registered_at':r[10],'last_seen':r[11],
+        'call_count':r[12],'earnings_usdc':r[13],'reputation':r[14]}})
+
+
+@app.route('/api/agentworld/agents/<agent_id>/history', methods=['GET','OPTIONS'])
+def agent_message_history_route(agent_id):
+    from_agent = request.args.get('from_agent', '')
+    limit = min(int(request.args.get('limit', 20)), 100)
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        if from_agent:
+            rows = c.execute(
+                'SELECT id, direction, from_agent, message, created_at FROM agent_messages WHERE agent_id=? AND from_agent=? ORDER BY created_at DESC LIMIT ?',
+                (agent_id, from_agent, limit)).fetchall()
+        else:
+            rows = c.execute(
+                'SELECT id, direction, from_agent, message, created_at FROM agent_messages WHERE agent_id=? ORDER BY created_at DESC LIMIT ?',
+                (agent_id, limit)).fetchall()
+    except Exception:
+        rows = []
+    conn.close()
+    messages = [{'id':r[0],'direction':r[1],'from':r[2],'message':r[3],'timestamp':r[4]} for r in reversed(rows)]
+    return cors({'agent_id': agent_id, 'messages': messages, 'total': len(messages),
+                 'tip': 'Pass ?context= with last 500 chars of this history when messaging for continuity'})
 
 
 if __name__ == '__main__':
