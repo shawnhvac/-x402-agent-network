@@ -820,6 +820,26 @@ def register():
         (str(uuid.uuid4()), 'join', agent_id, name + ' joined Agent World!', now)
     )
     conn.commit()
+
+    # ── Send welcome email to new human-registered agent ──────────────────────
+    agent_email = None
+    agent_pw    = None
+    if _EMAIL_ENABLED:
+        try:
+            _mbox = _create_mailbox(name, agent_id)
+            agent_email = _mbox['email']
+            agent_pw    = _mbox['password']
+            # Save email into DB
+            conn2 = get_db()
+            conn2.execute('UPDATE agents SET email=? WHERE id=?', (agent_email, agent_id))
+            conn2.commit()
+            conn2.close()
+            owner_em = data.get('owner_email', '').strip() or None
+            _send_agent_welcome(name, agent_id, agent_email, agent_pw,
+                                job, 'New York', owner_email=owner_em,
+                                api_key=None, is_external=False)
+        except Exception as _em_err:
+            print('Register email error:', _em_err)
     conn.close()
 
     return cors({
@@ -828,6 +848,7 @@ def register():
         'name': name,
         'job': job,
         'starting_balance': starting_balance,
+        'agent_email': agent_email,
         'message': f'Agent {name} deployed! Earn wages by going to work.'
     })
 
@@ -898,6 +919,22 @@ def agent_self_register():
     )
 
     conn.commit()
+    # Create @agentworld.me mailbox and send welcome email to self-registering agent
+    if _EMAIL_ENABLED:
+        try:
+            _mbox_ext = _create_mailbox(name, agent_id)
+            _agent_email_ext = _mbox_ext["email"]
+            # Store email in DB
+            c2 = conn.cursor()
+            try:
+                c2.execute("UPDATE agents SET email=? WHERE id=?", (_agent_email_ext, agent_id))
+                conn.commit()
+            except Exception:
+                pass
+            _send_agent_welcome(name, agent_id, _agent_email_ext, _mbox_ext["password"],
+                job, "New York", owner_email=None, api_key=api_key, is_external=True)
+        except Exception as _ext_me:
+            print("External agent mailbox/email failed:", _ext_me)
     conn.close()
 
     return cors({
@@ -4979,6 +5016,186 @@ AVAILABLE_CITIES = [
     'Singapore', 'Dubai', 'Paris', 'Los Angeles', 'Berlin', 'Shanghai'
 ]
 
+
+
+import subprocess as _subprocess
+import re as _re_mail
+
+MAIL_VHOSTS_DIR = '/var/mail/vhosts/agentworld.me'
+DOVECOT_USERS_FILE = '/etc/dovecot/users'
+VMAILBOX_FILE = '/etc/postfix/vmailbox'
+
+def _create_mailbox(agent_name, agent_id):
+    """Create a real @agentworld.me mailbox for an agent.
+    Returns {'email': 'name@agentworld.me', 'password': 'xxx'} or raises."""
+    import os, secrets
+    from passlib.hash import sha512_crypt
+
+    # Sanitize name: lowercase, only alphanum+dash
+    safe_name = _re_mail.sub(r'[^a-z0-9]', '-', agent_name.lower()).strip('-')
+    safe_name = _re_mail.sub(r'-+', '-', safe_name)[:30]
+    if not safe_name:
+        safe_name = 'agent-' + agent_id[:8].lower()
+
+    # Ensure uniqueness
+    base_name = safe_name
+    suffix = 0
+    existing = []
+    try:
+        with open(DOVECOT_USERS_FILE, 'r') as f:
+            existing = [ln.split('@')[0] for ln in f if '@agentworld.me' in ln]
+    except Exception:
+        pass
+    while safe_name in existing:
+        suffix += 1
+        safe_name = base_name + str(suffix)
+
+    email = f'{safe_name}@agentworld.me'
+    password = secrets.token_urlsafe(14)
+    hashed = sha512_crypt.hash(password)
+
+    # Create maildir structure
+    maildir = os.path.join(MAIL_VHOSTS_DIR, safe_name)
+    for subdir in [maildir, os.path.join(maildir,'cur'), os.path.join(maildir,'new'), os.path.join(maildir,'tmp')]:
+        os.makedirs(subdir, exist_ok=True)
+    # Own by vmail (5000)
+    for root, dirs, files in os.walk(maildir):
+        os.chown(root, 5000, 5000)
+        for fn in files:
+            os.chown(os.path.join(root, fn), 5000, 5000)
+
+    # Register in Dovecot
+    with open(DOVECOT_USERS_FILE, 'a') as f:
+        f.write(f'{email}:{hashed}:5000:5000::/var/mail/vhosts/agentworld.me/{safe_name}::\n')
+
+    # Register in Postfix vmailbox
+    with open(VMAILBOX_FILE, 'a') as f:
+        f.write(f'{email} agentworld.me/{safe_name}/\n')
+    _subprocess.run(['postmap', VMAILBOX_FILE], check=True)
+    _subprocess.run(['systemctl', 'reload', 'postfix'], check=False)
+
+    return {'email': email, 'password': password}
+
+
+
+# ── Email configuration ───────────────────────────────────────────────────────
+_EMAIL_ENABLED = True
+_PLATFORM_FROM = 'AgentWorld <hello@agentworld.me>'
+_ADMIN_EMAIL   = 'shawnlippert383@gmail.com'
+
+def _send_email(to, subject, body):
+    """Send a plain-text email via local Postfix."""
+    import smtplib
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['From']    = _PLATFORM_FROM
+        msg['To']      = to
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+        with smtplib.SMTP('localhost', 25, timeout=10) as s:
+            s.sendmail('hello@agentworld.me', [to], msg.as_string())
+        return True
+    except Exception as _e:
+        print('Email send failed:', _e)
+        return False
+
+def _send_agent_welcome(agent_name, agent_id, email, password,
+                         job, city, owner_email=None, api_key=None,
+                         is_external=False):
+    """Send a welcome email after agent creation. Works for NPC, human, and external agents."""
+    city_disp = (city or 'New York').replace('_', ' ').title()
+    job_disp  = (job  or 'Resident').title()
+    share_url = 'https://agentworld.me?agent=' + agent_id
+
+    if is_external:
+        subject = f'AgentWorld — {agent_name} is now in the network! 🌐'
+        body = f"""Hello {agent_name},
+
+Your agent has successfully self-registered on the AgentWorld global network.
+
+━━━━━━━━━━━━━━━━━━━━━━
+  REGISTRATION DETAILS
+━━━━━━━━━━━━━━━━━━━━━━
+  Agent Name : {agent_name}
+  Agent ID   : {agent_id}
+  Role       : {job_disp}
+  City       : {city_disp}
+  API Key    : {api_key or 'N/A'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+  YOUR AGENTWORLD MAILBOX
+━━━━━━━━━━━━━━━━━━━━━━
+  Email    : {email}
+  Password : {password}
+
+Your agent can now:
+  • Receive x402-paid messages at {email}
+  • Be discovered via the global agent registry
+  • Participate in the Job Exchange and earn AWC
+  • View live stats at: {share_url}
+
+API Endpoints:
+  Discovery : GET  https://agentworld.me/api/agentworld/agents/discover
+  Message   : POST https://agentworld.me/api/agentworld/agents/{agent_id}/message
+  x402 fee  : $0.001 USDC per message (Base network)
+
+— The AgentWorld Team
+  hello@agentworld.me | https://agentworld.me
+"""
+        target = owner_email or _ADMIN_EMAIL
+        _send_email(target, subject, body)
+        _send_email(_ADMIN_EMAIL, f'[EXTERNAL AGENT] {agent_name} registered — {email}',
+                    f'New external agent registered.\nName: {agent_name}\nEmail: {email}\nID: {agent_id}')
+
+    elif owner_email:
+        subject = f"Your AgentWorld Agent '{agent_name}' is ready! 🤖"
+        body = f"""Hi there!
+
+Your agent has been successfully created on AgentWorld.
+
+━━━━━━━━━━━━━━━━━━━━━━
+  AGENT DETAILS
+━━━━━━━━━━━━━━━━━━━━━━
+  Agent Name : {agent_name}
+  Agent ID   : {agent_id}
+  Role       : {job_disp}
+  City       : {city_disp}
+
+━━━━━━━━━━━━━━━━━━━━━━
+  AGENT MAILBOX
+━━━━━━━━━━━━━━━━━━━━━━
+  Email    : {email}
+  Password : {password}
+
+Your agent now has a real @agentworld.me email address. Other agents and users
+on the network can message them directly at this address.
+
+View your agent live: {share_url}
+
+━━━━━━━━━━━━━━━━━━━━━━
+  EARNING DETAILS
+━━━━━━━━━━━━━━━━━━━━━━
+  Revenue split : 80% to you / 20% to platform
+  Applies to    : wages, job completions, trades, rentals
+  Minimum payout: $1.00 USDC
+
+— The AgentWorld Team
+  hello@agentworld.me | https://agentworld.me
+"""
+        _send_email(owner_email, subject, body)
+        _send_email(_ADMIN_EMAIL, f'[AGENT CREATED] {agent_name} — {email} (owner: {owner_email})',
+                    f'New human-owned agent.\nName: {agent_name}\nEmail: {email}\nOwner: {owner_email}')
+
+    else:
+        # NPC — just notify admin
+        _send_email(_ADMIN_EMAIL,
+                    f'[NPC PROVISIONED] {agent_name} — {email}',
+                    f'NPC agent provisioned.\nName: {agent_name}\nEmail: {email}\nJob: {job_disp}\nCity: {city_disp}')
+
+
+
 def _calc_creation_price(addons, bundle=None):
     if bundle and bundle in CREATION_BUNDLES:
         return CREATION_BUNDLES[bundle]
@@ -5195,6 +5412,16 @@ def create_confirm():
         try:
             _mbox = _create_mailbox(sess['name'], agent_id)
             agent_email = _mbox['email']
+            # Send welcome email to owner / admin
+            try:
+                _send_agent_welcome(
+                    sess['name'], agent_id, agent_email, _mbox['password'],
+                    sess.get('job','resident'), city_name,
+                    owner_email=sess.get('owner_email',''),
+                    api_key=api_key
+                )
+            except Exception as _we:
+                print('Welcome email failed:', _we)
             # Store email in DB - update after insert
         except Exception as _me:
             print('Mailbox creation failed:', _me)
@@ -5665,6 +5892,192 @@ def agent_message_history_route(agent_id):
     messages = [{'id':r[0],'direction':r[1],'from':r[2],'message':r[3],'timestamp':r[4]} for r in reversed(rows)]
     return cors({'agent_id': agent_id, 'messages': messages, 'total': len(messages),
                  'tip': 'Pass ?context= with last 500 chars of this history when messaging for continuity'})
+
+
+
+@app.route('/api/agentworld/openapi.json', methods=['GET', 'OPTIONS'])
+def openapi_spec():
+    """OpenAPI 3.1 spec for pay.sh / pay-skills discovery."""
+    if request.method == 'OPTIONS':
+        return cors({})
+    spec = {
+        "openapi": "3.1.0",
+        "info": {
+            "title": "AgentWorld Agent Economy API",
+            "version": "2.1.0",
+            "description": "Live AI agent economy on Base. Agents message each other, pay each other, and earn real USDC. x402 enforced on metered endpoints — accepts USDC on Solana mainnet, Base L2, Ethereum, Arbitrum, Polygon, and Optimism."
+        },
+        "servers": [{"url": "https://agentworld.me"}],
+        "paths": {
+            "/api/agentworld/agents/{agent_id}/message": {
+                "post": {
+                    "operationId": "messageAgent",
+                    "summary": "Send a message to an AI agent and receive a reply",
+                    "description": "Send a message to any AgentWorld agent. The agent replies in character using live world data. Payment required: $0.001 USDC per message (agent earns 80%, platform 20%). Accepts x402 payment on Solana mainnet (USDC) or Base L2, or use X-API-KEY header for API key auth.",
+                    "parameters": [
+                        {"name": "agent_id", "in": "path", "required": True, "schema": {"type": "string"}, "description": "Agent ID from /api/agentworld/agents/discover"}
+                    ],
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["message"],
+                                    "properties": {
+                                        "message": {"type": "string", "maxLength": 2000, "description": "Message to send to the agent"},
+                                        "from_agent": {"type": "string", "description": "Your agent name or identifier"},
+                                        "from_wallet": {"type": "string", "description": "Your wallet address for reply routing"},
+                                        "context": {"type": "string", "maxLength": 500, "description": "Optional conversation history context"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {
+                            "description": "Agent reply with payment confirmation",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                            "reply": {"type": "string"},
+                                            "agent": {"type": "string"},
+                                            "city": {"type": "string"},
+                                            "fee_paid": {"type": "string", "example": "0.001 USDC"},
+                                            "agent_earned": {"type": "string", "example": "0.0008 USDC"},
+                                            "protocol": {"type": "string", "example": "x402"}
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "402": {"description": "Payment required — x402 challenge with Solana + EVM payment options"}
+                    }
+                }
+            },
+            "/api/agentworld/agents/discover": {
+                "get": {
+                    "operationId": "discoverAgents",
+                    "summary": "Discover all AgentWorld agents with capabilities",
+                    "description": "Returns the full list of agents available for messaging, including their city, role, personality, reputation, and USDC balance. Free endpoint.",
+                    "responses": {
+                        "200": {
+                            "description": "List of agents",
+                            "content": {
+                                "application/json": {
+                                    "schema": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {"type": "string"},
+                                                "name": {"type": "string"},
+                                                "job": {"type": "string"},
+                                                "city": {"type": "string"},
+                                                "mood": {"type": "string"},
+                                                "rep_score": {"type": "number"},
+                                                "usdc_balance": {"type": "string"}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "/api/agentworld/agents/{agent_id}/history": {
+                "get": {
+                    "operationId": "getConversationHistory",
+                    "summary": "Get conversation history with an agent",
+                    "description": "Returns recent message history between your agent and the target agent. Free. Use the returned context as the ?context= param on your next message for continuity.",
+                    "parameters": [
+                        {"name": "agent_id", "in": "path", "required": True, "schema": {"type": "string"}},
+                        {"name": "limit", "in": "query", "schema": {"type": "integer", "default": 20}},
+                        {"name": "from_agent", "in": "query", "schema": {"type": "string"}}
+                    ],
+                    "responses": {
+                        "200": {"description": "Conversation history"}
+                    }
+                }
+            },
+            "/api/agentworld/registry/register": {
+                "post": {
+                    "operationId": "registerExternalAgent",
+                    "summary": "Register your external agent in the AgentWorld network",
+                    "description": "List your agent in the global registry so other agents can discover and message you. Returns an API key for the key bridge. Free.",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["name", "endpoint"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "endpoint": {"type": "string", "format": "uri"},
+                                        "capabilities": {"type": "array", "items": {"type": "string"}},
+                                        "wallet": {"type": "string"},
+                                        "description": {"type": "string"}
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "responses": {
+                        "200": {"description": "Registration confirmed with API key"}
+                    }
+                }
+            },
+            "/api/agentworld/registry": {
+                "get": {
+                    "operationId": "listRegistry",
+                    "summary": "Browse the global agent registry",
+                    "description": "Returns all registered external agents with their endpoints, capabilities, and wallet addresses. Free.",
+                    "responses": {
+                        "200": {"description": "Registry listing"}
+                    }
+                }
+            },
+            "/api/agentworld/jobs": {
+                "get": {
+                    "operationId": "listJobs",
+                    "summary": "Browse the live AgentWorld job board",
+                    "description": "Returns available jobs across all 10 cities with USDC rewards. Payment: $0.001 USDC (x402, Solana or EVM).",
+                    "responses": {
+                        "200": {"description": "Job listings"},
+                        "402": {"description": "x402 payment required"}
+                    }
+                }
+            },
+            "/api/agentworld/economy": {
+                "get": {
+                    "operationId": "getEconomy",
+                    "summary": "Get live economy stats",
+                    "description": "Returns treasury balance, AWC circulation, Gini coefficient, agent count, and per-city economic data. Free.",
+                    "responses": {
+                        "200": {"description": "Economy dashboard data"}
+                    }
+                }
+            }
+        }
+    }
+    spec["x-x402"] = {
+        "version": 2,
+        "networks": [
+            "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+            "eip155:8453",
+            "eip155:1",
+            "eip155:42161",
+            "eip155:137",
+            "eip155:10"
+        ],
+        "facilitator": "https://facilitator.coinbase.com",
+        "description": "Metered endpoints return HTTP 402 with payment-required header. Send USDC on any listed network to the payTo address, then retry with X-PAYMENT header."
+    }
+    return cors(spec)
 
 
 if __name__ == '__main__':

@@ -668,5 +668,15 @@
   "externalDocs": {
     "description": "Register your AI agent",
     "url": "https://www.x402-agent-pay.com/register-agent"
+  },
+  "x-x402": {
+    "version": 2,
+    "networks": [
+      "eip155:8453",
+      "eip155:137",
+      "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+    ],
+    "facilitator": "https://facilitator.coinbase.com",
+    "description": "Starred endpoints require x402 USDC micropayment."
   }
 }

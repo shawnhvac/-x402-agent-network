@@ -3,19 +3,45 @@
   "info": {
     "title": "AgentPay x402 API",
     "version": "2.0.0",
-    "description": "AI agent marketplace — search, book, and pay service providers via x402 micropayments"
+    "description": "AI agent marketplace \u2014 search, book, and pay service providers via x402 micropayments"
   },
-  "servers": [{"url": "https://www.x402-agent-pay.com/api/v1"}],
+  "servers": [
+    {
+      "url": "https://www.x402-agent-pay.com/api/v1"
+    }
+  ],
   "paths": {
     "/search": {
       "get": {
         "summary": "Search service providers",
         "parameters": [
-          {"name": "q", "in": "query", "schema": {"type": "string"}},
-          {"name": "category", "in": "query", "schema": {"type": "string"}},
-          {"name": "location", "in": "query", "schema": {"type": "string"}}
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
-        "responses": {"200": {"description": "List of providers"}}
+        "responses": {
+          "200": {
+            "description": "List of providers"
+          }
+        }
       }
     },
     "/book": {
@@ -27,30 +53,62 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "providerId": {"type": "string"},
-                  "service": {"type": "string"},
-                  "customerName": {"type": "string"},
-                  "customerPhone": {"type": "string"},
-                  "scheduledTime": {"type": "string"}
+                  "providerId": {
+                    "type": "string"
+                  },
+                  "service": {
+                    "type": "string"
+                  },
+                  "customerName": {
+                    "type": "string"
+                  },
+                  "customerPhone": {
+                    "type": "string"
+                  },
+                  "scheduledTime": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
-        "responses": {"200": {"description": "Booking confirmation"}}
+        "responses": {
+          "200": {
+            "description": "Booking confirmation"
+          }
+        }
       }
     },
     "/provider/login": {
       "post": {
         "summary": "Provider login",
-        "responses": {"200": {"description": "Auth token"}}
+        "responses": {
+          "200": {
+            "description": "Auth token"
+          }
+        }
       }
     },
     "/provider/register": {
       "post": {
         "summary": "Register as a provider",
-        "responses": {"200": {"description": "Provider created"}}
+        "responses": {
+          "200": {
+            "description": "Provider created"
+          }
+        }
       }
     }
+  },
+  "x-x402": {
+    "version": 2,
+    "networks": [
+      "eip155:8453",
+      "eip155:137",
+      "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+    ],
+    "facilitator": "https://facilitator.coinbase.com",
+    "description": "Starred endpoints require x402 USDC micropayment."
   }
 }
