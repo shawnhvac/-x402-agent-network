@@ -65,6 +65,111 @@ import sqlite3, uuid, os, random
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
+
+# ── MODEL ROUTER — Gemma3:4b local · llama3.2:1b fallback · OpenRouter cloud ──
+import os as _os, urllib.request as _mr_req, json as _mr_json
+
+
+# ── Load .env for OpenRouter key ───────────────────────────────────────────
+_env_file = '/root/agentworld/.env'
+if os.path.exists(_env_file):
+    with open(_env_file) as _ef:
+        for _el in _ef:
+            _el = _el.strip()
+            if '=' in _el and not _el.startswith('#'):
+                _ek, _ev = _el.split('=', 1)
+                if _ek not in os.environ:
+                    os.environ[_ek] = _ev
+OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
+# ─────────────────────────────────────────────────────────────────────────
+
+OPENROUTER_URL     = 'https://openrouter.ai/api/v1/chat/completions'
+
+# Model tiers:
+#   fast   → llama3.2:1b  (simple NPC chatter, low latency)
+#   smart  → gemma3:4b    (agent-to-agent msgs, complex reasoning)
+#   cloud  → openrouter   (fallback if Ollama is down or for premium tasks)
+
+_OLLAMA_URL = 'http://localhost:11434/api/chat'
+_MODEL_FAST  = 'llama3.2:1b'
+_MODEL_SMART = 'gemma3:4b'
+
+def _call_ollama(model, messages, max_tokens=150, temperature=0.8, timeout=60):
+    """Call local Ollama. Returns (reply_str, tokens_int) or raises."""
+    payload = _mr_json.dumps({
+        'model': model,
+        'messages': messages,
+        'stream': False,
+        'keep_alive': '60m',
+        'options': {'num_predict': max_tokens, 'temperature': temperature, 'num_ctx': 512}
+    }).encode()
+    req = _mr_req.Request(_OLLAMA_URL, data=payload,
+                          headers={'Content-Type': 'application/json'})
+    with _mr_req.urlopen(req, timeout=timeout) as resp:
+        r = _mr_json.loads(resp.read())
+    reply = r.get('message', {}).get('content', '').strip()
+    tokens = r.get('eval_count', 0)
+    if not reply:
+        raise ValueError('empty ollama response')
+    return reply, tokens
+
+def _call_openrouter(messages, model='google/gemma-4-31b-it:free', max_tokens=300, temperature=0.8):
+    """Call OpenRouter as cloud fallback. Returns (reply_str, tokens_int) or raises."""
+    if not OPENROUTER_API_KEY:
+        raise ValueError('No OpenRouter key configured')
+    payload = _mr_json.dumps({
+        'model': model,
+        'messages': messages,
+        'max_tokens': max_tokens,
+        'temperature': temperature
+    }).encode()
+    req = _mr_req.Request(OPENROUTER_URL, data=payload, headers={
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {OPENROUTER_API_KEY}',
+        'HTTP-Referer': 'https://agentworld.me',
+        'X-Title': 'AgentWorld'
+    })
+    with _mr_req.urlopen(req, timeout=30) as resp:
+        r = _mr_json.loads(resp.read())
+    reply = r['choices'][0]['message']['content'].strip()
+    tokens = r.get('usage', {}).get('completion_tokens', 0)
+    if not reply:
+        raise ValueError('empty openrouter response')
+    return reply, tokens
+
+def smart_reply(messages, max_tokens=150, temperature=0.8, prefer_cloud=False):
+    """
+    Route to best available model:
+      prefer_cloud=False  → gemma3:4b → llama3.2:1b → OpenRouter
+      prefer_cloud=True   → OpenRouter → gemma3:4b → llama3.2:1b
+    Returns (reply_str, model_used_str, tokens_int)
+    """
+    if prefer_cloud and OPENROUTER_API_KEY:
+        try:
+            reply, tok = _call_openrouter(messages, max_tokens=max_tokens, temperature=temperature)
+            return reply, 'openrouter:gemma-4-31b-it', tok
+        except Exception as _e:
+            print(f'[router] OpenRouter failed: {_e}, falling back to local')
+    # Try Gemma3:4b first (smart local)
+    try:
+        reply, tok = _call_ollama(_MODEL_SMART, messages, max_tokens=max_tokens, temperature=temperature)
+        return reply, _MODEL_SMART, tok
+    except Exception as _e:
+        print(f'[router] gemma3:4b failed: {_e}, trying llama3.2:1b')
+    # Try llama3.2:1b (fast local)
+    try:
+        reply, tok = _call_ollama(_MODEL_FAST, messages, max_tokens=max_tokens, temperature=temperature)
+        return reply, _MODEL_FAST, tok
+    except Exception as _e:
+        print(f'[router] llama3.2:1b failed: {_e}, trying OpenRouter')
+    # Cloud fallback last resort
+    try:
+        reply, tok = _call_openrouter(messages, max_tokens=max_tokens, temperature=temperature)
+        return reply, 'openrouter:gemma-4-31b-it', tok
+    except Exception as _e:
+        raise RuntimeError(f'All models failed: {_e}')
+
+# ── END MODEL ROUTER ──────────────────────────────────────────────────────────
 DB = '/var/lib/agentworld/world.db'
 
 
@@ -3517,25 +3622,11 @@ def chat_with_agent():
             ]
             opts = {'num_predict': 100, 'temperature': 0.8, 'num_ctx': 512}
 
-        payload = _js2.dumps({
-            'model': 'llama3.2:1b',
-            'messages': msgs,
-            'stream': False,
-            'keep_alive': '60m',
-            'options': opts
-        }).encode()
-
         try:
-            req = _ureq.Request('http://localhost:11434/api/chat', data=payload,
-                                headers={'Content-Type': 'application/json'})
-            with _ureq.urlopen(req, timeout=90) as resp:
-                result = _js2.loads(resp.read())
-            reply = result.get('message', {}).get('content', '').strip()
-            if not reply:
-                raise ValueError('empty response')
+            reply, _model_used, _tok = smart_reply(msgs, max_tokens=opts.get('num_predict', 100), temperature=0.8)
         except Exception:
-            # Fallback if Ollama is unavailable
             reply = "I'm a bit distracted right now — catch me later!"
+
 
         mid = str(uuid.uuid4())
         conn.execute(
@@ -3605,7 +3696,7 @@ def chat_stream():
             opts = {'num_predict': 100, 'temperature': 0.8, 'num_ctx': 512}
 
         payload = _sj.dumps({
-            'model': 'llama3.2:1b',
+            'model': 'gemma3:4b',
             'messages': msgs,
             'stream': True,
             'keep_alive': '60m',
@@ -5687,28 +5778,12 @@ If asked about payments or tasks, mention your rate is 0.01 USDC per message."""
     if context:
         system_prompt += f'\n\nConversation context: {context[:500]}'
 
-    ollama_payload = {
-        'model': 'llama3.2:1b',
-        'messages': [
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': f'[From: {from_agent}] {message}'}
-        ],
-        'stream': False,
-        'options': {'temperature': 0.8, 'num_predict': 200}
-    }
-
+    _a2a_msgs = [
+        {'role': 'system', 'content': system_prompt},
+        {'role': 'user', 'content': f'[From: {from_agent}] {message}'}
+    ]
     try:
-        import json as _j
-        payload_bytes = _j.dumps(ollama_payload).encode()
-        req = _ureq.Request(
-            'http://localhost:11434/api/chat',
-            data=payload_bytes,
-            headers={'Content-Type': 'application/json'}
-        )
-        with _ureq.urlopen(req, timeout=30) as resp:
-            result = _j.loads(resp.read())
-            reply = result.get('message', {}).get('content', '').strip()
-            tokens = result.get('eval_count', 0)
+        reply, _a2a_model, tokens = smart_reply(_a2a_msgs, max_tokens=200, temperature=0.8, prefer_cloud=False)
     except Exception as e:
         reply = f"I'm {ag_name} in {ag_city}. I received your message but I'm currently busy. Try again shortly."
         tokens = 0
@@ -6079,6 +6154,16 @@ def openapi_spec():
     }
     return cors(spec)
 
+
+
+@app.route('/api/agentworld/model-status', methods=['GET'])
+def model_status_route():
+    """Return health of all model tiers."""
+    try:
+        from model_router import health_check as _mr_health
+        return jsonify({'ok': True, 'tiers': _mr_health()})
+    except Exception as e:
+        return jsonify({'ok': False, 'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8765, debug=False)
