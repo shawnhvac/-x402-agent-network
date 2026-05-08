@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgentPay - Complete AI Agent Commerce (Services + Products)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .tagline {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 40px;
+        }
+        
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+        
+        .endpoints {
+            background: #f5f5f5;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+        
+        .endpoints h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .endpoint {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-left: 3px solid #667eea;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .endpoint-method {
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .endpoint-path {
+            color: #333;
+            margin-left: 10px;
+        }
+        
+        .status {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 10px 0;
+        }
+        
+        .status.error {
+            background: #ef4444;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .demo-agents {
+            background: #f9f9f9;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+        
+        .demo-agents h3 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        
+        .agent {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+        }
+        
+        .agent-name {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .agent-desc {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🦬 AgentPay</h1>
+        <div class="tagline">The Universal Agent Marketplace - Services + Products</div>
+        
+        <div class="description">
+            <p><strong>AgentPay is the global infrastructure layer for agent-to-agent commerce.</strong></p>
+            <p style="margin-top: 15px;">Any AI agent or API can now accept instant USDC payments via HTTP 402 with zero friction, keeping 98% of every transaction.</p>
+        </div>
+        
+        <div class="status" id="status">🔍 Checking system status...</div>
+        
+        <div class="demo-agents">
+            <h3>📦 Live Demo Agents</h3>
+            <div class="agent">
+                <div class="agent-name">Grid Trader</div>
+                <div class="agent-desc">Grid trading strategy (demo) - 0.10 USDC/execution</div>
+            </div>
+            <div class="agent">
+                <div class="agent-name">Sniper Bot</div>
+                <div class="agent-desc">Token sniping (demo) - 0.25-1.00 USDC</div>
+            </div>
+            <div class="agent">
+                <div class="agent-name">LLM Inference</div>
+                <div class="agent-desc">AI model inference - 0.05 USDC per 1K tokens</div>
+            </div>
+            <div class="agent">
+                <div class="agent-name">Data Feed</div>
+                <div class="agent-desc">Real-time price oracle - 0.01 USDC per point</div>
+            </div>
+        </div>
+        
+        <div class="endpoints">
+            <h3>🔌 API Endpoints</h3>
+            <div class="endpoint">
+                <span class="endpoint-method">GET</span>
+                <span class="endpoint-path">/health</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method">GET</span>
+                <span class="endpoint-path">/metrics</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method">GET</span>
+                <span class="endpoint-path">/status</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method">POST</span>
+                <span class="endpoint-path">/data-feed</span>
+            </div>
+            <div class="endpoint">
+                <span class="endpoint-method">GET</span>
+                <span class="endpoint-path">/api/agents</span>
+            </div>
+        </div>
+        
+        <div class="cta-buttons">
+            <a href="https://github.com/shawnhvac/agentpay" class="btn btn-primary">GitHub</a>
+            <a href="./openapi.yaml" class="btn btn-secondary">OpenAPI Spec</a>
+        </div>
+        
+        <div class="footer">
+            <p>Built with HTTP 402 Payment Required (RFC 7231)</p>
+            <p>Open source • MIT licensed • agent-to-agent commerce infrastructure</p>
+        </div>
+    </div>
+    
+    <script>
+        // Check system status
+        async function checkStatus() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    document.getElementById('status').innerHTML = '✅ System Healthy';
+                    document.getElementById('status').style.background = '#10b981';
+                } else {
+                    document.getElementById('status').innerHTML = '⚠️ Degraded Performance';
+                    document.getElementById('status').classList.add('error');
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = '❌ System Offline';
+                document.getElementById('status').classList.add('error');
+            }
+        }
+        
+        checkStatus();
+        setInterval(checkStatus, 5000); // Check every 5 seconds
+    </script>
+
+<section id="pricing" style="background:#0b1220;padding:80px 20px;text-align:center;">
+  <div style="max-width:900px;margin:0 auto;">
+    <div style="font-size:11px;color:#00e5ff;text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:12px;">Pricing</div>
+    <h2 style="font-size:clamp(28px,4vw,40px);font-weight:900;margin-bottom:12px;">Start in Minutes</h2>
+    <p style="color:#7888aa;font-size:16px;margin-bottom:48px;">All plans include x402 payment rails, USDC support, and Base mainnet integration.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;text-align:left;">
+      <div style="background:#0d1525;border:1px solid #1a2840;border-radius:16px;padding:28px;">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px;">Starter</h3>
+        <div style="font-size:32px;font-weight:900;color:#00ff9d;margin:12px 0 4px;">$29<span style="font-size:14px;font-weight:400;">/mo</span></div>
+        <p style="font-size:13px;color:#7888aa;margin-bottom:16px;">1 agent · 500 transactions/mo</p>
+        <ul style="padding-left:18px;color:#b0bcd0;font-size:14px;margin-bottom:20px;">
+          <li style="margin-bottom:6px;">x402 payment protocol</li>
+          <li style="margin-bottom:6px;">Base mainnet integration</li>
+          <li style="margin-bottom:6px;">USDC + fiat dual rail</li>
+        </ul>
+        <button id="ap-btn-starter" onclick="buyAgentPay('starter')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00e5ff,#0077cc);border:none;border-radius:8px;color:#000;font-weight:800;font-size:14px;cursor:pointer;">Get Started →</button>
+      </div>
+      <div style="background:#0d1525;border:2px solid #00e5ff;border-radius:16px;padding:28px;position:relative;">
+        <div style="position:absolute;top:-12px;left:20px;background:#00e5ff;color:#000;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;">MOST POPULAR</div>
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px;">Pro</h3>
+        <div style="font-size:32px;font-weight:900;color:#00ff9d;margin:12px 0 4px;">$99<span style="font-size:14px;font-weight:400;">/mo</span></div>
+        <p style="font-size:13px;color:#7888aa;margin-bottom:16px;">10 agents · Unlimited transactions</p>
+        <ul style="padding-left:18px;color:#b0bcd0;font-size:14px;margin-bottom:20px;">
+          <li style="margin-bottom:6px;">Everything in Starter</li>
+          <li style="margin-bottom:6px;">Multi-agent orchestration</li>
+          <li style="margin-bottom:6px;">Priority API support</li>
+        </ul>
+        <button id="ap-btn-pro" onclick="buyAgentPay('pro')" style="width:100%;padding:13px;background:linear-gradient(135deg,#00e5ff,#0077cc);border:none;border-radius:8px;color:#000;font-weight:800;font-size:14px;cursor:pointer;">Get Started →</button>
+      </div>
+      <div style="background:#0d1525;border:1px solid #1a2840;border-radius:16px;padding:28px;">
+        <h3 style="font-size:17px;font-weight:700;margin-bottom:6px;">Enterprise</h3>
+        <div style="font-size:32px;font-weight:900;color:#00ff9d;margin:12px 0 4px;">$299<span style="font-size:14px;font-weight:400;">/mo</span></div>
+        <p style="font-size:13px;color:#7888aa;margin-bottom:16px;">Unlimited agents + dedicated support</p>
+        <ul style="padding-left:18px;color:#b0bcd0;font-size:14px;margin-bottom:20px;">
+          <li style="margin-bottom:6px;">Everything in Pro</li>
+          <li style="margin-bottom:6px;">Dedicated onboarding</li>
+          <li style="margin-bottom:6px;">SLA + custom integrations</li>
+        </ul>
+        <button id="ap-btn-enterprise" onclick="buyAgentPay('enterprise')" style="width:100%;padding:13px;background:#1a2840;border:1px solid #1a2840;border-radius:8px;color:#e0e8ff;font-weight:800;font-size:14px;cursor:pointer;">Contact Us →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+async function buyAgentPay(planId) {
+  const btn = document.getElementById('ap-btn-' + planId);
+  if (btn) { btn.textContent = 'Loading...'; btn.disabled = true; }
+  try {
+    const res = await fetch('https://agentworld.me/api/agentpay/checkout', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({plan: planId})
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+      if (btn) { btn.textContent = 'Get Started'; btn.disabled = false; }
+    }
+  } catch(e) {
+    alert('Network error. Please try again.');
+    if (btn) { btn.textContent = 'Get Started'; btn.disabled = false; }
+  }
+}
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === '1') {
+  const el = document.createElement('div');
+  el.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#00ff9d;color:#000;padding:14px 28px;border-radius:10px;font-weight:700;z-index:9999;font-size:15px;box-shadow:0 4px 20px rgba(0,0,0,.3);';
+  el.textContent = '✅ Welcome to AgentPay! Check your email for onboarding details.';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 7000);
+}
+</script>
+</body>
+</html>

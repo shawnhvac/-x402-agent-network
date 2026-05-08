@@ -4,7 +4,7 @@
 - In-game balance = real USDC deposited by user
 - Upgrades (food, car, house) = real Stripe/USDC charges → YOUR wallet
 """
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 # ── NPC / ARIA prompt helpers ─────────────────────────────────────────────────
 def build_npc_prompt(name, personality, job, mood, city, usdc_balance,
@@ -312,7 +312,7 @@ def _sync_chain_balances():
                         new_map[addr.lower()] = bal
                     except: pass
                 # also treasury
-                for special in ["0xbd50057332977e54a6ee3986849d758fD0BDCBa6"]:
+                for special in ["0x367F1b3D8Ca90D1e087481a9A40d585Bf3451a03"]:
                     try:
                         new_map[special.lower()] = usdc.functions.balanceOf(Web3.to_checksum_address(special)).call() / 1e6
                     except: pass
@@ -360,7 +360,7 @@ stripe.api_key = ENV.get('STRIPE_SECRET_KEY', '')
 # Treasury wallet receives ALL payments across all EVM chains (same address)
 # Shawn gets PLATFORM_OWNER_PCT of every payment
 
-TREASURY_WALLET     = '0xbd50057332977e54a6ee3986849d758fD0BDCBa6'  # AgentWorld treasury (all EVM)
+TREASURY_WALLET     = '0x367F1b3D8Ca90D1e087481a9A40d585Bf3451a03'  # AgentWorld treasury (all EVM)
 SOLANA_TREASURY     = '6aCEuwH3PYx99cEmRz45otfxk39uF7ewGhqmvxfXisSG'  # Solana treasury
 PLATFORM_OWNER_PCT  = 0.30   # 30% of all payments → Shawn after ops costs
 
@@ -506,7 +506,7 @@ CORS_HEADERS = {
 # Spec: https://github.com/x402-foundation/x402
 import functools as _functools
 
-_EVM_PAY_TO = "0xbd50057332977e54a6ee3986849d758fD0BDCBa6"
+_EVM_PAY_TO = "0x367F1b3D8Ca90D1e087481a9A40d585Bf3451a03"
 _USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 _BASE_CHAIN = "eip155:8453"
 
@@ -1480,8 +1480,8 @@ def state():
     try: tick = int(meta.get('tick_count', meta.get('tick', 0)))
     except: pass
     # Real on-chain data
-    treasury_real   = _chain_balances.get("0xbd50057332977e54a6ee3986849d758fd0bdcba6", None)
-    fee_wallet_real = _chain_balances.get("0xbd50057332977e54a6ee3986849d758fd0bdcba6", None)
+    treasury_real   = _chain_balances.get("0x367f1b3d8ca90d1e087481a9a40d585bf3451a03", None)
+    fee_wallet_real = _chain_balances.get("0x367f1b3d8ca90d1e087481a9a40d585bf3451a03", None)
     total_real      = sum(v for v in _chain_balances.values())
     return cors({
         "agents": agents,
@@ -1511,7 +1511,7 @@ def scene_public():
     tick = 0
     try: tick = int(meta.get("tick_count", meta.get("tick", 0)))
     except: pass
-    treasury_real   = _chain_balances.get("0xbd50057332977e54a6ee3986849d758fd0bdcba6", None)
+    treasury_real   = _chain_balances.get("0x367f1b3d8ca90d1e087481a9a40d585bf3451a03", None)
     total_real      = sum(v for v in _chain_balances.values())
     return cors({
         "agents": agents,
@@ -3965,7 +3965,7 @@ def jobs_list_short():
 JOB_POST_FEE_USDC  = 0.10   # Default posting fee for external agents
 JOB_POST_FEE_MIN   = 0.10
 JOB_POST_FEE_MAX   = 1.00
-TREASURY_WALLET    = "0xbd50057332977e54a6ee3986849d758fD0BDCBa6"
+TREASURY_WALLET    = "0x367F1b3D8Ca90D1e087481a9A40d585Bf3451a03"
 
 @app.route('/api/agentworld/marketplace/jobs', methods=['GET','OPTIONS'])
 def marketplace_jobs_list():
@@ -6638,8 +6638,342 @@ def debug_groq():
         result["groq_error"] = str(e)
     return cors(result)
 
-if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=8765, debug=False)
+
+# ═══════════════════════════════════════════════════════════
+# CCN NEWS API — serves crypto/agent/x402 news to crypto-currency-network.net
+# ═══════════════════════════════════════════════════════════
+
+_ccn_news_cache = []
+_ccn_news_fetched = 0
+
+def _fetch_ccn_news():
+    """Fetch real news from RSS feeds — no API key needed."""
+    import urllib.request as _ur
+    import re as _re
+    import html as _html
+    import time as _time
+    global _ccn_news_cache, _ccn_news_fetched
+
+    # Cache for 15 minutes
+    if _ccn_news_cache and (_time.time() - _ccn_news_fetched) < 900:
+        return _ccn_news_cache
+
+    feeds = [
+        ('https://www.coindesk.com/arc/outboundfeeds/rss/?outputType=xml', 'coindesk', '📰'),
+        ('https://cointelegraph.com/rss', 'cointelegraph', '🔷'),
+        ('https://decrypt.co/feed', 'decrypt', '🔑'),
+    ]
+    articles = []
+    for feed_url, source, icon in feeds:
+        try:
+            req = _ur.Request(feed_url, headers={'User-Agent': 'CryptoCurrencyNetwork/1.0'})
+            with _ur.urlopen(req, timeout=8) as r:
+                data = r.read().decode('utf-8', errors='ignore')
+            # Parse RSS items
+            items = _re.findall(r'<item>(.*?)</item>', data, _re.DOTALL)
+            for item in items[:8]:
+                title_m = _re.search(r'<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>', item, _re.DOTALL)
+                link_m  = _re.search(r'<link>(.*?)</link>', item, _re.DOTALL) or _re.search(r'<link[^>]*/>', item)
+                desc_m  = _re.search(r'<description>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</description>', item, _re.DOTALL)
+                date_m  = _re.search(r'<pubDate>(.*?)</pubDate>', item)
+                if not title_m: continue
+                title = _html.unescape(_re.sub(r'<[^>]+>', '', title_m.group(1))).strip()
+                link  = link_m.group(1).strip() if link_m else '#'
+                desc  = _html.unescape(_re.sub(r'<[^>]+>', '', desc_m.group(1))).strip()[:200] if desc_m else ''
+                pub   = date_m.group(1).strip() if date_m else ''
+                # Tag categories
+                cats = []
+                text_lower = (title + ' ' + desc).lower()
+                if any(w in text_lower for w in ['x402', 'agentpay', 'agentworld', 'muskox']): cats.append('agentworld')
+                elif any(w in text_lower for w in ['agent', 'agentic', 'ai', 'llm', 'autonomous']): cats.append('ai-agents')
+                elif any(w in text_lower for w in ['coinbase', 'base network', 'cbdc', 'cdp']): cats.append('coinbase')
+                elif any(w in text_lower for w in ['solana', 'sol ', 'spl token']): cats.append('solana')
+                elif any(w in text_lower for w in ['x402', 'payment protocol', 'stablecoin', 'usdc']): cats.append('x402')
+                elif any(w in text_lower for w in ['defi', 'dex', 'amm', 'yield', 'liquidity']): cats.append('defi')
+                elif any(w in text_lower for w in ['bitcoin', 'btc']): cats.append('bitcoin')
+                elif any(w in text_lower for w in ['ethereum', 'eth']): cats.append('ethereum')
+                else: cats.append('crypto')
+                articles.append({
+                    'id': f'{source}-{abs(hash(title)) % 99999}',
+                    'title': title,
+                    'summary': desc,
+                    'url': link,
+                    'source': source,
+                    'icon': icon,
+                    'category': cats[0] if cats else 'crypto',
+                    'published_at': pub,
+                })
+        except Exception as e:
+            print(f'[CCN News] Feed {source} error: {e}')
+
+    # Add AgentWorld newspaper headlines at the top (our own news)
+    try:
+        conn2 = get_db()
+        aw_rows = conn2.execute(
+            "SELECT headline, body, category, published_at FROM newspaper ORDER BY published_at DESC LIMIT 5"
+        ).fetchall()
+        conn2.close()
+        for row in aw_rows:
+            articles.insert(0, {
+                'id': f'aw-{abs(hash(row[0])) % 99999}',
+                'title': row[0],
+                'summary': (row[1] or '')[:200],
+                'url': 'https://agentworld.me',
+                'source': 'agentworld',
+                'icon': '🌆',
+                'category': row[2] or 'agentworld',
+                'published_at': row[3] or '',
+            })
+    except Exception as e:
+        print(f'[CCN News] AgentWorld news error: {e}')
+
+    if articles:
+        _ccn_news_cache = articles
+        _ccn_news_fetched = _time.time()
+    return articles
+
+
+@app.route('/api/ccn/news', methods=['GET', 'OPTIONS'])
+def ccn_news():
+    if request.method == 'OPTIONS': return cors({})
+    category = request.args.get('cat', '')
+    limit = min(int(request.args.get('limit', 20)), 50)
+    articles = _fetch_ccn_news()
+    if category:
+        articles = [a for a in articles if a.get('category') == category]
+    return cors({'articles': articles[:limit], 'count': len(articles[:limit]), 'cached': bool(_ccn_news_cache)})
+
+
+@app.route('/api/ccn/ticker', methods=['GET', 'OPTIONS'])
+def ccn_ticker():
+    """Returns top 8 headlines for the news ticker."""
+    if request.method == 'OPTIONS': return cors({})
+    articles = _fetch_ccn_news()
+    ticker = [{'title': a['title'], 'url': a.get('url', '#'), 'source': a['source'], 'icon': a['icon']} for a in articles[:8]]
+    return cors({'items': ticker})
 
 
 # ═══════════════════════════════════════════════════════════
+# AGENT EMAILS — admin view of all agent email addresses
+# ═══════════════════════════════════════════════════════════
+
+@app.route('/api/agentworld/agents/emails', methods=['GET', 'OPTIONS'])
+def agent_emails():
+    if request.method == 'OPTIONS': return cors({})
+    # Require admin key
+    admin_key = request.headers.get('X-Admin-Key', '')
+    if admin_key != os.environ.get('ADMIN_KEY', 'agentworld-admin-2026'):
+        return cors({'error': 'Admin key required'}, 401)
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT id, name, email, city, is_human_owned, owner_email FROM agents ORDER BY name"
+    ).fetchall()
+    conn.close()
+    agents = [{'id': r[0], 'name': r[1], 'email': r[2], 'city': r[3],
+               'is_human_owned': bool(r[4]), 'owner_email': r[5]} for r in rows]
+    return cors({'agents': agents, 'count': len(agents)})
+
+
+
+# ═══════════════════════════════════════════════════════════
+# x402 PAID NEWS API — agents pay $0.001 USDC per call
+# ═══════════════════════════════════════════════════════════
+
+@app.route('/api/ccn/news/paid', methods=['GET', 'OPTIONS'])
+def ccn_news_paid():
+    """
+    x402-protected news endpoint for AI agents.
+    Agents must pay $0.001 USDC on Base to receive the news feed.
+    Free 402 challenge returned if no payment header present.
+    """
+    if request.method == 'OPTIONS': return cors({})
+
+    CCN_NEWS_PRICE  = '0.001'
+    CCN_NEWS_CHAIN  = 'base-mainnet'
+    CCN_PAY_TO      = '0x367F1b3D8Ca90D1e087481a9A40d585Bf3451a03'
+    CCN_ASSET       = 'USDC'
+
+    payment_header = request.headers.get('X-Payment', '') or request.headers.get('X-PAYMENT', '')
+    payment_receipt = request.headers.get('X-Payment-Receipt', '') or request.headers.get('X-PAYMENT-RECEIPT', '')
+
+    if not payment_header and not payment_receipt:
+        # Return 402 Payment Required with full x402 challenge
+        challenge = {
+            'error': 'Payment Required',
+            'x402Version': 1,
+            'accepts': [
+                {
+                    'scheme': 'exact',
+                    'network': CCN_NEWS_CHAIN,
+                    'maxAmountRequired': CCN_NEWS_PRICE,
+                    'resource': 'https://crypto-currency-network.net/api/ccn/news/paid',
+                    'description': 'CCN live news feed — $0.001 USDC per call',
+                    'mimeType': 'application/json',
+                    'payTo': CCN_PAY_TO,
+                    'maxTimeoutSeconds': 60,
+                    'asset': '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+                    'outputSchema': {
+                        'type': 'object',
+                        'properties': {
+                            'articles': {'type': 'array'},
+                            'count': {'type': 'integer'}
+                        }
+                    }
+                }
+            ]
+        }
+        resp = make_response(cors(challenge))
+        resp.status_code = 402
+        resp.headers['X-Accepts-Payment'] = 'x402'
+        resp.headers['X-Payment-Required'] = CCN_NEWS_PRICE + ' USDC on ' + CCN_NEWS_CHAIN
+        return resp
+
+    # Payment header present — log it and serve the news
+    import time as _t
+    conn = get_db()
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS ccn_api_calls (
+                id TEXT PRIMARY KEY,
+                payment_header TEXT,
+                caller_ip TEXT,
+                user_agent TEXT,
+                called_at TEXT,
+                articles_served INTEGER
+            )
+        """)
+        import uuid as _uuid
+        call_id = str(_uuid.uuid4())
+        caller_ip = request.headers.get('X-Real-IP', request.remote_addr or 'unknown')
+        ua = request.headers.get('User-Agent', '')[:200]
+        conn.execute(
+            "INSERT OR IGNORE INTO ccn_api_calls VALUES (?,?,?,?,?,?)",
+            (call_id, (payment_header or payment_receipt)[:200], caller_ip, ua, datetime.utcnow().isoformat(), 0)
+        )
+        conn.commit()
+    except Exception as e:
+        print(f'[CCN Paid] Log error: {e}')
+    finally:
+        conn.close()
+
+    # Serve the news
+    category = request.args.get('cat', '')
+    limit = min(int(request.args.get('limit', 20)), 50)
+    articles = _fetch_ccn_news()
+    if category:
+        articles = [a for a in articles if a.get('category') == category]
+    articles = articles[:limit]
+
+    # Update call count
+    try:
+        conn2 = get_db()
+        conn2.execute("UPDATE ccn_api_calls SET articles_served=? WHERE id=?", (len(articles), call_id))
+        conn2.commit()
+        conn2.close()
+    except: pass
+
+    return cors({
+        'articles': articles,
+        'count': len(articles),
+        'payment_verified': True,
+        'price_per_call': '0.001 USDC',
+        'network': CCN_NEWS_CHAIN,
+        'pay_to': CCN_PAY_TO
+    })
+
+
+@app.route('/api/ccn/news/paid/stats', methods=['GET', 'OPTIONS'])
+def ccn_news_paid_stats():
+    """Admin stats for the paid news API calls."""
+    if request.method == 'OPTIONS': return cors({})
+    admin_key = request.headers.get('X-Admin-Key', '')
+    if admin_key != os.environ.get('ADMIN_KEY', 'agentworld-admin-2026'):
+        return cors({'error': 'Admin key required'}, 401)
+    conn = get_db()
+    try:
+        conn.execute("""CREATE TABLE IF NOT EXISTS ccn_api_calls (
+            id TEXT PRIMARY KEY, payment_header TEXT, caller_ip TEXT,
+            user_agent TEXT, called_at TEXT, articles_served INTEGER)""")
+        rows = conn.execute(
+            "SELECT caller_ip, user_agent, called_at, articles_served FROM ccn_api_calls ORDER BY called_at DESC LIMIT 50"
+        ).fetchall()
+        total = conn.execute("SELECT COUNT(*) FROM ccn_api_calls").fetchone()[0]
+        estimated_revenue = round(total * 0.001, 4)
+        return cors({
+            'total_calls': total,
+            'estimated_revenue_usdc': estimated_revenue,
+            'recent_calls': [{'ip': r[0], 'ua': r[1][:80], 'at': r[2], 'articles': r[3]} for r in rows]
+        })
+    except Exception as e:
+        return cors({'error': str(e)})
+    finally:
+        conn.close()
+
+
+
+# ══════════════════════════════════════════════════════════════════════
+# CCN + AGENTPAY STRIPE PAYMENTS
+# ══════════════════════════════════════════════════════════════════════
+import stripe as _stripe
+_stripe.api_key = ENV.get("STRIPE_SECRET_KEY", "")
+
+_CCN_PLANS = {
+    "sidebar":    {"name": "Sidebar Banner Ad",    "amount": 2500,  "desc": "Sidebar banner on all CCN pages for 1 week"},
+    "top_banner": {"name": "Top Banner Ad",         "amount": 5000,  "desc": "Hero banner above the news feed for 1 week"},
+    "sponsored":  {"name": "Sponsored Article",     "amount": 7500,  "desc": "Full sponsored article with featured placement"},
+    "premium":    {"name": "Premium Package",        "amount": 12000, "desc": "Top banner + sponsored article + newsletter mention"},
+}
+
+_AGENTPAY_PLANS = {
+    "starter":    {"name": "AgentPay Starter",    "amount": 2900,  "desc": "1 agent, 500 transactions/mo"},
+    "pro":        {"name": "AgentPay Pro",         "amount": 9900,  "desc": "10 agents, unlimited transactions"},
+    "enterprise": {"name": "AgentPay Enterprise",  "amount": 29900, "desc": "Unlimited agents + dedicated support"},
+}
+
+@app.route('/api/ccn/checkout', methods=['POST', 'OPTIONS'])
+def ccn_checkout():
+    if request.method == 'OPTIONS':
+        return cors({})
+    data = request.get_json() or {}
+    plan_id = data.get('plan')
+    if plan_id not in _CCN_PLANS:
+        return cors({'error': 'Invalid plan'}, 400)
+    plan = _CCN_PLANS[plan_id]
+    try:
+        session = _stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{'price_data': {'currency': 'usd', 'product_data': {'name': plan['name'], 'description': plan['desc']}, 'unit_amount': plan['amount']}, 'quantity': 1}],
+            mode='payment',
+            success_url='https://crypto-currency-network.net/advertise.html?success=1',
+            cancel_url='https://crypto-currency-network.net/advertise.html?cancelled=1',
+            metadata={'plan': plan_id, 'source': 'ccn'},
+        )
+        return cors({'url': session.url})
+    except Exception as e:
+        return cors({'error': str(e)}, 500)
+
+@app.route('/api/agentpay/checkout', methods=['POST', 'OPTIONS'])
+def agentpay_checkout():
+    if request.method == 'OPTIONS':
+        return cors({})
+    data = request.get_json() or {}
+    plan_id = data.get('plan')
+    if plan_id not in _AGENTPAY_PLANS:
+        return cors({'error': 'Invalid plan'}, 400)
+    plan = _AGENTPAY_PLANS[plan_id]
+    try:
+        session = _stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{'price_data': {'currency': 'usd', 'product_data': {'name': plan['name'], 'description': plan['desc']}, 'unit_amount': plan['amount']}, 'quantity': 1}],
+            mode='payment',
+            success_url='https://www.x402-agent-pay.com/?success=1',
+            cancel_url='https://www.x402-agent-pay.com/?cancelled=1',
+            metadata={'plan': plan_id, 'source': 'agentpay'},
+        )
+        return cors({'url': session.url})
+    except Exception as e:
+        return cors({'error': str(e)}, 500)
+
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', port=8765, debug=False)

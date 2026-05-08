@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advertise on Cryptocurrency Network — Reach Crypto & AI Traders</title>
+<link rel="icon" href="/favicon.ico">
+<style>
+:root{--bg:#0a0e1a;--card:#131929;--border:#1e2d45;--text:#e8f0fe;--muted:#8899aa;--green:#00ff9d;--orange:#ff6600;--blue:#4fc3f7;--accent:#7c4dff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;}
+nav{background:rgba(10,14,26,0.97);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:15px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text);}
+.logo span{color:var(--orange);}
+.live-badge{background:rgba(0,255,157,0.15);border:1px solid var(--green);color:var(--green);padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+nav a{color:var(--muted);text-decoration:none;font-size:13px;}
+nav a:hover{color:var(--text);}
+.hero{background:linear-gradient(135deg,rgba(124,77,255,0.15),rgba(0,255,157,0.08));border-bottom:1px solid var(--border);padding:60px 20px;text-align:center;}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:800;margin-bottom:16px;}
+.hero h1 span{color:var(--green);}
+.hero p{color:var(--muted);font-size:16px;max-width:560px;margin:0 auto 30px;}
+.stats-row{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-top:30px;}
+.stat-pill{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 24px;text-align:center;}
+.stat-pill .n{font-size:24px;font-weight:800;color:var(--green);}
+.stat-pill .l{font-size:12px;color:var(--muted);margin-top:2px;}
+.wrap{max-width:900px;margin:0 auto;padding:40px 20px;}
+h2{font-size:22px;font-weight:700;margin-bottom:20px;}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:50px;}
+.plan{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;}
+.plan.featured{border-color:var(--green);}
+.plan .badge{position:absolute;top:-12px;left:20px;background:var(--green);color:#000;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;}
+.plan h3{font-size:18px;font-weight:700;margin-bottom:6px;}
+.plan .price{font-size:28px;font-weight:800;color:var(--green);margin:12px 0 4px;}
+.plan .price span{font-size:14px;font-weight:400;color:var(--muted);}
+.plan .dur{font-size:12px;color:var(--muted);margin-bottom:16px;}
+.plan ul{list-style:none;margin-bottom:20px;}
+.plan ul li{font-size:13px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);}
+.plan ul li::before{content:"✓ ";color:var(--green);}
+.pay-opts{font-size:11px;color:var(--muted);margin-top:8px;}
+.pay-opts span{background:rgba(0,255,157,0.1);border:1px solid rgba(0,255,157,0.3);color:var(--green);padding:2px 8px;border-radius:4px;margin:2px;display:inline-block;}
+.form-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px;margin-bottom:40px;}
+.form-section h2{margin-bottom:24px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:580px){.form-grid{grid-template-columns:1fr;}}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;}
+input,select,textarea{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 14px;font-size:14px;outline:none;font-family:inherit;}
+input:focus,select:focus,textarea:focus{border-color:var(--green);}
+textarea{resize:vertical;min-height:80px;}
+select option{background:#131929;}
+.full{grid-column:1/-1;}
+.payment-section{background:rgba(124,77,255,0.08);border:1px solid rgba(124,77,255,0.3);border-radius:12px;padding:20px;margin-top:8px;}
+.pay-method{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;}
+.pay-btn{background:var(--card);border:2px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;text-align:center;flex:1;min-width:130px;transition:.2s;}
+.pay-btn:hover,.pay-btn.active{border-color:var(--green);background:rgba(0,255,157,0.08);}
+.pay-btn .icon{font-size:20px;margin-bottom:4px;}
+.pay-btn .name{font-size:12px;font-weight:700;}
+.pay-btn .sub{font-size:10px;color:var(--muted);}
+#wallet-section{display:none;margin-top:16px;}
+#stripe-section{display:none;margin-top:16px;}
+.wallet-addr{background:#0a0e1a;border:1px solid var(--green);border-radius:10px;padding:14px;font-family:monospace;font-size:12px;word-break:break-all;color:var(--green);margin:10px 0;}
+.copy-btn{background:rgba(0,255,157,0.1);border:1px solid var(--green);color:var(--green);padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;margin-left:8px;}
+.copy-btn:hover{background:rgba(0,255,157,0.2);}
+.submit-btn{width:100%;background:var(--green);color:#000;border:none;border-radius:10px;padding:16px;font-size:16px;font-weight:800;cursor:pointer;margin-top:20px;transition:.2s;}
+.submit-btn:hover{opacity:.9;}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;}
+#success-msg{display:none;background:rgba(0,255,157,0.1);border:1px solid var(--green);border-radius:10px;padding:20px;text-align:center;color:var(--green);margin-top:20px;}
+.placement-preview{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+.preview-card{background:#0a0e1a;border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.2s;}
+.preview-card:hover,.preview-card.active{border-color:var(--green);}
+.preview-card .plabel{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.preview-card .ptitle{font-size:13px;font-weight:700;}
+.faq{margin-bottom:60px;}
+.faq h2{margin-bottom:20px;}
+.faq-item{border-bottom:1px solid var(--border);padding:16px 0;}
+.faq-item dt{font-weight:600;margin-bottom:6px;cursor:pointer;}
+.faq-item dd{color:var(--muted);font-size:14px;line-height:1.6;}
+footer{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
+footer a{color:var(--muted);text-decoration:none;}
+</style>
+  <meta name="description" content="Advertise to crypto traders, AI developers, and DeFi enthusiasts on Cryptocurrency Network. From $25/week. Sponsored content and banner ads available.">
+  <meta name="keywords" content="crypto advertising, blockchain ads, AI developer advertising, crypto news ads">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://crypto-currency-network.net/advertise.html">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Advertise on Cryptocurrency Network — Reach Crypto & AI Traders">
+  <meta property="og:description" content="Advertise to crypto traders, AI developers, and DeFi enthusiasts on Cryptocurrency Network. From $25/week. Sponsored content and banner ads available.">
+  <meta property="og:url" content="https://crypto-currency-network.net/advertise.html">
+  <meta property="og:image" content="https://crypto-currency-network.net/logo.png">
+  <meta property="og:site_name" content="Cryptocurrency Network">
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Advertise on Cryptocurrency Network — Reach Crypto & AI Traders">
+  <meta name="twitter:description" content="Advertise to crypto traders, AI developers, and DeFi enthusiasts on Cryptocurrency Network. From $25/week. Sponsored content and banner ads available.">
+  <meta name="twitter:image" content="https://crypto-currency-network.net/logo.png">
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/"><span>CRYPTO</span>CURRENCY<br>NETWORK</a>
+  <span class="live-badge">● LIVE</span>
+  <a href="/">← Back to News</a>
+</nav>
+
+<div class="hero">
+  <h1>Reach the <span>Crypto & AI</span><br>Community</h1>
+  <p>Advertise on Cryptocurrency Network — the go-to source for crypto traders, AI developers, DeFi enthusiasts, and on-chain builders.</p>
+  <div class="stats-row">
+    <div class="stat-pill"><div class="n">CCN</div><div class="l">Publication</div></div>
+    <div class="stat-pill"><div class="n">AI + Crypto</div><div class="l">Audience</div></div>
+    <div class="stat-pill"><div class="n">3 Sites</div><div class="l">Ecosystem Network</div></div>
+    <div class="stat-pill"><div class="n">USDC / SOL / Card</div><div class="l">Payment Options</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h2>📦 Ad Packages</h2>
+  <div class="plans">
+    <div class="plan">
+      <h3>Sidebar Banner</h3>
+      <div class="price">$25 <span>/week</span></div>
+      <div class="dur">per week</div>
+      <ul>
+        <li>Sidebar card on all pages</li>
+        <li>Logo, title, description</li>
+        <li>Click-through link</li>
+        <li>Impression tracking</li>
+      </ul>
+      <button id="btn-sidebar" onclick="buyPlan('sidebar')" style="width:100%;margin-top:18px;padding:13px;background:linear-gradient(135deg,#00e5ff,#0077cc);border:none;border-radius:8px;color:#000;font-weight:800;font-size:14px;cursor:pointer;">Buy Now — Pay with Card →</button>
+      <div class="pay-opts">
+        <span>USDC Base</span><span>USDC ETH</span><span>USDC Solana</span><span>Stripe</span>
+      </div>
+    </div>
+
+    <div class="plan featured">
+      <div class="badge">⭐ POPULAR</div>
+      <h3>Sponsored Article</h3>
+      <div class="price">$75 <span>/week</span></div>
+      <div class="dur">per week</div>
+      <ul>
+        <li>News card in main feed</li>
+        <li>"Sponsored" label</li>
+        <li>Featured placement</li>
+        <li>All pages + homepage</li>
+        <li>Click + impression stats</li>
+      </ul>
+      <button id="btn-sponsored" onclick="buyPlan('sponsored')" style="width:100%;margin-top:18px;padding:13px;background:linear-gradient(135deg,#00e5ff,#0077cc);border:none;border-radius:8px;color:#000;font-weight:800;font-size:14px;cursor:pointer;">Buy Now — Pay with Card →</button>
+      <div class="pay-opts">
+        <span>USDC Base</span><span>USDC ETH</span><span>USDC Solana</span><span>Stripe</span>
+      </div>
+    </div>
+
+    <div class="plan">
+      <h3>Top Banner</h3>
+      <div class="price">$50 <span>/week</span></div>
+      <div class="dur">per week</div>
+      <ul>
+        <li>Hero banner above news</li>
+        <li>Maximum visibility</li>
+        <li>Custom emoji/logo</li>
+        <li>Full-width on mobile</li>
+        <li>Click + impression stats</li>
+      </ul>
+      <button id="btn-top_banner" onclick="buyPlan('top_banner')" style="width:100%;margin-top:18px;padding:13px;background:linear-gradient(135deg,#00e5ff,#0077cc);border:none;border-radius:8px;color:#000;font-weight:800;font-size:14px;cursor:pointer;">Buy Now — Pay with Card →</button>
+      <div class="pay-opts">
+        <span>USDC Base</span><span>USDC ETH</span><span>USDC Solana</span><span>Stripe</span>
+      </div>
+    </div>
+
+    <div class="plan">
+      <h3>Bundle — All Placements</h3>
+      <div class="price">$120 <span>/week</span></div>
+      <div class="dur">per week</div>
+      <ul>
+        <li>Sidebar + Top Banner</li>
+        <li>Sponsored Article slot</li>
+        <li>30% off vs individual</li>
+        <li>Priority support</li>
+        <li>Full analytics report</li>
+      </ul>
+      <div class="pay-opts">
+        <span>USDC Base</span><span>USDC ETH</span><span>USDC Solana</span><span>Stripe</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2>🚀 Submit Your Ad</h2>
+    <form id="adForm">
+      <div class="form-grid">
+        <div>
+          <label>Your Name / Company</label>
+          <input type="text" id="advertiser" placeholder="Acme Protocol Inc." required>
+        </div>
+        <div>
+          <label>Emoji / Logo Icon</label>
+          <input type="text" id="logo_emoji" placeholder="🚀" maxlength="4" value="📢">
+        </div>
+        <div class="full">
+          <label>Ad Headline</label>
+          <input type="text" id="title" placeholder="The fastest DeFi bridge on Base" required>
+        </div>
+        <div class="full">
+          <label>Short Description (1-2 sentences)</label>
+          <textarea id="description" placeholder="Swap any token across chains in under 3 seconds with zero slippage." required></textarea>
+        </div>
+        <div class="full">
+          <label>Destination URL</label>
+          <input type="url" id="url" placeholder="https://yourproject.xyz" required>
+        </div>
+        <div>
+          <label>Placement</label>
+          <select id="placement">
+            <option value="sidebar">Sidebar Banner — $25/wk</option>
+            <option value="sponsored_article">Sponsored Article — $75/wk</option>
+            <option value="top_banner">Top Banner — $50/wk</option>
+            <option value="bundle">Bundle (All) — $120/wk</option>
+          </select>
+        </div>
+        <div>
+          <label>Duration</label>
+          <select id="duration_days">
+            <option value="7">1 Week</option>
+            <option value="14">2 Weeks (-10%)</option>
+            <option value="30">1 Month (-20%)</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Payment Method</label>
+          <div class="payment-section">
+            <div class="pay-method">
+              <div class="pay-btn active" onclick="selectPay('usdc_base',this)">
+                <div class="icon">🔵</div>
+                <div class="name">USDC on Base</div>
+                <div class="sub">ERC-20 · Fast · Cheap</div>
+              </div>
+              <div class="pay-btn" onclick="selectPay('usdc_ethereum',this)">
+                <div class="icon">⟠</div>
+                <div class="name">USDC on Ethereum</div>
+                <div class="sub">ERC-20 · Mainnet</div>
+              </div>
+              <div class="pay-btn" onclick="selectPay('usdc_solana',this)">
+                <div class="icon">🟣</div>
+                <div class="name">USDC on Solana</div>
+                <div class="sub">SPL · Near-zero fees</div>
+              </div>
+              <div class="pay-btn" onclick="selectPay('stripe',this)">
+                <div class="icon">💳</div>
+                <div class="name">Credit Card</div>
+                <div class="sub">Via Stripe</div>
+              </div>
+            </div>
+
+            <div id="wallet-section">
+              <div id="wallet-instructions" style="font-size:13px;color:var(--muted);margin-bottom:8px;"></div>
+              <div class="wallet-addr" id="wallet-addr"></div>
+              <button type="button" class="copy-btn" onclick="copyAddr()">📋 Copy Address</button>
+              <div style="margin-top:14px;">
+                <label>Your Transaction Hash (after paying)</label>
+                <input type="text" id="tx_hash" placeholder="0x... or Solana signature">
+              </div>
+              <div style="margin-top:10px;font-size:12px;color:var(--muted);">
+                💡 Send the exact USDC amount matching your plan. We verify on-chain and activate within 1 hour.
+              </div>
+            </div>
+
+            <div id="stripe-section">
+              <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:16px;text-align:center;color:var(--muted);font-size:14px;">
+                💳 After submitting, we will email you a Stripe payment link within 1 hour.<br>
+                Contact: <a href="mailto:support@x402-agent-pay.com" style="color:var(--green);">support@x402-agent-pay.com</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">📤 Submit Ad Request</button>
+      <div id="success-msg">
+        <div style="font-size:32px;margin-bottom:10px;">🎉</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:8px;">Ad Submitted!</div>
+        <div style="color:var(--muted);">We'll verify your payment and activate your ad within 1 hour. Questions? Email <a href="mailto:support@x402-agent-pay.com" style="color:var(--green);">support@x402-agent-pay.com</a></div>
+      </div>
+    </form>
+  </div>
+
+  <div class="faq">
+    <h2>❓ FAQ</h2>
+    <dl>
+      <div class="faq-item"><dt>How quickly does my ad go live?</dt><dd>On-chain payments (USDC on Base or Solana) are verified automatically — usually within 1 hour. Card payments via Stripe activate same day after we send you the link.</dd></div>
+      <div class="faq-item"><dt>What's the audience?</dt><dd>Cryptocurrency Network readers are crypto traders, DeFi users, AI developers, and on-chain builders interested in Bitcoin, Ethereum, Base Network, Solana, and autonomous AI agents.</dd></div>
+      <div class="faq-item"><dt>Can I pay in crypto?</dt><dd>Yes — USDC on Base network or USDC on Solana. Both are accepted. We verify the transaction hash on-chain before activating your ad.</dd></div>
+      <div class="faq-item"><dt>How do I track performance?</dt><dd>We provide click and impression counts. Email us at support@x402-agent-pay.com for a report.</dd></div>
+      <div class="faq-item"><dt>Can I cancel early?</dt><dd>Ads are non-refundable but we can pause and credit remaining days toward a new campaign.</dd></div>
+    </dl>
+  </div>
+</div>
+
+<footer style="background:var(--card,#0d1117);border-top:1px solid var(--border,#1e293b);padding:32px 16px;margin-top:48px;">
+  <div style="max-width:1000px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:24px;font-size:13px;color:var(--muted,#64748b);">
+    <div>
+      <strong style="color:var(--text,#e2e8f0);display:block;margin-bottom:10px;">Cryptocurrency Network</strong>
+      Independent crypto &amp; AI agent news.<br><br>
+      <a href="/agentworld.html" style="color:#00ff9d;">🌆 AgentWorld</a><br>
+      <a href="/agentpay.html" style="color:#ff6600;">⚡ AgentPay</a><br>
+      <a href="https://x402-agent-pay.com" target="_blank" style="color:#ff6600;">x402-agent-pay.com ↗</a>
+    </div>
+    <div>
+      <strong style="color:var(--text,#e2e8f0);display:block;margin-bottom:10px;">News</strong>
+      <a href="/news.html">All News</a><br>
+      <a href="/bitcoin.html">Bitcoin</a><br>
+      <a href="/ethereum.html">Ethereum</a><br>
+      <a href="/defi.html">DeFi</a><br>
+      <a href="/base-network.html">Base Network</a>
+    </div>
+    <div>
+      <strong style="color:var(--text,#e2e8f0);display:block;margin-bottom:10px;">Platform</strong>
+      <a href="/ai-agents.html">AI Agents</a><br>
+      <a href="/markets.html">Markets</a><br>
+      <a href="/agentworld.html">AgentWorld</a><br>
+      <a href="/agentpay.html">AgentPay</a>
+    </div>
+    <div>
+      <strong style="color:var(--text,#e2e8f0);display:block;margin-bottom:10px;">Company</strong>
+      <a href="/about.html">About</a><br>
+      <a href="/contact.html">Contact</a><br>
+      <a href="/advertise.html">Advertise</a><br>
+      <a href="/disclaimer.html">Disclaimer</a><br>
+      <a href="/privacy.html">Privacy</a><br>
+      <a href="/terms.html">Terms</a>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid var(--border,#1e293b);font-size:12px;color:var(--muted,#64748b);">
+    © 2026 Cryptocurrency Network · Not financial advice
+  </div>
+</footer>
+
+<script>
+const WALLETS = {
+  usdc_base: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
+  usdc_solana: '6aCEuwH3PYx99cEmRz45otfxk39uF7ewGhqmvxfXisSG',
+  usdc_ethereum: '0x21d6442a930Fff60a5033dDC9e04A73a8b793eD2'
+};
+const PRICES = {sidebar:25, sponsored_article:75, top_banner:50, bundle:120};
+
+let currentPayMethod = 'usdc_base';
+
+function selectPay(method, el) {
+  currentPayMethod = method;
+  document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('wallet-section').style.display = (method === 'stripe') ? 'none' : 'block';
+  document.getElementById('stripe-section').style.display = (method === 'stripe') ? 'block' : 'none';
+  if (method === 'usdc_base') {
+    document.getElementById('wallet-addr').textContent = WALLETS.usdc_base;
+    document.getElementById('wallet-instructions').textContent = 'Send USDC (ERC-20) on Base network to:';
+  } else if (method === 'usdc_solana') {
+    document.getElementById('wallet-addr').textContent = WALLETS.usdc_solana;
+    document.getElementById('wallet-instructions').textContent = 'Send USDC (SPL token) on Solana to:';
+  } else if (method === 'usdc_ethereum') {
+    document.getElementById('wallet-addr').textContent = WALLETS.usdc_ethereum;
+    document.getElementById('wallet-instructions').textContent = 'Send USDC (ERC-20) on Ethereum mainnet to:';
+  }
+}
+selectPay('usdc_base', document.querySelector('.pay-btn'));
+
+function copyAddr() {
+  const addr = document.getElementById('wallet-addr').textContent;
+  navigator.clipboard.writeText(addr).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy Address', 2000);
+  });
+}
+
+document.getElementById('adForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+  const placement = document.getElementById('placement').value;
+  const duration = parseInt(document.getElementById('duration_days').value);
+  const pricePerWeek = PRICES[placement] || 25;
+  const weeks = duration / 7;
+  const discount = duration >= 30 ? 0.8 : duration >= 14 ? 0.9 : 1;
+  const totalUsdc = Math.round(pricePerWeek * weeks * discount * 100) / 100;
+
+  const payload = {
+    advertiser: document.getElementById('advertiser').value,
+    title: document.getElementById('title').value,
+    description: document.getElementById('description').value,
+    url: document.getElementById('url').value,
+    logo_emoji: document.getElementById('logo_emoji').value || '📢',
+    placement: placement,
+    payment_method: currentPayMethod,
+    tx_hash: document.getElementById('tx_hash')?.value || '',
+    amount_usdc: totalUsdc,
+    duration_days: duration
+  };
+  try {
+    const r = await fetch('https://crypto-currency-network.net/api/ccn/ads/submit', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('success-msg').style.display = 'block';
+      document.getElementById('adForm').style.display = 'none';
+    } else {
+      btn.textContent = 'Error: ' + d.error; btn.disabled = false;
+    }
+  } catch(err) {
+    btn.textContent = 'Network error — try again'; btn.disabled = false;
+  }
+});
+</script>
+
+<!-- ECOSYSTEM FOOTER -->
+<div style="text-align:center;padding:20px 16px 28px;background:#1a1a2e;border-top:2px solid #ff6600;font-size:11px;color:#aaa;margin-top:40px">
+  <div style="margin-bottom:10px;font-size:12px;color:#ff6600;letter-spacing:1px;font-weight:bold">⚡ x402 ECOSYSTEM</div>
+  <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:12px">
+    <a href="https://agentworld.me" style="color:#00d4ff;text-decoration:none;font-weight:bold">🌆 AgentWorld</a>
+    <a href="https://x402-agent-pay.com" style="color:#ff6600;text-decoration:none;font-weight:bold">⚡ x402 AgentPay</a>
+    <a href="https://crypto-currency-network.net" style="color:#00ff88;text-decoration:none;font-weight:bold">📰 Crypto Currency Network</a>
+  </div>
+  <div style="color:#555;font-size:9px">Crypto Currency Network · Covering the x402 Ecosystem · 2026</div>
+</div>
+
+<div style="text-align:center;padding:6px;font-size:10px;color:#555">a <a href="https://www.elonmuskoxnft.com" target="_blank" style="color:#ffd700;text-decoration:none;font-weight:bold">$MUSKOX</a> project</div>
+
+<script>
+async function buyPlan(planId) {
+  const btn = document.getElementById('btn-' + planId);
+  if (btn) { btn.textContent = 'Loading...'; btn.disabled = true; }
+  try {
+    const res = await fetch('/api/ccn/checkout', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({plan: planId})
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+      if (btn) { btn.textContent = 'Get Started'; btn.disabled = false; }
+    }
+  } catch(e) {
+    alert('Network error. Please try again.');
+    if (btn) { btn.textContent = 'Get Started'; btn.disabled = false; }
+  }
+}
+
+// Show success/cancel messages
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === '1') {
+  const el = document.createElement('div');
+  el.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#00ff9d;color:#000;padding:14px 28px;border-radius:10px;font-weight:700;z-index:9999;font-size:15px;';
+  el.textContent = '✅ Payment successful! We will be in touch within 24 hours.';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+if (params.get('cancelled') === '1') {
+  const el = document.createElement('div');
+  el.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4444;color:#fff;padding:14px 28px;border-radius:10px;font-weight:700;z-index:9999;font-size:15px;';
+  el.textContent = 'Payment cancelled.';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+</script>
+</body>
+</html>

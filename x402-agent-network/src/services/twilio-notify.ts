@@ -1,18 +1,3 @@
-import twilio from 'twilio';
-
-const accountSid = process.env.TWILIO_ACCOUNT_SID!;
-const authToken  = process.env.TWILIO_AUTH_TOKEN!;
-const fromNumber = process.env.TWILIO_PHONE_NUMBER!;
-
-// Lazy-init so missing creds don't crash startup
-let twilioClient: ReturnType<typeof twilio> | null = null;
-function getClient() {
-  if (!twilioClient && accountSid && authToken) {
-    twilioClient = twilio(accountSid, authToken);
-  }
-  return twilioClient;
-}
-
 // ─── Fee calculator ───────────────────────────────────────────────
 export function calculateFee(servicePrice: number): number {
   if (servicePrice < 50)  return Math.round(servicePrice * 0.03 * 100) / 100;
@@ -26,58 +11,19 @@ export function feePercent(servicePrice: number): string {
   return '1%';
 }
 
-// ─── Phone type detection (simple heuristic — US numbers) ─────────
-function isMobileNumber(phone: string): boolean {
-  // If it starts with known mobile area codes or has +1 — treat all as mobile for now
-  // In production integrate Twilio Lookup API for definitive mobile/landline check
-  const cleaned = phone.replace(/\D/g, '');
-  // Landline patterns heuristic: 800/888/866/877/855/844/833 = toll-free = voice only
-  const tollFree = /^1?(800|888|866|877|855|844|833)/.test(cleaned);
-  return !tollFree;
-}
-
-// ─── Send SMS ─────────────────────────────────────────────────────
+// ─── SMS (stub — Twilio removed) ──────────────────────────────────
 export async function sendSMS(to: string, body: string): Promise<boolean> {
-  try {
-    const client = getClient();
-    if (!client) { console.warn('Twilio not configured'); return false; }
-    const msg = await client.messages.create({ from: fromNumber, to, body });
-    console.log(`[Twilio SMS] Sent to ${to} — SID: ${msg.sid}`);
-    return true;
-  } catch (err: any) {
-    console.error(`[Twilio SMS] Error sending to ${to}:`, err.message);
-    return false;
-  }
+  console.warn(`[SMS] Twilio removed. Skipping SMS to ${to}: ${body.substring(0, 60)}`);
+  return false;
 }
 
-// ─── Make robocall (TwiML voice) ──────────────────────────────────
+// ─── Voice call (stub — Twilio removed) ──────────────────────────
 export async function makeRobocall(to: string, message: string, bookingId: string): Promise<boolean> {
-  try {
-    const client = getClient();
-    if (!client) { console.warn('Twilio not configured'); return false; }
-    // TwiML: say message, gather keypress
-    const twiml = `<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-  <Say voice="Polly.Joanna">${message}</Say>
-  <Gather numDigits="1" action="https://www.x402-agent-pay.com/api/v1/notify/ivr-response/${bookingId}" method="POST">
-    <Say voice="Polly.Joanna">Press 1 to confirm this booking. Press 2 to decline.</Say>
-  </Gather>
-  <Say voice="Polly.Joanna">We did not receive a response. We will try again shortly. Goodbye.</Say>
-</Response>`;
-    const call = await client.calls.create({
-      from: fromNumber,
-      to,
-      twiml,
-    });
-    console.log(`[Twilio Call] Called ${to} — SID: ${call.sid}`);
-    return true;
-  } catch (err: any) {
-    console.error(`[Twilio Call] Error calling ${to}:`, err.message);
-    return false;
-  }
+  console.warn(`[Voice] Twilio removed. Skipping robocall to ${to} for booking ${bookingId}`);
+  return false;
 }
 
-// ─── Send email via Base44 sendBookingEmail backend function ─────
+// ─── Send email via Base44 backend function ───────────────────────
 const BASE44_EMAIL_FN = 'https://muskox3-481c23be.base44.app/functions/sendBookingEmail';
 
 export async function sendEmailNotification(
@@ -124,7 +70,7 @@ export interface BookingNotification {
   date: string;
   time: string;
   price: number;
-  attempt?: number; // 1, 2, or 3
+  attempt?: number;
 }
 
 export interface NotificationResult {
@@ -136,54 +82,22 @@ export interface NotificationResult {
 
 export async function notifyBusiness(booking: BookingNotification): Promise<NotificationResult> {
   const attempt = booking.attempt || 1;
-  const { bookingId, businessName, businessPhone, businessEmail,
+  const { bookingId, businessName, businessEmail,
           serviceType, customerName, date, time, price } = booking;
 
-  const fee   = calculateFee(price);
-  const pct   = feePercent(price);
-  const net   = Math.round((price - fee) * 100) / 100;
+  const fee = calculateFee(price);
+  const pct = feePercent(price);
+  const net = Math.round((price - fee) * 100) / 100;
 
-  const smsMsg = 
-    `AgentPay Booking Request\n` +
-    `Business: ${businessName}\n` +
-    `Service: ${serviceType}\n` +
-    `Date/Time: ${date} at ${time}\n` +
-    `Job Value: $${price} (you receive $${net} after ${pct} fee)\n` +
-    `Reply YES to confirm or NO to decline.\n` +
-    `Ref: ${bookingId}`;
-
-  const voiceMsg =
-    `Hello ${businessName}. You have a new booking request through AgentPay. ` +
-    `A customer is requesting ${serviceType} on ${date} at ${time}. ` +
-    `The job value is ${price} dollars. Your payout will be ${net} dollars after the platform fee.`;
-
-  // Attempt 1 — SMS if mobile, voice if landline/toll-free
-  // Attempt 2 — escalate: voice call
-  // Attempt 3 — email fallback
-  if (attempt === 1 && businessPhone) {
-    const useMobile = isMobileNumber(businessPhone);
-    if (useMobile) {
-      const ok = await sendSMS(businessPhone, smsMsg);
-      if (ok) return { sent: true, method: 'sms', attempt };
-    }
-    // Landline or SMS failed — try voice
-    const ok = await makeRobocall(businessPhone, voiceMsg, bookingId);
-    if (ok) return { sent: true, method: 'voice', attempt };
-  }
-
-  if (attempt === 2 && businessPhone) {
-    const ok = await makeRobocall(businessPhone, voiceMsg, bookingId);
-    if (ok) return { sent: true, method: 'voice', attempt };
-  }
-
-  if (attempt === 3 && businessEmail) {
-    const emailBody = 
+  // All notifications now go via email only
+  if (businessEmail) {
+    const emailBody =
       `New Booking Request\n\n` +
       `Business: ${businessName}\n` +
       `Service: ${serviceType}\n` +
       `Date/Time: ${date} at ${time}\n` +
       `Job Value: $${price} (you receive $${net} after ${pct} fee)\n\n` +
-      `Reply to this email with YES to confirm or NO to decline.\n` +
+      `Reply YES to confirm or NO to decline.\n` +
       `Ref: ${bookingId}`;
     const ok = await sendEmailNotification(
       businessEmail,
@@ -195,5 +109,6 @@ export async function notifyBusiness(booking: BookingNotification): Promise<Noti
     if (ok) return { sent: true, method: 'email', attempt };
   }
 
+  console.warn(`[Notify] No contact method available for booking ${bookingId} — no email provided`);
   return { sent: false, method: 'none', attempt, message: 'No contact method available' };
 }

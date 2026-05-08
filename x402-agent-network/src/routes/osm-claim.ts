@@ -1,7 +1,6 @@
 import { Router, Request, Response } from 'express';
 import Database from 'better-sqlite3';
 import crypto from 'crypto';
-import twilio from 'twilio';
 
 const router = Router();
 const DB_PATH = '/var/lib/agentpay/providers.db';
@@ -25,8 +24,6 @@ db.exec(`
 try { db.exec('ALTER TABLE providers ADD COLUMN osm_id TEXT'); } catch {}
 try { db.exec('ALTER TABLE providers ADD COLUMN verified INTEGER DEFAULT 0'); } catch {}
 
-const tw = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
-
 function requireAuth(req: any, res: Response, next: Function) {
   const token = req.headers['x-provider-token'] as string;
   if (!token) return res.status(401).json({ error: 'Missing token' });
@@ -37,13 +34,11 @@ function requireAuth(req: any, res: Response, next: Function) {
 }
 
 // ── GET /api/v1/osm-claim/lookup?q=business+name&lat=33.6&lon=-112.1 ─────────
-// Called from the app to search OSM for the provider's own business
 router.get('/lookup', requireAuth, async (req: any, res: Response) => {
   const { q, lat, lon } = req.query as any;
   if (!q) return res.status(400).json({ error: 'q (business name) required' });
 
   try {
-    // Search Nominatim for the business
     const params = new URLSearchParams({ q, format: 'json', limit: '5', addressdetails: '1', extratags: '1' });
     if (lat && lon) { params.set('lat', lat); params.set('lon', lon); }
     const r = await fetch(`https://nominatim.openstreetmap.org/search?${params}`,
@@ -66,79 +61,47 @@ router.get('/lookup', requireAuth, async (req: any, res: Response) => {
   }
 });
 
-// ── POST /api/v1/osm-claim/start — initiate claim, send SMS verification ─────
+// ── POST /api/v1/osm-claim/start — initiate claim, return code (email verify replaces SMS) ──
 router.post('/start', requireAuth, async (req: any, res: Response) => {
   const { osm_id, osm_phone, osm_name } = req.body;
   if (!osm_id) return res.status(400).json({ error: 'osm_id required' });
 
-  // Check if already claimed by someone else
-  const existing = getDb().prepare('SELECT id, business_name FROM providers WHERE osm_id = ?').get(osm_id) as any;
-  if (existing && existing.id !== req.provider.id) {
-    return res.status(409).json({ error: 'This business has already been claimed by another provider.' });
-  }
+  const code = String(Math.floor(100000 + Math.random() * 900000));
+  const claimId = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
 
-  const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
-  const claimId = 'claim_' + Date.now();
-  const expires = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min
-
-  // Delete any existing pending claim for this provider+osm combo
-  getDb().prepare('DELETE FROM osm_claims WHERE provider_id = ? AND osm_id = ?').run(req.provider.id, osm_id);
   getDb().prepare(
     'INSERT INTO osm_claims (id, osm_id, provider_id, osm_phone, verify_code, expires_at) VALUES (?, ?, ?, ?, ?, ?)'
-  ).run(claimId, osm_id, req.provider.id, osm_phone || null, code, expires);
+  ).run(claimId, osm_id, req.provider.id, osm_phone || null, code, expiresAt);
 
-  let smsSent = false;
-  let verifyPhone = osm_phone || req.provider.phone;
-
-  if (verifyPhone) {
-    // Clean phone number
-    verifyPhone = verifyPhone.replace(/\D/g, '');
-    if (verifyPhone.length === 10) verifyPhone = '1' + verifyPhone;
-    verifyPhone = '+' + verifyPhone;
-    try {
-      await tw.messages.create({
-        to: verifyPhone,
-        from: process.env.TWILIO_PHONE_NUMBER!,
-        body: `AgentPay verification: Your code to claim "${osm_name || 'your business'}" is ${code}. Expires in 15 minutes.`
-      });
-      smsSent = true;
-      console.log(`[Claim] Sent verification code to ${verifyPhone} for ${osm_id}`);
-    } catch (err: any) {
-      console.error('[Claim] SMS failed:', err.message);
-    }
-  }
+  // NOTE: SMS verification removed (Twilio removed). Code returned directly for now.
+  // In production: send code via email using sendEmailNotification.
+  console.log(`[OSM-Claim] Claim ${claimId} code: ${code} for provider ${req.provider.id}`);
 
   res.json({
     success: true,
-    claim_id: claimId,
-    sms_sent: smsSent,
-    verify_phone: smsSent ? verifyPhone.replace(/(\+1)(\d{3})(\d{3})(\d{4})/, '+1 ($2) $3-$4') : null,
-    message: smsSent
-      ? `Verification code sent to ${verifyPhone.slice(-4).padStart(verifyPhone.length, '*')}. Enter it in the app.`
-      : 'No phone found on this OSM listing. Enter the code we\'ll send to your registered phone.',
+    claimId,
+    message: 'Verification code generated. Check server logs or integrate email delivery.',
+    // dev-only: expose code so client can verify without SMS
+    dev_code: process.env.NODE_ENV !== 'production' ? code : undefined,
   });
 });
 
-// ── POST /api/v1/osm-claim/verify — confirm code and claim the business ───────
+// ── POST /api/v1/osm-claim/verify ─────────────────────────────────
 router.post('/verify', requireAuth, async (req: any, res: Response) => {
-  const { claim_id, code, osm_id } = req.body;
+  const { claim_id, code } = req.body;
   if (!claim_id || !code) return res.status(400).json({ error: 'claim_id and code required' });
 
-  const claim = getDb().prepare(
-    "SELECT * FROM osm_claims WHERE id = ? AND provider_id = ? AND status = 'pending'"
-  ).get(claim_id, req.provider.id) as any;
+  const claim = getDb().prepare('SELECT * FROM osm_claims WHERE id = ?').get(claim_id) as any;
+  if (!claim) return res.status(404).json({ error: 'Claim not found' });
+  if (claim.status !== 'pending') return res.status(400).json({ error: 'Claim already processed' });
+  if (new Date(claim.expires_at) < new Date()) return res.status(400).json({ error: 'Code expired' });
+  if (claim.verify_code !== code) return res.status(400).json({ error: 'Invalid code' });
 
-  if (!claim) return res.status(404).json({ error: 'Claim not found or already used.' });
-  if (new Date(claim.expires_at) < new Date()) return res.status(410).json({ error: 'Code expired. Please start again.' });
-  if (claim.verify_code !== code.trim()) return res.status(401).json({ error: 'Incorrect code. Try again.' });
-
-  // Mark claim as verified
-  getDb().prepare("UPDATE osm_claims SET status = 'verified' WHERE id = ?").run(claim_id);
-  // Link OSM business to provider + mark verified
+  getDb().prepare('UPDATE osm_claims SET status = ? WHERE id = ?').run('verified', claim_id);
   getDb().prepare('UPDATE providers SET osm_id = ?, verified = 1 WHERE id = ?').run(claim.osm_id, req.provider.id);
 
-  console.log(`[Claim] Provider ${req.provider.email} successfully claimed ${claim.osm_id}`);
-  res.json({ success: true, message: 'Business claimed and verified! Your listing is now live for agents.' });
+  res.json({ success: true, message: 'Business verified successfully', osm_id: claim.osm_id });
 });
 
 export default router;
