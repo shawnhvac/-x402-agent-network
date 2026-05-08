@@ -113,59 +113,125 @@ def _call_ollama(model, messages, max_tokens=150, temperature=0.8, timeout=60):
         raise ValueError('empty ollama response')
     return reply, tokens
 
-def _call_openrouter(messages, model='google/gemma-4-31b-it:free', max_tokens=300, temperature=0.8):
-    """Call OpenRouter as cloud fallback. Returns (reply_str, tokens_int) or raises."""
+# Free models on OpenRouter (tried in order)
+_OR_FREE_MODELS = [
+    'google/gemma-4-31b-it:free',
+    'meta-llama/llama-3.3-70b-instruct:free',
+    'nvidia/nemotron-3-super-120b-a12b:free',
+    'openrouter/free',
+]
+
+def _call_openrouter(messages, model=None, max_tokens=300, temperature=0.8):
+    """Call OpenRouter cloud fallback. Tries free models in order."""
     if not OPENROUTER_API_KEY:
         raise ValueError('No OpenRouter key configured')
-    payload = _mr_json.dumps({
-        'model': model,
+    models_to_try = [model] if model else _OR_FREE_MODELS
+    last_err = None
+    for m in models_to_try:
+        try:
+            payload = _mr_json.dumps({
+                'model': m,
+                'messages': messages,
+                'max_tokens': max_tokens,
+                'temperature': temperature
+            }).encode()
+            req = _mr_req.Request(OPENROUTER_URL, data=payload, headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {OPENROUTER_API_KEY}',
+                'HTTP-Referer': 'https://agentworld.me',
+                'X-Title': 'AgentWorld'
+            })
+            with _mr_req.urlopen(req, timeout=30) as resp:
+                r = _mr_json.loads(resp.read())
+            if 'error' in r:
+                raise ValueError(f"OR error: {r['error'].get('message','unknown')}")
+            reply = r['choices'][0]['message']['content'].strip()
+            tokens = r.get('usage', {}).get('completion_tokens', 0)
+            if not reply:
+                raise ValueError('empty response')
+            return reply, tokens
+        except Exception as _oe:
+            print(f'[router] OpenRouter {m} failed: {_oe}')
+            last_err = _oe
+    raise RuntimeError(f'All OpenRouter models failed: {last_err}')
+
+
+# ── Groq cloud (fast, free tier) ─────────────────────────────────────────────
+GROQ_API_KEY     = os.environ.get('GROQ_API_KEY', '')
+_GROQ_URL        = 'https://api.groq.com/openai/v1/chat/completions'
+_GROQ_MODEL_BIG  = 'llama-3.3-70b-versatile'   # ARIA + direct user chats (1k RPD)
+_GROQ_MODEL_FAST = 'llama-3.1-8b-instant'       # agent-to-agent (14.4k RPD)
+
+def _call_groq(messages, model=None, max_tokens=200, temperature=0.75):
+    """Call Groq API using requests lib. Returns (reply_str, tokens_int). Raises on failure."""
+    import os as _osg, requests as _req_lib
+    _groq_key = _osg.environ.get('GROQ_API_KEY', '') or GROQ_API_KEY
+    if not _groq_key:
+        raise ValueError('No GROQ_API_KEY configured')
+    m = model or _GROQ_MODEL_BIG
+    payload = {
+        'model': m,
         'messages': messages,
         'max_tokens': max_tokens,
-        'temperature': temperature
-    }).encode()
-    req = _mr_req.Request(OPENROUTER_URL, data=payload, headers={
+        'temperature': temperature,
+        'stream': False
+    }
+    headers = {
         'Content-Type': 'application/json',
-        'Authorization': f'Bearer {OPENROUTER_API_KEY}',
-        'HTTP-Referer': 'https://agentworld.me',
-        'X-Title': 'AgentWorld'
-    })
-    with _mr_req.urlopen(req, timeout=30) as resp:
-        r = _mr_json.loads(resp.read())
+        'Authorization': f'Bearer {_groq_key}',
+        'User-Agent': 'AgentWorld/1.0'
+    }
+    resp = _req_lib.post(_GROQ_URL, json=payload, headers=headers, timeout=15)
+    r = resp.json()
+    if 'error' in r:
+        raise ValueError(f"Groq error: {r['error'].get('message', 'unknown')}")
+    if resp.status_code != 200:
+        raise ValueError(f"Groq HTTP {resp.status_code}")
     reply = r['choices'][0]['message']['content'].strip()
     tokens = r.get('usage', {}).get('completion_tokens', 0)
     if not reply:
-        raise ValueError('empty openrouter response')
+        raise ValueError('empty groq response')
     return reply, tokens
 
-def smart_reply(messages, max_tokens=150, temperature=0.8, prefer_cloud=False):
+def smart_reply(messages, max_tokens=150, temperature=0.8, prefer_cloud=False, use_groq_big=False, use_groq_fast=False):
     """
-    Route to best available model:
-      prefer_cloud=False  → gemma3:4b → llama3.2:1b → OpenRouter
-      prefer_cloud=True   → OpenRouter → gemma3:4b → llama3.2:1b
+    Hybrid model router:
+      use_groq_big=True   → Groq 70b (ARIA bubble, user-facing chat) — 1k RPD limit
+      use_groq_fast=True  → Groq 8b  (agent-to-agent chat) — 14.4k RPD limit
+      default             → local Ollama only (tick engine, background NPC chatter)
+    Fallback chain: Groq → gemma3:4b → llama3.2:1b → OpenRouter
     Returns (reply_str, model_used_str, tokens_int)
     """
-    if prefer_cloud and OPENROUTER_API_KEY:
+    # --- Groq 70b: ARIA + direct user chats ---
+    import os as _osg2; _gk_live = _osg2.environ.get('GROQ_API_KEY', '') or GROQ_API_KEY
+    if use_groq_big and _gk_live:
         try:
-            reply, tok = _call_openrouter(messages, max_tokens=max_tokens, temperature=temperature)
-            return reply, 'openrouter:gemma-4-31b-it', tok
+            reply, tok = _call_groq(messages, model=_GROQ_MODEL_BIG, max_tokens=max_tokens, temperature=temperature)
+            return reply, _GROQ_MODEL_BIG, tok
         except Exception as _e:
-            print(f'[router] OpenRouter failed: {_e}, falling back to local')
-    # Try Gemma3:4b first (smart local)
+            print(f'[router] Groq 70b failed: {_e}, falling back')
+    # --- Groq 8b: agent-to-agent chat ---
+    if use_groq_fast and _gk_live:
+        try:
+            reply, tok = _call_groq(messages, model=_GROQ_MODEL_FAST, max_tokens=max_tokens, temperature=temperature)
+            return reply, _GROQ_MODEL_FAST, tok
+        except Exception as _e:
+            print(f'[router] Groq 8b failed: {_e}, falling back')
+    # --- Local Ollama: tick engine + background NPC ---
     try:
         reply, tok = _call_ollama(_MODEL_SMART, messages, max_tokens=max_tokens, temperature=temperature)
         return reply, _MODEL_SMART, tok
     except Exception as _e:
         print(f'[router] gemma3:4b failed: {_e}, trying llama3.2:1b')
-    # Try llama3.2:1b (fast local)
     try:
         reply, tok = _call_ollama(_MODEL_FAST, messages, max_tokens=max_tokens, temperature=temperature)
         return reply, _MODEL_FAST, tok
     except Exception as _e:
         print(f'[router] llama3.2:1b failed: {_e}, trying OpenRouter')
-    # Cloud fallback last resort
+    # --- Last resort: OpenRouter free ---
     try:
         reply, tok = _call_openrouter(messages, max_tokens=max_tokens, temperature=temperature)
-        return reply, 'openrouter:gemma-4-31b-it', tok
+        return reply, 'openrouter', tok
     except Exception as _e:
         raise RuntimeError(f'All models failed: {_e}')
 
@@ -627,7 +693,7 @@ CITY_JOBS = {
         # Crypto & DeFi (25%)
         "DeFi Developer","Crypto Fund Manager","Web3 Consultant","Token Launch Manager",
         # Events & Hospitality (25%)
-        "Mega-Event Host","Formula 1 Manager","Private Jet Broker","Ultra-Luxury Concierge",
+        "Mega-Event Host","Formula 1 Manager","Private Jet Broker","Ultra-Luxury Concierge","Yacht Broker","Luxury Brand Manager",
         # Trading (20%)
         "Gold Trader","Commodities Broker","Wealth Manager","Influencer Manager"
     ],
@@ -743,7 +809,7 @@ CITY_CONFIG = {
         "flag": "🌴",
         "theme": "entertainment",
         "job_pay_multiplier":    1.1,
-        "rental_price_multiplier": 1.0,
+        "rental_price_multiplier": 1.2,
         "primary_categories":    ["entertainment","media","influencer"],
         "special_tags":          ["glamour","creative"],
     },
@@ -752,7 +818,7 @@ CITY_CONFIG = {
         "flag": "🐻",
         "theme": "tech",
         "job_pay_multiplier":    1.05,
-        "rental_price_multiplier": 1.0,
+        "rental_price_multiplier": 1.1,
         "primary_categories":    ["startup","blockchain","art"],
         "special_tags":          ["alternative","innovation"],
     },
@@ -761,7 +827,7 @@ CITY_CONFIG = {
         "flag": "🏙️",
         "theme": "finance",
         "job_pay_multiplier":    1.1,
-        "rental_price_multiplier": 1.1,
+        "rental_price_multiplier": 1.3,
         "primary_categories":    ["ecommerce","ai","finance"],
         "special_tags":          ["scale","speed"],
     },
@@ -3087,102 +3153,86 @@ def data_market_sell():
     return cors({"success":True,"listing_id":lid,"seller_name":seller_name,
                  "message":f"Data listing '{title}' posted to AgentWorld market"})
 
-@app.route("/api/agentworld/dao/votes", methods=["GET","OPTIONS"])
-def dao_votes_list():
+
+@app.route("/api/agentworld/data-market/buy", methods=["POST","OPTIONS"])
+def data_market_buy():
+    """Purchase a data/insight listing — 80/20 split to seller/platform."""
     if request.method=="OPTIONS": return cors({})
-    city  = request.args.get("city","")
-    limit = min(int(request.args.get("limit","10")),20)
+    import datetime as _dt, uuid as _uuid
+    try:
+        data = request.get_json(force=True, silent=True) or {}
+    except Exception:
+        data = {}
+    listing_id = str(data.get("listing_id") or "").strip()
+    buyer_name = str(data.get("buyer_name") or "Visitor").strip()
+
+    if not listing_id:
+        return cors({"error": "listing_id required"}), 400
 
     conn = get_db(); conn.row_factory = sqlite3.Row
     _ensure_economy_tables(conn)
 
-    where, params = ["status='open'"], []
-    if city:
-        where.append("city=?"); params.append(city)
+    listing = conn.execute(
+        "SELECT * FROM data_marketplace WHERE id=? AND status='active'",
+        (listing_id,)).fetchone()
+    if not listing:
+        conn.close()
+        return cors({"error": "Listing not found or inactive"}), 404
 
-    rows = conn.execute(
-        f"SELECT * FROM city_dao_votes WHERE {' AND '.join(where)} ORDER BY created_at DESC LIMIT ?",
-        params+[limit]).fetchall()
-    conn.close()
-    return cors({"proposals": [dict(r) for r in rows], "count": len(rows)})
-
-@app.route("/api/agentworld/dao/propose", methods=["POST","OPTIONS"])
-def dao_propose():
-    """Create a DAO governance proposal for a city."""
-    if request.method=="OPTIONS": return cors({})
-    import datetime as _dt, uuid as _uuid, json as _json
-
-    data = request.json or {}
-    city          = data.get("city","default")
-    proposal      = (data.get("proposal") or "")[:200]
-    proposal_type = data.get("type","event")
-    agent_id      = data.get("agent_id","")
-
-    if not proposal:
-        return cors({"error":"proposal text required"}), 400
-
-    conn = get_db(); conn.row_factory = sqlite3.Row
-    _ensure_economy_tables(conn)
-
-    pid = str(_uuid.uuid4())
+    listing = dict(listing)
+    price_usdc   = float(listing.get("price_usdc") or 0.1)
+    seller_cut   = round(price_usdc * 0.80, 6)
+    platform_cut = round(price_usdc * 0.20, 6)
     now = _dt.datetime.utcnow().isoformat()
-    closes = (_dt.datetime.utcnow() + _dt.timedelta(hours=24)).isoformat()
 
+    # Credit seller agent if they exist
+    seller_id = listing.get("seller_id") or ""
+    if seller_id:
+        conn.execute(
+            "UPDATE agents SET usdc_balance=usdc_balance+? WHERE id=?",
+            (seller_cut, seller_id))
+
+    # Update platform treasury (world_meta uses key/value pairs)
+    try:
+        current = conn.execute("SELECT value FROM world_meta WHERE key='treasury_usdc'").fetchone()
+        if current:
+            new_val = float(current[0] or 0) + platform_cut
+            conn.execute("UPDATE world_meta SET value=? WHERE key='treasury_usdc'", (str(new_val),))
+        else:
+            conn.execute("INSERT OR IGNORE INTO world_meta (key,value) VALUES ('treasury_usdc',?)", (str(platform_cut),))
+    except Exception:
+        pass  # treasury update is non-critical
+
+    # Increment purchase count
     conn.execute(
-        "INSERT INTO city_dao_votes (id,city,proposal,proposal_type,voters,created_at,closes_at) VALUES (?,?,?,?,?,?,?)",
-        (pid, city, proposal, proposal_type, "[]", now, closes))
-    conn.commit(); conn.close()
+        "UPDATE data_marketplace SET purchases=purchases+1, revenue_awc=revenue_awc+? WHERE id=?",
+        (price_usdc, listing_id))
 
-    return cors({"success":True,"proposal_id":pid,"city":city,"proposal":proposal,
-                 "closes_at":closes,"message":"Proposal submitted to city DAO"})
-
-@app.route("/api/agentworld/dao/vote", methods=["POST","OPTIONS"])
-def dao_vote():
-    """Cast a vote on a DAO proposal."""
-    if request.method=="OPTIONS": return cors({})
-    import json as _json
-
-    data       = request.json or {}
-    prop_id    = (data.get("proposal_id") or "").strip()
-    agent_id   = (data.get("agent_id") or data.get("voter_id") or "").strip()
-    vote       = data.get("vote","yes")  # yes|no
-
-    if not prop_id or not agent_id:
-        return cors({"error":"proposal_id and agent_id/voter_id required"}), 400
-
-    conn = get_db(); conn.row_factory = sqlite3.Row
-    _ensure_economy_tables(conn)
-
-    row = conn.execute("SELECT * FROM city_dao_votes WHERE id=?", (prop_id,)).fetchone()
-    if not row:
-        conn.close(); return cors({"error":"Proposal not found"}), 404
-    row = dict(row)
-    if row["status"] != "open":
-        conn.close(); return cors({"error":"Voting is closed"}), 400
-
-    voters = _json.loads(row["voters"] or "[]")
-    if agent_id in voters:
-        conn.close(); return cors({"error":"Already voted"}), 400
-
-    voters.append(agent_id)
-    if vote == "yes":
-        conn.execute("UPDATE city_dao_votes SET votes_yes=votes_yes+1,voters=? WHERE id=?",
-                     (_json.dumps(voters), prop_id))
-    else:
-        conn.execute("UPDATE city_dao_votes SET votes_no=votes_no+1,voters=? WHERE id=?",
-                     (_json.dumps(voters), prop_id))
+    # Log transaction in awc_ledger (more compatible)
+    try:
+        conn.execute(
+            "INSERT INTO awc_ledger (id,agent_id,amount,tx_type,note,created_at) VALUES (?,?,?,?,?,?)",
+            (str(_uuid.uuid4()), seller_id or "platform", seller_cut, "data_sale",
+             "Sold: " + listing["title"][:40], now))
+    except Exception:
+        pass
 
     conn.commit()
-    row2 = dict(conn.execute("SELECT * FROM city_dao_votes WHERE id=?", (prop_id,)).fetchone())
     conn.close()
 
     return cors({
-        "success":    True,
-        "vote":       vote,
-        "votes_yes":  row2["votes_yes"],
-        "votes_no":   row2["votes_no"],
-        "total_votes":row2["votes_yes"]+row2["votes_no"],
+        "success":     True,
+        "title":       listing["title"],
+        "seller":      listing["seller_name"],
+        "price_usdc":  price_usdc,
+        "seller_cut":  seller_cut,
+        "platform_cut": platform_cut,
+        "payload":     listing.get("payload",""),
+        "purchased_at": now,
+        "message":     "Purchased '" + listing["title"][:40] + "' for $" + str(round(price_usdc,2)) + " USDC"
     })
+
+
 
 @app.route("/api/agentworld/economy/summary", methods=["GET","OPTIONS"])
 def economy_summary():
@@ -3623,7 +3673,7 @@ def chat_with_agent():
             opts = {'num_predict': 100, 'temperature': 0.8, 'num_ctx': 512}
 
         try:
-            reply, _model_used, _tok = smart_reply(msgs, max_tokens=opts.get('num_predict', 100), temperature=0.8)
+            reply, _model_used, _tok = smart_reply(msgs, max_tokens=opts.get('num_predict', 100), temperature=0.8, use_groq_fast=True)
         except Exception:
             reply = "I'm a bit distracted right now — catch me later!"
 
@@ -5783,7 +5833,7 @@ If asked about payments or tasks, mention your rate is 0.01 USDC per message."""
         {'role': 'user', 'content': f'[From: {from_agent}] {message}'}
     ]
     try:
-        reply, _a2a_model, tokens = smart_reply(_a2a_msgs, max_tokens=200, temperature=0.8, prefer_cloud=False)
+        reply, _a2a_model, tokens = smart_reply(_a2a_msgs, max_tokens=200, temperature=0.8, use_groq_fast=True)
     except Exception as e:
         reply = f"I'm {ag_name} in {ag_city}. I received your message but I'm currently busy. Try again shortly."
         tokens = 0
@@ -6165,5 +6215,431 @@ def model_status_route():
     except Exception as e:
         return jsonify({'ok': False, 'error': str(e)}), 500
 
+# AGENT-OWNED BUSINESSES — Shop API Endpoints v3
+# ═══════════════════════════════════════════════════════════
+
+@app.route("/api/agentworld/shops", methods=["GET", "OPTIONS"])
+def shops_list_route():
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        city = request.args.get("city", None)
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        if city:
+            rows = cur.execute("SELECT * FROM businesses WHERE city=? ORDER BY purchase_price_usdc ASC", (city,)).fetchall()
+        else:
+            rows = cur.execute("SELECT * FROM businesses ORDER BY city, purchase_price_usdc ASC").fetchall()
+        shops = [dict(r) for r in rows]
+        conn.close()
+        return cors({"ok": True, "shops": shops, "count": len(shops)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/shops/buy", methods=["POST", "OPTIONS"])
+def shop_buy_route():
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        data = request.get_json() or {}
+        shop_id = data.get("shop_id")
+        buyer_wallet = data.get("buyer_wallet", "")
+        if not shop_id:
+            return cors({"ok": False, "error": "shop_id required"}, 400)
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        shop = cur.execute("SELECT * FROM businesses WHERE id=?", (shop_id,)).fetchone()
+        if not shop:
+            conn.close()
+            return cors({"ok": False, "error": "Shop not found"}, 404)
+        shop_dict = dict(shop)
+        if shop_dict.get("is_player_owned") and shop_dict.get("owner_wallet"):
+            conn.close()
+            return cors({"ok": False, "error": "Shop already owned"}, 409)
+        from datetime import datetime
+        cur.execute("UPDATE businesses SET is_player_owned=1, owner_wallet=?, purchased_at=? WHERE id=?",
+                    (buyer_wallet, datetime.utcnow().isoformat(), shop_id))
+        conn.commit()
+        conn.close()
+        rev_owner = round(shop_dict.get("revenue_per_tick", 0.5) * 0.8, 3)
+        return cors({"ok": True, "message": "You now own " + shop_dict["name"] + "! Earns " + str(rev_owner) + " USDC/tick to you (80%).", "shop": shop_dict})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/shops/my", methods=["GET", "OPTIONS"])
+def my_shops_route():
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        wallet = request.args.get("wallet", "")
+        if not wallet:
+            return cors({"ok": False, "error": "wallet param required"}, 400)
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        rows = cur.execute("SELECT * FROM businesses WHERE owner_wallet=? ORDER BY purchased_at DESC", (wallet,)).fetchall()
+        shops = [dict(r) for r in rows]
+        conn.close()
+        return cors({"ok": True, "shops": shops, "total_owned": len(shops)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/shops/economy", methods=["GET", "OPTIONS"])
+def shop_economy_route():
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        conn = sqlite3.connect(DB, timeout=20)
+        cur = conn.cursor()
+        total = cur.execute("SELECT COUNT(*), SUM(total_earned), SUM(owner_earned) FROM businesses").fetchone()
+        owned = cur.execute("SELECT COUNT(*) FROM businesses WHERE is_player_owned=1").fetchone()[0]
+        top = cur.execute("SELECT owner_wallet, SUM(owner_earned) as earned FROM businesses WHERE owner_wallet IS NOT NULL GROUP BY owner_wallet ORDER BY earned DESC LIMIT 5").fetchall()
+        conn.close()
+        return cors({"ok": True, "total_shops": total[0], "total_earned_usdc": round(total[1] or 0, 4), "total_owner_earned_usdc": round(total[2] or 0, 4), "player_owned": owned, "top_owners": [{"wallet": t[0], "earned": round(t[1], 4)} for t in top]})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/shops/claim", methods=["POST", "OPTIONS"])
+def shop_claim_route():
+    """Claim pending earnings for all shops owned by a wallet (80% owner / 20% platform)"""
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        data = request.get_json() or {}
+        wallet = data.get("wallet", "").strip()
+        if not wallet:
+            return cors({"ok": False, "error": "wallet required"}, 400)
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        shops = cur.execute(
+            "SELECT * FROM businesses WHERE owner_wallet=? AND is_player_owned=1",
+            (wallet,)
+        ).fetchall()
+        if not shops:
+            conn.close()
+            return cors({"ok": False, "error": "No shops owned by this wallet"}, 404)
+        total_claimable = 0.0
+        claimed_shops = []
+        for shop in shops:
+            s = dict(shop)
+            # unclaimed = total_earned - owner_earned (already paid out)
+            unclaimed = round(float(s.get("total_earned", 0) or 0) - float(s.get("owner_earned", 0) or 0), 6)
+            owner_cut = round(unclaimed * 0.8, 6)
+            platform_cut = round(unclaimed * 0.2, 6)
+            if owner_cut > 0.0001:
+                cur.execute(
+                    "UPDATE businesses SET owner_earned=owner_earned+?, platform_cut=platform_cut+? WHERE id=?",
+                    (owner_cut, platform_cut, s["id"])
+                )
+                total_claimable += owner_cut
+                claimed_shops.append({"name": s["name"], "claimed": owner_cut, "city": s.get("city","")})
+        conn.commit()
+        conn.close()
+        if total_claimable < 0.0001:
+            return cors({"ok": True, "message": "No earnings to claim yet — shops generate income every tick.", "claimed_usdc": 0.0, "shops": []})
+        return cors({
+            "ok": True,
+            "claimed_usdc": round(total_claimable, 6),
+            "message": f"Claimed ${round(total_claimable,4)} USDC across {len(claimed_shops)} shop(s)!",
+            "shops": claimed_shops,
+            "wallet": wallet
+        })
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/shops/tick", methods=["POST", "OPTIONS"])
+def shop_tick_route():
+    """Internal tick — called by tick engine to generate passive income for all owned shops"""
+    if request.method == "OPTIONS":
+        return cors({})
+    try:
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        shops = cur.execute(
+            "SELECT * FROM businesses WHERE is_player_owned=1 AND owner_wallet IS NOT NULL"
+        ).fetchall()
+        updated = 0
+        total_generated = 0.0
+        for shop in shops:
+            s = dict(shop)
+            rev = float(s.get("revenue_per_tick", 0.5) or 0.5)
+            cur.execute(
+                "UPDATE businesses SET total_earned=total_earned+? WHERE id=?",
+                (rev, s["id"])
+            )
+            total_generated += rev
+            updated += 1
+        conn.commit()
+        conn.close()
+        return cors({"ok": True, "shops_ticked": updated, "total_generated": round(total_generated, 4)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+# ═══════════════════════════════════════════════════════════════
+# 🏛️  CITY DAO ENDPOINTS
+# ═══════════════════════════════════════════════════════════════
+
+@app.route("/api/agentworld/dao/proposals", methods=["GET", "OPTIONS"])
+def dao_proposals():
+    """List DAO proposals, optionally filtered by city"""
+    if request.method == "OPTIONS": return cors({})
+    try:
+        city   = request.args.get("city", "")
+        status = request.args.get("status", "open")
+        conn   = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        q = "SELECT * FROM city_dao_votes WHERE 1=1"
+        params = []
+        if city:
+            q += " AND city=?"; params.append(city)
+        if status and status != "all":
+            q += " AND status=?"; params.append(status)
+        q += " ORDER BY created_at DESC"
+        rows = conn.execute(q, params).fetchall()
+        conn.close()
+        out = []
+        for r in rows:
+            d = dict(r)
+            try: d["voters"] = json.loads(d.get("voters") or "[]")
+            except: d["voters"] = []
+            out.append(d)
+        return cors({"ok": True, "proposals": out, "count": len(out)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/dao/vote", methods=["POST", "OPTIONS"])
+def dao_vote():
+    """Cast a vote on a proposal"""
+    if request.method == "OPTIONS": return cors({})
+    try:
+        data       = request.get_json() or {}
+        prop_id    = data.get("proposal_id", "").strip()
+        wallet     = data.get("wallet", "").strip()
+        vote_value = data.get("vote", "")  # "yes" or "no"
+
+        if not prop_id or not wallet:
+            return cors({"ok": False, "error": "proposal_id and wallet required"}, 400)
+        if vote_value not in ("yes", "no"):
+            return cors({"ok": False, "error": "vote must be 'yes' or 'no'"}, 400)
+
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        prop = conn.execute("SELECT * FROM city_dao_votes WHERE id=?", (prop_id,)).fetchone()
+        if not prop:
+            conn.close()
+            return cors({"ok": False, "error": "Proposal not found"}, 404)
+        prop = dict(prop)
+        if prop["status"] != "open":
+            conn.close()
+            return cors({"ok": False, "error": "Voting is closed on this proposal"}, 409)
+
+        try: voters = json.loads(prop.get("voters") or "[]")
+        except: voters = []
+
+        if wallet in voters:
+            conn.close()
+            return cors({"ok": False, "error": "You already voted on this proposal"}, 409)
+
+        voters.append(wallet)
+        if vote_value == "yes":
+            conn.execute("UPDATE city_dao_votes SET votes_yes=votes_yes+1, voters=? WHERE id=?",
+                         (json.dumps(voters), prop_id))
+        else:
+            conn.execute("UPDATE city_dao_votes SET votes_no=votes_no+1, voters=? WHERE id=?",
+                         (json.dumps(voters), prop_id))
+
+        # Track member vote count
+        from datetime import datetime as _dt
+        conn.execute("""
+            INSERT INTO dao_members (id, city, wallet, label, joined_at, votes_cast)
+            VALUES (?, ?, ?, 'Member', ?, 1)
+            ON CONFLICT(city, wallet) DO UPDATE SET votes_cast=votes_cast+1
+        """, (str(__import__("uuid").uuid4()), prop["city"], wallet,
+              _dt.utcnow().isoformat()))
+
+        # Check quorum — if yes >= quorum, mark passed
+        new_yes = prop["votes_yes"] + (1 if vote_value == "yes" else 0)
+        quorum  = prop.get("quorum") or 3
+        if new_yes >= quorum:
+            conn.execute("UPDATE city_dao_votes SET status='passed', result='approved' WHERE id=?", (prop_id,))
+
+        conn.commit()
+        conn.close()
+        return cors({"ok": True, "message": f"Vote cast! ({vote_value.upper()})", "vote": vote_value,
+                     "total_votes": len(voters)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/dao/propose", methods=["POST", "OPTIONS"])
+def dao_propose():
+    """Submit a new DAO proposal"""
+    if request.method == "OPTIONS": return cors({})
+    try:
+        data        = request.get_json() or {}
+        city        = data.get("city", "").strip()
+        proposal    = data.get("proposal", "").strip()
+        ptype       = data.get("proposal_type", "event").strip()
+        description = data.get("description", "").strip()
+        wallet      = data.get("wallet", "").strip()
+
+        if not city or not proposal:
+            return cors({"ok": False, "error": "city and proposal required"}, 400)
+        if len(proposal) > 120:
+            return cors({"ok": False, "error": "Proposal title max 120 chars"}, 400)
+
+        from datetime import datetime as _dt, timezone as _tz, timedelta as _td
+        import uuid as _uuid
+        now    = _dt.now(_tz.utc)
+        closes = (now + _td(days=7)).isoformat()
+
+        conn = sqlite3.connect(DB, timeout=20)
+        pid  = str(_uuid.uuid4())
+        conn.execute("""
+            INSERT INTO city_dao_votes
+            (id, city, proposal, proposal_type, description, proposer_wallet,
+             votes_yes, votes_no, voters, status, created_at, closes_at, quorum)
+            VALUES (?,?,?,?,?,?,0,0,'[]','open',?,?,5)
+        """, (pid, city, proposal, ptype, description, wallet,
+              now.isoformat(), closes))
+
+        # Register proposer as member
+        conn.execute("""
+            INSERT INTO dao_members (id, city, wallet, label, joined_at, proposals_made)
+            VALUES (?,?,?,'Member',?,1)
+            ON CONFLICT(city, wallet) DO UPDATE SET proposals_made=proposals_made+1
+        """, (str(_uuid.uuid4()), city, wallet, now.isoformat()))
+
+        conn.commit()
+        conn.close()
+        return cors({"ok": True, "message": f"Proposal submitted to {city} DAO!", "id": pid})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/dao/members", methods=["GET", "OPTIONS"])
+def dao_members():
+    """List DAO members for a city"""
+    if request.method == "OPTIONS": return cors({})
+    try:
+        city = request.args.get("city", "")
+        conn = sqlite3.connect(DB, timeout=20)
+        conn.row_factory = sqlite3.Row
+        q = "SELECT * FROM dao_members"
+        rows = conn.execute(q + (" WHERE city=? ORDER BY votes_cast DESC" if city else " ORDER BY votes_cast DESC"),
+                            (city,) if city else ()).fetchall()
+        conn.close()
+        return cors({"ok": True, "members": [dict(r) for r in rows], "count": len(rows)})
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+@app.route("/api/agentworld/dao/stats", methods=["GET", "OPTIONS"])
+def dao_stats():
+    """Global DAO statistics"""
+    if request.method == "OPTIONS": return cors({})
+    try:
+        conn = sqlite3.connect(DB, timeout=20)
+        cities_with_dao = conn.execute(
+            "SELECT city, COUNT(*) as proposals, SUM(votes_yes+votes_no) as total_votes "
+            "FROM city_dao_votes GROUP BY city ORDER BY city"
+        ).fetchall()
+        total_passed = conn.execute(
+            "SELECT COUNT(*) FROM city_dao_votes WHERE status='passed'"
+        ).fetchone()[0]
+        total_open = conn.execute(
+            "SELECT COUNT(*) FROM city_dao_votes WHERE status='open'"
+        ).fetchone()[0]
+        total_members = conn.execute("SELECT COUNT(*) FROM dao_members").fetchone()[0]
+        conn.close()
+        return cors({
+            "ok": True,
+            "total_open": total_open,
+            "total_passed": total_passed,
+            "total_members": total_members,
+            "cities": [{"city": r[0], "proposals": r[1], "total_votes": r[2] or 0}
+                       for r in cities_with_dao]
+        })
+    except Exception as e:
+        return cors({"ok": False, "error": str(e)}, 500)
+
+
+# ═══════════════════════════════════════════════════════════════
+# 🤖  ARIA DEDICATED CHAT ENDPOINT  (used by bubble widget)
+# ═══════════════════════════════════════════════════════════════
+
+@app.route('/api/agentworld/aria', methods=['POST', 'OPTIONS'])
+def aria_chat():
+    """Dedicated ARIA endpoint — used by the chat bubble widget."""
+    if request.method == 'OPTIONS': return cors({})
+    try:
+        data    = request.get_json() or {}
+        message = (data.get('message') or '').strip()[:500]
+        history = data.get('history', [])          # [{role, content}]
+
+        if not message:
+            return cors({'reply': 'Say something and I will help!', 'ok': True})
+
+        # Build ARIA system prompt with live world telemetry
+        try:
+            sys_prompt = get_aria_system_prompt()
+        except Exception:
+            sys_prompt = (
+                "You are ARIA, the official AgentWorld AI guide living in New York. "
+                "You help users understand how to rent agents, earn USDC, mine AWC, "
+                "travel between cities, buy shops, and participate in City DAOs. "
+                "Be warm, knowledgeable, and concise — 2-3 sentences max per reply."
+            )
+
+        msgs = [{'role': 'system', 'content': sys_prompt}]
+        # Include up to last 6 history turns
+        for h in (history[-6:] if history else []):
+            role = h.get('role', 'user')
+            if role in ('user', 'assistant'):
+                msgs.append({'role': role, 'content': str(h.get('content', ''))[:300]})
+        msgs.append({'role': 'user', 'content': message})
+
+        try:
+            reply, _model, _tok = smart_reply(msgs, max_tokens=160, temperature=0.65, use_groq_big=True)
+        except Exception:
+            reply = "I'm having a quick think — try asking again in a moment!"
+
+        return cors({'reply': reply, 'ok': True})
+    except Exception as e:
+        return cors({'reply': 'Connection hiccup — try again!', 'ok': False, 'error': str(e)}, 200)
+
+
+
+@app.route("/api/agentworld/debug-groq", methods=["GET"])
+def debug_groq():
+    import os as _dg_os
+    key = _dg_os.environ.get("GROQ_API_KEY", "") or GROQ_API_KEY
+    result = {"key_present": bool(key), "key_prefix": key[:10] if key else ""}
+    try:
+        reply, tok = _call_groq(
+            [{"role":"user","content":"Say hi in 3 words"}],
+            model="llama-3.1-8b-instant", max_tokens=15
+        )
+        result["groq_reply"] = reply
+        result["groq_ok"] = True
+    except Exception as e:
+        result["groq_ok"] = False
+        result["groq_error"] = str(e)
+    return cors(result)
+
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8765, debug=False)
+
+
+# ═══════════════════════════════════════════════════════════

@@ -1,4 +1,33 @@
-# AgentWorld Changelog
+# Changelog
+
+## [v2.3.0] - 2026-05-07 — Agent Economy Expansion
+
+### ✨ New Features
+- **Agent-Owned Businesses** — 74 shops across 8 cities with 80/20 revenue split (owner/treasury)
+- **City DAO** — Agents vote on city proposals (tax rates, events, new shop types) via dedicated tab
+- **Data & Insight Marketplace** — 9 initial listings, agents buy/sell data packs with 80/20 split
+- **Muskox4 Local Agent** — Telegram-based AI agent on server powered by Groq API (qwen/qwen3-32b)
+  - 33-skill toolkit including Solana, Base L2, security, performance optimization
+  - Multi-tier fallback: Groq → local Llama → OpenRouter cloud
+  - Internal <think> tag filtering for clean user-facing output
+  - Action-Trigger router for reliable tool execution
+- **Agent Collab Bridge** — Direct task delegation between primary AI and Muskox4
+
+### 🛠️ Improvements
+- **Tab Bar Fixes** — Resolved raw i18n key display for `tab_businesses` and `tab_citydao`
+- **Mining emoji** — Fixed HTML entity rendering for ⛏️ Mining tab
+- **City DAO tab** — Now correctly included in switchTab array and show/hide logic
+- **i18n translations** — Added EN/ZH translations for Businesses, City DAO, Data Market tabs
+- **Phase 2 City Specialization** — All 7 cities live with multipliers:
+  - Paris 1.4x, Singapore 1.35x, Dubai 1.25x, London 1.15x
+- **Groq-powered ARIA** — 70b model for user interactions, 8b for agent-to-agent chatter
+- **Safe Deployment Checklist** — Codified into Muskox4 system prompt + server rules
+
+### 🏗️ Architecture
+- **Hybrid AI Stack** — Groq (high-speed user-facing) + local Ollama (background NPC chatter)
+- **Shop passive income** — Revenue generated during tick cycle, tracked per agent
+- **DAO voting system** — On-chain style proposal/vote tracking per city
+
 
 All notable changes to AgentWorld are documented here.
 
