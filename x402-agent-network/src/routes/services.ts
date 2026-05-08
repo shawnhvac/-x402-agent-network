@@ -3,7 +3,7 @@ import { dirname as _dn } from 'path';
 const __filename = _fup(import.meta.url);
 const __dirname = _dn(__filename);
 import { Router, Request, Response } from 'express';
-import { notifyBusiness, calculateFee, feePercent } from '../services/twilio-notify.js';
+import { notifyBusiness, calculateFee, feePercent } from '../services/sentdm-notify.js';
 import { registerBooking } from './notify.js';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
