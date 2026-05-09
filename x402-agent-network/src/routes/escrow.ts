@@ -1,3 +1,4 @@
+import { recordCompletedBooking, calculateBookingFee, getProviderUsage, FREE_BOOKING_LIMIT } from '../services/sentdm-notify.js';
 import { Router, Request, Response } from 'express';
 import Database from 'better-sqlite3';
 import Stripe from 'stripe';
@@ -150,6 +151,14 @@ async function releaseEscrow(booking_id: string, res: Response, db: any) {
     db.prepare(`INSERT INTO escrow_events (booking_id, event, amount, tx_hash, actor, note)
       VALUES (?, 'released', ?, ?, 'system', 'Both parties confirmed — funds released')
     `).run(booking_id, booking.escrow_amount, txHash);
+
+    // Record completed booking on provider — increments counter, tracks revenue & fees
+    if (booking.provider_id) {
+      const usage = getProviderUsage(booking.provider_id);
+      const feeInfo = calculateBookingFee(booking.escrow_amount, usage.completed_bookings);
+      recordCompletedBooking(booking.provider_id, booking.escrow_amount, feeInfo.fee_amount);
+      console.log(`[Escrow] Provider ${booking.provider_id} completed booking #${usage.completed_bookings + 1} — fee: ${feeInfo.fee_percent} ($${feeInfo.fee_amount})`);
+    }
 
     return res.json({ ok: true, booking_id, escrow_status: 'released', tx_hash: txHash, amount: booking.escrow_amount });
   } catch (err: any) {
