@@ -97,3 +97,5 @@ jobs:
       - name: Build complete
         run: echo "Release APK + AAB ready"
 # triggered Fri Apr 24 03:19:07 CEST 2026
+
+# Last triggered: 2026-05-09 04:00 UTC — unified onboarding build
