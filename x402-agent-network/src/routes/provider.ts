@@ -204,4 +204,105 @@ router.get('/list', (req: Request, res: Response) => {
   res.json({ success: true, count: providers.length, providers });
 });
 
+
+// ══════════════════════════════════════════════════════════════════════════
+// EXTENSION ENDPOINTS — used by AgentPay Chrome Extension
+// ══════════════════════════════════════════════════════════════════════════
+
+// GET /api/v1/provider/stats — dashboard summary for extension
+router.get('/stats', requireAuth, (req: any, res: Response) => {
+  try {
+    const db = getDb();
+    const provider = db.prepare('SELECT * FROM providers WHERE id = ?').get(req.provider.id) as any;
+
+    const today = db.prepare(`
+      SELECT COUNT(*) as cnt FROM bookings
+      WHERE provider_id = ? AND date(created_at) = date('now')
+    `).get(req.provider.id) as any;
+
+    const avg = db.prepare(`
+      SELECT AVG(price) as avg_price FROM bookings
+      WHERE provider_id = ? AND status = 'completed'
+    `).get(req.provider.id) as any;
+
+    const completed = provider?.completed_bookings || 0;
+
+    res.json({
+      completed_bookings: completed,
+      total_revenue:      provider?.total_revenue   || 0,
+      total_fees_paid:    provider?.total_fees_paid  || 0,
+      today_bookings:     today?.cnt                || 0,
+      avg_service_price:  Math.round((avg?.avg_price || 0) * 100) / 100,
+      free_remaining:     Math.max(0, 10 - completed),
+      on_free_tier:       completed < 10,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET /api/v1/provider/bookings/pending — new/active bookings for extension
+router.get('/bookings/pending', requireAuth, (req: any, res: Response) => {
+  try {
+    const db = getDb();
+    const provider = db.prepare('SELECT * FROM providers WHERE id = ?').get(req.provider.id) as any;
+    const completedCount = provider?.completed_bookings || 0;
+
+    const bookings = db.prepare(`
+      SELECT * FROM bookings
+      WHERE provider_id = ?
+        AND status IN ('pending','confirmed','provider_accepted')
+      ORDER BY created_at DESC
+      LIMIT 20
+    `).all(req.provider.id) as any[];
+
+    // Fee tier calc inline (avoid circular import)
+    function calcFee(price: number, completed: number) {
+      const isFree = completed < 10;
+      if (isFree) return { is_free_booking: true, fee_percent: '0%', fee_amount: 0, net_to_provider: price, free_remaining: 10 - completed };
+      let rate = 0.05;
+      if      (price >= 2000) rate = 0.01;
+      else if (price >= 500)  rate = 0.02;
+      else if (price >= 100)  rate = 0.03;
+      else if (price >= 25)   rate = 0.04;
+      const fee = Math.round(price * rate * 100) / 100;
+      const pct = (rate * 100) + '%';
+      return { is_free_booking: false, fee_percent: pct, fee_amount: fee, net_to_provider: Math.round((price - fee) * 100) / 100, free_remaining: 0 };
+    }
+
+    const enriched = bookings.map((b: any) => ({ ...b, ...calcFee(b.price || 0, completedCount) }));
+    res.json({ bookings: enriched, total: enriched.length });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/v1/provider/bookings/:id/accept
+router.post('/bookings/:id/accept', requireAuth, (req: any, res: Response) => {
+  try {
+    getDb().prepare(`UPDATE bookings SET status = 'provider_accepted', updated_at = datetime('now') WHERE id = ? AND provider_id = ?`)
+      .run(req.params.id, req.provider.id);
+    res.json({ ok: true, booking_id: req.params.id, status: 'provider_accepted' });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/v1/provider/bookings/:id/decline
+router.post('/bookings/:id/decline', requireAuth, (req: any, res: Response) => {
+  try {
+    getDb().prepare(`UPDATE bookings SET status = 'provider_declined', updated_at = datetime('now') WHERE id = ? AND provider_id = ?`)
+      .run(req.params.id, req.provider.id);
+    res.json({ ok: true, booking_id: req.params.id, status: 'provider_declined' });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+// POST /api/v1/provider/bookings/:id/complete  
+router.post('/bookings/:id/complete', requireAuth, (req: any, res: Response) => {
+  try {
+    getDb().prepare(`UPDATE bookings SET provider_confirmed = 1, status = 'provider_complete', updated_at = datetime('now') WHERE id = ? AND provider_id = ?`)
+      .run(req.params.id, req.provider.id);
+    res.json({ ok: true, booking_id: req.params.id, message: 'Marked complete — escrow releases when consumer confirms' });
+  } catch (err: any) { res.status(500).json({ error: err.message }); }
+});
+
+
 export default router;
