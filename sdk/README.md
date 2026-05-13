@@ -5,7 +5,7 @@
 One line to pay another agent. Every payment creates a tamper-proof audit trail, updates reputation, and carries a full capability contract — all in a single HTTP header.
 
 ```bash
-pip install agentpay
+pip install x402-agentpay
 ```
 
 ---

@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="agentpay",
+    name="x402-agentpay",
     version="1.0.0",
     author="Shawn Lippert",
     author_email="x402agentpay@gmail.com",
