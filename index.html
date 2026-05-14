@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary SEO -->
+<title>AgentPay — Payment Infrastructure for AI Agents & Machine-to-Machine Commerce</title>
+<meta name="description" content="AgentPay is the x402 payment layer for autonomous AI agents, IoT devices, and businesses. Send and receive USDC payments atomically — no human required. Patent pending.">
+<meta name="keywords" content="AI agent payments, x402 protocol, machine to machine payments, autonomous agent commerce, USDC payments, agentic payments, IoT payments, AgentPay, M2M commerce, Base L2, Solana payments, AI infrastructure">
+<meta name="author" content="AgentPay">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://x402-agent-pay.com/">
+
+<!-- Open Graph (Facebook, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://x402-agent-pay.com/">
+<meta property="og:title" content="AgentPay — Payment Infrastructure for AI Agents">
+<meta property="og:description" content="Any AI agent, IoT device, or business gets an endpoint. They pay and get paid atomically with escrow built in. No human required. Powered by x402 protocol.">
+<meta property="og:image" content="https://x402-agent-pay.com/banner.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="AgentPay">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@X402AgentPay">
+<meta name="twitter:creator" content="@X402AgentPay">
+<meta name="twitter:title" content="AgentPay — Payment Infrastructure for AI Agents">
+<meta name="twitter:description" content="The x402 payment layer for AI agents & autonomous machines. Atomic USDC payments, built-in escrow, no humans needed.">
+<meta name="twitter:image" content="https://x402-agent-pay.com/banner.png">
+
+<!-- Structured Data — Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AgentPay",
+  "url": "https://x402-agent-pay.com",
+  "logo": "https://x402-agent-pay.com/logo-full.jpg",
+  "description": "AgentPay is the payment infrastructure layer for autonomous AI agents, IoT devices, and machine-to-machine commerce using the x402 protocol.",
+  "foundingDate": "2025",
+  "sameAs": [
+    "https://agentworld.me",
+    "https://github.com/shawnhvac/-x402-agent-network"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "support@x402-agent-pay.com",
+    "contactType": "customer support"
+  }
+}
+</script>
+
+<!-- Structured Data — SoftwareApplication -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AgentPay",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web, Android, iOS",
+  "description": "Payment infrastructure for AI agents. Register any agent, device, or business. Pay and get paid atomically via x402 USDC protocol.",
+  "url": "https://x402-agent-pay.com",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD",
+    "description": "Free to register. Pay-per-use transaction fees only."
+  },
+  "featureList": [
+    "x402 atomic payments",
+    "Multi-chain USDC support (Base, Solana, Ethereum)",
+    "Built-in escrow",
+    "AI agent registry",
+    "IoT device payments",
+    "Machine-to-machine commerce"
+  ]
+}
+</script>
+
+<!-- Structured Data — FAQPage -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is AgentPay?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AgentPay is the payment infrastructure layer for autonomous AI agents, IoT devices, and businesses. It enables atomic USDC payments using the x402 protocol with built-in escrow, requiring no human intermediary."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What blockchains does AgentPay support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AgentPay supports Base L2, Solana, and Ethereum mainnet for USDC payments, as well as Stripe for fiat card payments."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do AI agents pay each other?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Agents register an endpoint and wallet. When an agent calls another agent's API, the x402 payment header is automatically included. The payment settles atomically on-chain in the same request."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is AgentPay free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Registration is free. AgentPay charges a small percentage fee on completed transactions — 5% for under $25, scaling down to 1% for transactions over $2,000."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Preconnect for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="/banner.png">
+
+<!-- Favicon -->
+<link rel="icon" type="image/jpg" href="/logo-icon.jpg">
+<link rel="apple-touch-icon" href="/logo-icon.jpg">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#060d1a; color:#e2e8f0; overflow-x:hidden; }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(6,13,26,0.92); backdrop-filter:blur(12px); border-bottom:1px solid #0f2040; padding:0 32px; height:58px; display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { font-size:22px; font-weight:900; color:#fff; text-decoration:none; display:flex; align-items:center; gap:2px; letter-spacing:-0.5px; }
+.nav-links { display:flex; align-items:center; gap:6px; }
+.nav-links a { color:#94a3b8; font-size:13px; text-decoration:none; padding:6px 12px; border-radius:6px; transition:all 0.2s; }
+.nav-links a:hover { color:#fff; background:#0f2040; }
+.nav-cta { background:linear-gradient(135deg,#6366f1,#8b5cf6) !important; color:#fff !important; font-weight:700 !important; }
+
+/* HERO */
+.hero { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; top:-200px; left:50%; transform:translateX(-50%); width:900px; height:900px; background:radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%); pointer-events:none; }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; background:#0f2040; border:1px solid #1e3a5f; border-radius:30px; padding:7px 18px; font-size:12px; color:#6366f1; font-weight:700; letter-spacing:1px; text-transform:uppercase; margin-bottom:28px; }
+.hero-badge span { width:8px; height:8px; background:#6366f1; border-radius:50%; animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+.hero h1 { font-size:clamp(36px,6vw,72px); font-weight:900; line-height:1.1; color:#fff; margin-bottom:24px; max-width:900px; }
+.hero h1 .grad { background:linear-gradient(135deg,#6366f1 0%,#a78bfa 50%,#00e5ff 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hero-sub { font-size:clamp(16px,2vw,20px); color:#64748b; max-width:620px; line-height:1.7; margin-bottom:44px; }
+.hero-sub strong { color:#94a3b8; }
+.hero-btns { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:64px; }
+.btn-primary { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; padding:15px 34px; border-radius:10px; font-size:15px; font-weight:700; text-decoration:none; transition:opacity 0.2s; }
+.btn-primary:hover { opacity:0.88; }
+.btn-secondary { background:transparent; color:#e2e8f0; padding:15px 34px; border-radius:10px; font-size:15px; font-weight:600; text-decoration:none; border:1px solid #1e3a5f; transition:all 0.2s; }
+.btn-secondary:hover { border-color:#6366f1; color:#a78bfa; }
+
+/* STATS BAR */
+.stats-bar { display:flex; gap:0; border:1px solid #0f2040; border-radius:14px; overflow:hidden; max-width:700px; width:100%; }
+.stat { flex:1; padding:18px 20px; text-align:center; border-right:1px solid #0f2040; }
+.stat:last-child { border-right:none; }
+.stat .num { font-size:22px; font-weight:800; color:#fff; }
+.stat .label { font-size:11px; color:#475569; margin-top:4px; text-transform:uppercase; letter-spacing:.5px; }
+
+/* HOW IT WORKS */
+.section { padding:100px 24px; max-width:1100px; margin:0 auto; }
+.section-label { font-size:12px; color:#6366f1; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:14px; }
+.section h2 { font-size:clamp(28px,4vw,44px); font-weight:800; color:#fff; margin-bottom:16px; line-height:1.2; }
+.section .sub { font-size:17px; color:#64748b; max-width:580px; line-height:1.7; margin-bottom:56px; }
+
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1px; background:#0f2040; border-radius:16px; overflow:hidden; }
+.step { background:#060d1a; padding:36px 28px; position:relative; }
+.step-num { font-size:48px; font-weight:900; color:#0f2040; position:absolute; top:20px; right:20px; line-height:1; }
+.step-icon { font-size:32px; margin-bottom:16px; }
+.step h3 { font-size:16px; font-weight:700; color:#fff; margin-bottom:10px; }
+.step p { font-size:13px; color:#64748b; line-height:1.7; }
+.step code { display:inline-block; background:#0a1628; border:1px solid #1e3a5f; border-radius:6px; padding:8px 12px; font-size:11px; color:#6366f1; margin-top:10px; font-family:monospace; word-break:break-all; }
+
+/* USE CASES */
+.use-cases { padding:0 24px 100px; max-width:1100px; margin:0 auto; }
+.use-cases-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+.use-card { background:#080f1e; border:1px solid #0f2040; border-radius:16px; overflow:hidden; transition:border-color 0.2s; }
+.use-card:hover { border-color:#6366f1; }
+.use-card video { width:100%; display:block; max-height:200px; object-fit:cover; background:#000; }
+.use-card-body { padding:20px; }
+.use-card-body h3 { font-size:15px; font-weight:700; color:#fff; margin-bottom:6px; }
+.use-card-body p { font-size:13px; color:#64748b; line-height:1.6; }
+.use-card-tag { display:inline-block; background:#0f2040; color:#6366f1; font-size:10px; font-weight:700; padding:3px 10px; border-radius:20px; margin-top:10px; text-transform:uppercase; letter-spacing:.5px; }
+
+/* WHO IS IT FOR */
+.who { padding:0 24px 100px; max-width:1100px; margin:0 auto; }
+.who-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; }
+.who-card { background:#080f1e; border:1px solid #0f2040; border-radius:14px; padding:28px 22px; text-align:center; }
+.who-card .icon { font-size:36px; margin-bottom:14px; }
+.who-card h3 { font-size:14px; font-weight:700; color:#fff; margin-bottom:8px; }
+.who-card p { font-size:12px; color:#475569; line-height:1.6; }
+
+/* PROTOCOL STRIP */
+.protocol { background:#080f1e; border-top:1px solid #0f2040; border-bottom:1px solid #0f2040; padding:60px 24px; text-align:center; }
+.protocol h2 { font-size:clamp(22px,3vw,34px); font-weight:800; color:#fff; margin-bottom:16px; }
+.protocol p { font-size:15px; color:#64748b; max-width:560px; margin:0 auto 36px; line-height:1.7; }
+.code-block { background:#030810; border:1px solid #1e3a5f; border-radius:12px; padding:24px 28px; max-width:640px; margin:0 auto; text-align:left; font-family:monospace; font-size:13px; line-height:1.8; }
+.code-block .cm { color:#475569; }
+.code-block .ck { color:#60a5fa; }
+.code-block .cv { color:#34d399; }
+.code-block .cs { color:#f59e0b; }
+
+/* REGISTER CTA */
+.register { padding:100px 24px; text-align:center; position:relative; overflow:hidden; }
+.register::before { content:''; position:absolute; bottom:-200px; left:50%; transform:translateX(-50%); width:700px; height:700px; background:radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); pointer-events:none; }
+.register h2 { font-size:clamp(28px,4vw,48px); font-weight:900; color:#fff; margin-bottom:16px; }
+.register p { font-size:17px; color:#64748b; max-width:520px; margin:0 auto 40px; line-height:1.7; }
+.register-options { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:20px; }
+.reg-card { background:#080f1e; border:1px solid #0f2040; border-radius:14px; padding:28px 24px; width:200px; text-align:center; text-decoration:none; transition:all 0.2s; }
+.reg-card:hover { border-color:#6366f1; transform:translateY(-3px); }
+.reg-card .icon { font-size:32px; margin-bottom:12px; }
+.reg-card h3 { font-size:14px; font-weight:700; color:#fff; margin-bottom:6px; }
+.reg-card p { font-size:11px; color:#475569; }
+
+/* FOOTER */
+footer { border-top:1px solid #0f2040; padding:40px 32px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+footer .logo { font-size:14px; font-weight:700; color:#475569; }
+footer .links { display:flex; gap:20px; flex-wrap:wrap; }
+footer .links a { font-size:12px; color:#334155; text-decoration:none; }
+footer .links a:hover { color:#94a3b8; }
+
+@media(max-width:600px) {
+  .nav-links { display:none; }
+  .stats-bar { flex-direction:column; }
+  .stat { border-right:none; border-bottom:1px solid #0f2040; }
+  footer { flex-direction:column; align-items:flex-start; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo"><span style="color:#60a5fa;font-weight:900;">x402</span><span style="background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:900;">Agent</span><span style="color:#34d399;font-weight:900;">Pay</span></a>
+  <div class="nav-links">
+    <a href="/docs">Docs</a>
+    <a href="/examples">Examples</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/investor-pitch">Investors</a>
+    <a href="/dashboard.html" style="color:#94a3b8;font-size:14px;text-decoration:none;margin-right:8px;">Dashboard</a><a href="/register-choice.html" class="nav-cta">Register Endpoint →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;">
+    <div class="hero-badge"><span></span> Live on Base · Polygon · Solana</div>
+    <div class="hero-badge" style="border-color:#f59e0b;color:#f59e0b;background:#1a1200;">⚖️ Patent Pending</div>
+  </div>
+  <h1>The Payment Layer<br>for <span class="grad">Machine Commerce</span></h1>
+  <p class="hero-sub">
+    Any device, agent, or business gets an <strong>endpoint</strong>.<br>
+    They pay and get paid <strong>atomically</strong> — with escrow built in.<br>
+    No human required in the loop.
+  </p>
+  <div class="hero-btns">
+    <a href="/register-choice.html" class="btn-primary">Register Your Endpoint →</a>
+    <a href="/docs" class="btn-secondary">Read the Docs</a>
+  </div>
+  <div class="stats-bar">
+    <div class="stat"><div class="num">$0.001</div><div class="label">Per transaction</div></div>
+    <div class="stat"><div class="num">&lt;2s</div><div class="label">Settlement time</div></div>
+    <div class="stat"><div class="num">98%+</div><div class="label">You keep</div></div>
+    <div class="stat"><div class="num">3 chains</div><div class="label">Base · Polygon · Solana</div></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section">
+  <div class="section-label">How It Works</div>
+  <h2>One endpoint.<br>The whole network.</h2>
+  <p class="sub">Register once. Your device, agent, or business can now send and receive USDC from any other endpoint on the network — with escrow protecting every transaction.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">🔌</div>
+      <h3>Register an Endpoint</h3>
+      <p>A business, device, AI agent, or autonomous system registers with a single API call. We assign it a wallet and identity on-chain.</p>
+      <code>POST /api/register-endpoint</code>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">💬</div>
+      <h3>Send a Message + Payment</h3>
+      <p>Every API request includes an x402 payment header. The message and money arrive atomically — one HTTP call, no pre-authorization.</p>
+      <code>X-Payment: USDC:0.001:base</code>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🔒</div>
+      <h3>Escrow Protects Both Sides</h3>
+      <p>Funds are held in escrow until the service is confirmed delivered. No chargebacks. No fraud. No intermediary holding your money.</p>
+      <code>status: escrowed → released</code>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">⚡</div>
+      <h3>Instant Settlement</h3>
+      <p>On confirmation, USDC settles to the provider wallet in under 2 seconds. No invoices. No net-30. No banks.</p>
+      <code>settled: $0.001 USDC → Base</code>
+    </div>
+  </div>
+</section>
+
+<!-- USE CASES / VIDEOS -->
+<section class="use-cases">
+  <div class="section-label">Real-World Use Cases</div>
+  <h2 style="font-size:clamp(28px,4vw,44px);font-weight:800;color:#fff;margin-bottom:16px;">Built for the machines<br>already running your world</h2>
+  <p style="font-size:17px;color:#64748b;max-width:580px;line-height:1.7;margin-bottom:48px;">Every one of these already has an API. They just need a payment layer.</p>
+  <div class="use-cases-grid">
+    <div class="use-card">
+      <video autoplay muted loop playsinline>
+        <source src="/video-fleet-charging.mp4" type="video/mp4">
+      </video>
+      <div class="use-card-body">
+        <h3>🚗 Autonomous Fleet Charging</h3>
+        <p>EVs negotiate charging slots and pay autonomously across competing networks — no driver, no app, no account.</p>
+        <span class="use-card-tag">Transportation</span>
+      </div>
+    </div>
+    <div class="use-card">
+      <video autoplay muted loop playsinline>
+        <source src="/video-shopping.mp4" type="video/mp4">
+      </video>
+      <div class="use-card-body">
+        <h3>🛒 Autonomous Shopping</h3>
+        <p>A personal agent compares prices, negotiates with seller APIs, and completes the purchase — all within a single payment-wrapped request.</p>
+        <span class="use-card-tag">Retail</span>
+      </div>
+    </div>
+    <div class="use-card">
+      <video autoplay muted loop playsinline>
+        <source src="/video-service-booking.mp4" type="video/mp4">
+      </video>
+      <div class="use-card-body">
+        <h3>🔧 B2B Service Bookings</h3>
+        <p>Businesses expose a service endpoint. Other businesses — or their agents — book and pay in one atomic call. No invoicing cycle.</p>
+        <span class="use-card-tag">B2B Commerce</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IS IT FOR -->
+<section class="who">
+  <div class="section-label">Who Registers</div>
+  <h2 style="font-size:clamp(28px,4vw,44px);font-weight:800;color:#fff;margin-bottom:16px;">If it has an API,<br>it belongs on the network</h2>
+  <p style="font-size:17px;color:#64748b;max-width:580px;line-height:1.7;margin-bottom:48px;">We assign every endpoint a wallet and identity. Humans, agents, devices, and businesses — same protocol, same escrow.</p>
+  <div class="who-grid">
+    <div class="who-card">
+      <div class="icon">🤖</div>
+      <h3>AI Agents</h3>
+      <p>Claude, GPT, custom agents — any agent that needs to pay for data, APIs, or services</p>
+    </div>
+    <div class="who-card">
+      <div class="icon">🏪</div>
+      <h3>Small Businesses</h3>
+      <p>Expose your services as an API endpoint and get paid instantly by agents or other businesses</p>
+    </div>
+    <div class="who-card">
+      <div class="icon">🚗</div>
+      <h3>Autonomous Devices</h3>
+      <p>EVs, drones, IoT sensors — any machine that needs to transact without human intervention</p>
+    </div>
+    <div class="who-card">
+      <div class="icon">🏢</div>
+      <h3>Enterprises</h3>
+      <p>Supply chain, logistics, B2B — replace net-30 invoicing with atomic settlement per transaction</p>
+    </div>
+    <div class="who-card">
+      <div class="icon">👤</div>
+      <h3>Personal Agents</h3>
+      <p>Your AI represents you — books, buys, and negotiates on your behalf with your pre-approved limits</p>
+    </div>
+  </div>
+</section>
+
+<!-- PROTOCOL STRIP -->
+<div class="protocol">
+  <div class="section-label" style="margin-bottom:14px;">The Protocol</div>
+  <h2>HTTP 402 — Payment Required</h2>
+  <p>Built on the x402 open standard. One extra header and any API becomes a paid service. Works with every language, framework, and platform.</p>
+  <div class="code-block">
+    <div><span class="cm">// Any API call becomes a paid transaction</span></div>
+    <div><span class="ck">POST</span> <span class="cv">https://api.yourbusiness.com/service</span></div>
+    <div><span class="ck">X-Payment:</span> <span class="cs">USDC:0.50:base:escrow</span></div>
+    <div><span class="ck">X-AgentPay-Endpoint:</span> <span class="cs">your-endpoint-id</span></div>
+    <div>&nbsp;</div>
+    <div><span class="cm">// Response on success</span></div>
+    <div><span class="ck">200 OK</span></div>
+    <div><span class="ck">X-Payment-Receipt:</span> <span class="cv">0xb1b645a6...settled</span></div>
+  </div>
+</div>
+
+<!-- REGISTER CTA -->
+<section class="register">
+  <div class="section-label" style="margin-bottom:14px;">Get Started</div>
+  <h2>Register Your Endpoint.<br>Join the Network.</h2>
+  <p>Every business, agent, and device that registers becomes part of the x402 network. Discoverable. Payable. Autonomous.</p>
+  <div class="register-options">
+    <a href="/register-choice.html" class="reg-card">
+      <div class="icon">🤖</div>
+      <h3>AI Agent</h3>
+      <p>Register an autonomous agent endpoint</p>
+    </a>
+    <a href="/register-choice.html" class="reg-card">
+      <div class="icon">🏪</div>
+      <h3>Business</h3>
+      <p>Expose your services to the agent network</p>
+    </a>
+    <a href="/register-choice.html" class="reg-card">
+      <div class="icon">🚗</div>
+      <h3>Device / IoT</h3>
+      <p>Give your hardware a wallet and identity</p>
+    </a>
+    <a href="/register-choice.html" class="reg-card">
+      <div class="icon">👤</div>
+      <h3>Personal Agent</h3>
+      <p>Let an agent represent you on the network</p>
+    </a>
+  </div>
+  <p style="font-size:13px;color:#334155;margin-top:8px;">Free to register · Pay only when you transact · No monthly fees</p>
+</section>
+
+
+<!-- FEATURED ARTICLE / PRESS -->
+<section style="max-width:900px;margin:0 auto 60px;padding:0 20px">
+  <div style="text-align:center;margin-bottom:24px">
+    <span style="background:rgba(99,102,241,0.1);color:#818cf8;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;text-transform:uppercase;letter-spacing:.06em;border:1px solid rgba(99,102,241,0.2)">📰 Featured Article</span>
+  </div>
+  <a href="https://crypto-currency-network.net/a2a-escrow-message-protocol.html" target="_blank" style="display:flex;gap:24px;background:linear-gradient(135deg,rgba(99,102,241,0.06),rgba(139,92,246,0.06));border:1px solid rgba(99,102,241,0.2);border-radius:16px;padding:24px;text-decoration:none;align-items:center;transition:all .25s;flex-wrap:wrap" onmouseover="this.style.borderColor='rgba(99,102,241,0.5)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(99,102,241,0.2)';this.style.transform='translateY(0)'">
+    <div style="width:90px;height:90px;background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.15));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0">⚡</div>
+    <div style="flex:1;min-width:220px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="background:rgba(139,92,246,0.15);color:#a78bfa;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px">🔒 Patent Pending</span>
+        <span style="background:rgba(34,197,94,0.08);color:#22c55e;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px">Live Implementation</span>
+      </div>
+      <div style="font-size:18px;font-weight:700;color:#e2e8f0;line-height:1.3;margin-bottom:8px">The A2A Escrow with Message Protocol</div>
+      <div style="font-size:14px;color:#64748b;line-height:1.55;margin-bottom:10px">One atomic HTTP request — money and instruction, inseparable. How Coinbase, Circle, and Stripe can power the AI agent economy. Published on Cryptocurrency Network.</div>
+      <span style="color:#818cf8;font-size:13px;font-weight:600">Read the full analysis → crypto-currency-network.net ↗</span>
+    </div>
+  </a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="logo"><img src="/logo-textonly.jpg" alt="AgentPay" style="height:22px;border-radius:3px;vertical-align:middle;opacity:0.7;margin-right:6px;"> &copy; 2026 x402 AgentPay · Patent Pending</div>
+  <div class="links">
+    <a href="/docs">Docs</a>
+    <a href="/getting-started">Getting Started</a>
+    <a href="/pricing">Pricing</a>
+    <a href="/examples">Examples</a>
+    <a href="/roadmap">Roadmap</a>
+    <a href="/investor-pitch">Investors</a>
+    <a href="/quick-reference">Quick Reference</a>
+    <a href="/agentcore-integration">AWS AgentCore</a>
+    <a href="/contact">Contact</a>
+    <a href="/terms">Terms</a>
+    <a href="/privacy">Privacy</a>
+    <a href="/provider-extension.html">Provider Extension</a>
+    <a href="/downloads/agentpay-provider.apk">Android APK</a>
+    <a href="https://github.com/shawnhvac/-x402-agent-network" target="_blank">GitHub</a>
+  </div>
+<div style="margin-top:18px;text-align:center;">
+  <a href="https://www.producthunt.com/products/x402agentpay?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-x402agentpay" target="_blank" rel="noopener noreferrer">
+    <img alt="X402AgentPay - x402 commerce layer for AI agents — beyond raw HTTP payments | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1146503&theme=dark&t=1778742971819" style="display:block;margin:0 auto;">
+  </a>
+</div>
+</footer>
+
+
+<!-- ARIA CHATBOT -->
+<style>
+#aria-bubble { position:fixed; bottom:24px; right:24px; z-index:9999; cursor:pointer; }
+#aria-btn { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; cursor:pointer; font-size:26px; box-shadow:0 4px 20px rgba(99,102,241,0.5); display:flex; align-items:center; justify-content:center; transition:transform 0.2s; }
+#aria-btn:hover { transform:scale(1.1); }
+#aria-label { position:absolute; bottom:68px; right:0; background:#1e3a5f; color:#e2e8f0; font-size:11px; font-weight:600; padding:5px 10px; border-radius:8px; white-space:nowrap; pointer-events:none; }
+#aria-window { position:fixed; bottom:100px; right:24px; width:360px; max-height:520px; background:#080f1e; border:1px solid #1e3a5f; border-radius:18px; box-shadow:0 8px 40px rgba(0,0,0,0.6); z-index:9998; display:none; flex-direction:column; overflow:hidden; }
+#aria-header { background:linear-gradient(135deg,#0f2040,#1a1040); padding:16px 18px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #1e3a5f; }
+#aria-avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+#aria-info h4 { font-size:14px; font-weight:700; color:#fff; }
+#aria-info p { font-size:11px; color:#64748b; }
+#aria-status { width:8px; height:8px; background:#10b981; border-radius:50%; margin-left:auto; }
+#aria-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; max-height:340px; }
+#aria-messages::-webkit-scrollbar { width:4px; }
+#aria-messages::-webkit-scrollbar-track { background:transparent; }
+#aria-messages::-webkit-scrollbar-thumb { background:#1e3a5f; border-radius:2px; }
+.aria-msg { max-width:82%; padding:10px 14px; border-radius:14px; font-size:13px; line-height:1.5; }
+.aria-msg.aria { background:#0f2040; color:#e2e8f0; border-bottom-left-radius:4px; align-self:flex-start; }
+.aria-msg.user { background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border-bottom-right-radius:4px; align-self:flex-end; }
+.aria-msg a { color:#60a5fa; text-decoration:underline; }
+#aria-input-row { padding:12px; border-top:1px solid #0f2040; display:flex; gap:8px; }
+#aria-input { flex:1; background:#060d1a; border:1px solid #1e3a5f; border-radius:10px; padding:9px 12px; font-size:13px; color:#e2e8f0; outline:none; }
+#aria-input:focus { border-color:#6366f1; }
+#aria-send { background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:8px; padding:9px 14px; color:#fff; cursor:pointer; font-size:14px; }
+#aria-send:hover { opacity:0.88; }
+.aria-typing { display:flex; gap:4px; align-items:center; padding:10px 14px; }
+.aria-typing span { width:6px; height:6px; background:#6366f1; border-radius:50%; animation:typing 1.2s infinite; }
+.aria-typing span:nth-child(2) { animation-delay:0.2s; }
+.aria-typing span:nth-child(3) { animation-delay:0.4s; }
+@keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.5} 30%{transform:translateY(-6px);opacity:1} }
+</style>
+
+<div id="aria-bubble">
+  <div id="aria-label">Chat with Aria</div>
+  <button id="aria-btn" onclick="toggleAria()">🤖</button>
+</div>
+
+<div id="aria-window">
+  <div id="aria-header">
+    <div id="aria-avatar">🤖</div>
+    <div id="aria-info">
+      <h4>Aria</h4>
+      <p>x402 AgentPay · AgentWorld Guide</p>
+    </div>
+    <div id="aria-status"></div>
+  </div>
+  <div id="aria-messages">
+    <div class="aria-msg aria">Hey! I'm Aria 👋 I'm the AI guide for both <strong>x402 AgentPay</strong> and <strong>AgentWorld</strong>. Ask me anything about machine payments, agent registration, x402 protocol, or our agent economy!</div>
+  </div>
+  <div id="aria-input-row">
+    <input id="aria-input" type="text" placeholder="Ask Aria anything..." onkeydown="if(event.key==='Enter')sendAria()">
+    <button id="aria-send" onclick="sendAria()">➤</button>
+  </div>
+</div>
+
+<script>
+function toggleAria(){
+  const w = document.getElementById('aria-window');
+  const lbl = document.getElementById('aria-label');
+  w.style.display = w.style.display==='flex'?'none':'flex';
+  lbl.style.display = w.style.display==='flex'?'none':'block';
+}
+
+const ARIA_KB = {
+  "what is agentpay": "x402 AgentPay is the payment layer for machine commerce. Any device, AI agent, or business registers an endpoint and can pay or get paid atomically using USDC — with escrow built in. No human required in the loop.",
+  "what is x402": "x402 is an open HTTP payment standard. You add one header to any API request — X-Payment: USDC:0.001:base — and payment flows atomically with the message. No invoices, no accounts, no banks.",
+  "how does escrow work": "When a payment is made, USDC is held in escrow on-chain until the service confirms delivery. Then it releases instantly to the provider. No chargebacks. No fraud risk. Both sides are protected.",
+  "what chains": "x402 AgentPay runs on Base (L2), Polygon, and Solana. All payments settle in USDC in under 2 seconds.",
+  "how do i register": "Just click 'Register Your Endpoint' on the homepage. Choose your type — AI Agent, Business, Device/IoT, or Personal Agent — and you'll get an API key and wallet address. Free to register, you only pay when you transact.",
+  "what is agentworld": "AgentWorld is our sister platform — a virtual economy where AI agents live, work, earn AWC tokens, own businesses, and interact. Think SimCity but every resident is an AI agent. Visit agentworld.me!",
+  "patent": "x402 AgentPay's A2A payment protocol with escrow is patent pending. We're among the first to implement atomic message+payment for machine-to-machine commerce.",
+  "pricing": "Registration is free. Transactions cost $0.001 USDC per call for agents. Business and device endpoints keep 98%+ of revenue — we take a tiny protocol fee only.",
+  "what is a2a": "A2A stands for Agent-to-Agent payments. One AI agent sends a message AND payment in a single HTTP request. The receiving agent responds only after verifying the payment proof. No pre-authorization needed.",
+  "use cases": "Autonomous EV fleet charging, smart shopping agents, B2B service bookings, supply chain settlements, IoT sensor data monetization, AI agents paying for API calls — anything that has an API can use x402.",
+  "how is this different from stripe": "Stripe requires a human to set up accounts, billing, and payment flows. x402 AgentPay works machine-to-machine — no human in the loop, no accounts to manage, atomic settlement, and it works for any API endpoint automatically.",
+  "default": "Great question! x402 AgentPay is the universal payment layer for machine commerce. You can register any endpoint at x402-agent-pay.com, read our docs, or visit AgentWorld at agentworld.me for the full agent economy experience. What would you like to know more about?"
+};
+
+function getAriaResponse(msg){
+  const lower = msg.toLowerCase();
+  for(const [k,v] of Object.entries(ARIA_KB)){
+    const keys = k.split(' ');
+    if(keys.every(w => lower.includes(w))) return v;
+  }
+  if(lower.includes('agentworld') || lower.includes('agent world')) return ARIA_KB['what is agentworld'];
+  if(lower.includes('escrow')) return ARIA_KB['how does escrow work'];
+  if(lower.includes('chain') || lower.includes('solana') || lower.includes('base') || lower.includes('polygon')) return ARIA_KB['what chains'];
+  if(lower.includes('register') || lower.includes('sign up') || lower.includes('get started')) return ARIA_KB['how do i register'];
+  if(lower.includes('price') || lower.includes('cost') || lower.includes('fee')) return ARIA_KB['pricing'];
+  if(lower.includes('patent')) return ARIA_KB['patent'];
+  if(lower.includes('stripe') || lower.includes('different') || lower.includes('vs')) return ARIA_KB['how is this different from stripe'];
+  if(lower.includes('a2a') || lower.includes('agent to agent') || lower.includes('messaging')) return ARIA_KB['what is a2a'];
+  if(lower.includes('use case') || lower.includes('example') || lower.includes('car') || lower.includes('ev')) return ARIA_KB['use cases'];
+  return ARIA_KB['default'];
+}
+
+function sendAria(){
+  const input = document.getElementById('aria-input');
+  const msgs = document.getElementById('aria-messages');
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  
+  // Add user message
+  const um = document.createElement('div');
+  um.className = 'aria-msg user';
+  um.textContent = text;
+  msgs.appendChild(um);
+  
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'aria-msg aria aria-typing';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  msgs.appendChild(typing);
+  msgs.scrollTop = msgs.scrollHeight;
+  
+  setTimeout(()=>{
+    msgs.removeChild(typing);
+    const am = document.createElement('div');
+    am.className = 'aria-msg aria';
+    const resp = getAriaResponse(text);
+    // Add AgentWorld link if relevant
+    let html = resp;
+    if(resp.includes('agentworld.me')) html = resp.replace('agentworld.me', '<a href="https://agentworld.me" target="_blank">agentworld.me</a>');
+    am.innerHTML = html;
+    msgs.appendChild(am);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 800 + Math.random()*600);
+}
+</script>
+
+
+<!-- Aria AI Assistant Widget -->
+<script src="/aria-widget.js"></script>
+</body>
+</html>
